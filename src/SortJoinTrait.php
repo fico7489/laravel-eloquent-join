@@ -41,15 +41,14 @@ trait SortJoinTrait
             $modelCurrent = $relatedModel;
         }
 
+        $builder->orderBy($tableCurrent . '.' . $sort, $sortBy);
+
         if($this->selected){
             return $builder;
         }else{
             $this->selected = true;
 
-            return $builder
-                ->select ($tableBase . '.*')
-                ->groupBy ($tableBase . '.id')
-                ->orderBy($tableCurrent . '.' . $sort, $sortBy);
+            return $builder->select ($tableBase . '.*')->groupBy ($tableBase . '.id');
         }
     }
 }
