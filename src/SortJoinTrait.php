@@ -26,7 +26,7 @@ trait SortJoinTrait
     public function scopeOrderByJoin(Builder $builder, $column, $sortBy = 'asc')
     {
         $column = $this->performJoin($builder, $column);
-        $builder->orderBy($column, $sortBy);
+        return $builder->orderBy($column, $sortBy);
     }
 
     private function performJoin($builder, $relations){
