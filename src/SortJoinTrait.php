@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 trait SortJoinTrait
 {
+    private $selected = false;
+
     public function scopeOrderByJoin(Builder $builder, $relations, $sortBy = 'asc')
     {
         $relations = explode('.', $relations);
@@ -39,9 +41,15 @@ trait SortJoinTrait
             $modelCurrent = $relatedModel;
         }
 
-        return $builder
-            ->select ($tableBase . '.*')
-            ->groupBy ($tableBase . '.id')
-            ->orderBy($tableCurrent . '.' . $sort, $sortBy);
+        if($this->selected){
+            return $builder;
+        }else{
+            $this->selected = true;
+
+            return $builder
+                ->select ($tableBase . '.*')
+                ->groupBy ($tableBase . '.id')
+                ->orderBy($tableCurrent . '.' . $sort, $sortBy);
+        }
     }
 }
