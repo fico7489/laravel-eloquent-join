@@ -11,10 +11,22 @@ trait SortJoinTrait
     private $selected = false;
     private $joinedTables = [];
 
-    public function scopeOrderByJoin(Builder $builder, $relations, $sortBy = 'asc')
+    public function scopeWhereJoin(Builder $builder, $column, $operator = null, $value = null, $boolean = 'and')
     {
-        list($table, $column) = $this->performJoin($builder, $relations);
-        $builder->orderBy($table . '.' . $column, $sortBy);
+        $column = $this->performJoin($builder, $column);
+        return $builder->where($column, $operator, $value, $boolean);
+    }
+
+    public function scopeOrWhereJoin(Builder $builder, $column, $operator = null, $value)
+    {
+        $column = $this->performJoin($builder, $column);
+        return $builder->orWhere($column, $operator, $value);
+    }
+
+    public function scopeOrderByJoin(Builder $builder, $column, $sortBy = 'asc')
+    {
+        $column = $this->performJoin($builder, $column);
+        $builder->orderBy($column, $sortBy);
     }
 
     private function performJoin($builder, $relations){
@@ -63,6 +75,6 @@ trait SortJoinTrait
             $builder->select ($baseTable . '.*')->groupBy ($baseTable . '.' . $baseModel->primaryKey);
         }
 
-        return [$currentTable, $column];
+        return $currentTable . '.' . $column;
     }
 }
