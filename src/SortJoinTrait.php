@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 trait SortJoinTrait
 {
     private $selected = false;
+    private $joinedTables = [];
 
     public function scopeOrderByJoin(Builder $builder, $relations, $sortBy = 'asc')
     {
@@ -21,24 +22,32 @@ trait SortJoinTrait
 
         foreach($relations as $relation){
             if($relation == $sort){
+                //last item in $relations argument is sort fiels
                 continue;
             }
 
             $relatedRelation = $modelCurrent->$relation();
             $relatedModel = $relatedRelation->getRelated();
             $tableRelated = $relatedModel->getTable();
-            $tableRelatedAlias = uniqid();
 
-            $keyRelated = $relatedRelation->getForeignKey();
-            if($relatedRelation instanceof BelongsTo){
-                $builder->leftJoin($tableRelated . ' as ' . $tableRelatedAlias, $tableRelatedAlias . '.id', '=', $tableCurrent . '.' . $keyRelated);
-            }elseif($relatedRelation instanceof HasOne){
-                $keyRelated = last(explode('.', $keyRelated));
-                $builder->leftJoin($tableRelated . ' as ' . $tableRelatedAlias, $tableRelatedAlias . '.' . $keyRelated, '=', $tableCurrent . '.id');
+            if(array_key_exists($relation, $this->joinedTables)){
+                $tableRelatedAlias = $this->joinedTables[$relation];
+            }else{
+                $tableRelatedAlias = uniqid();
+
+                $keyRelated = $relatedRelation->getForeignKey();
+                if($relatedRelation instanceof BelongsTo){
+                    $builder->leftJoin($tableRelated . ' as ' . $tableRelatedAlias, $tableRelatedAlias . '.id', '=', $tableCurrent . '.' . $keyRelated);
+                }elseif($relatedRelation instanceof HasOne){
+                    $keyRelated = last(explode('.', $keyRelated));
+                    $builder->leftJoin($tableRelated . ' as ' . $tableRelatedAlias, $tableRelatedAlias . '.' . $keyRelated, '=', $tableCurrent . '.id');
+                }
             }
 
             $tableCurrent = $tableRelatedAlias;
             $modelCurrent = $relatedModel;
+
+            $this->joinedTables[$relation] = $tableRelatedAlias;
         }
 
         $builder->orderBy($tableCurrent . '.' . $sort, $sortBy);
