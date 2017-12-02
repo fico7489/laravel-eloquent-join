@@ -62,6 +62,11 @@ trait SortJoinTrait
                     $keyRelated = last(explode('.', $keyRelated));
                     $builder->leftJoin($relatedTable . ' as ' . $relatedTableAlias, $relatedTableAlias . '.' . $keyRelated, '=', $currentTable . '.' . $relatedPrimaryKey);
                 }
+
+                //apply where deleted_at is null is model using soft deletes
+                if(method_exists($currentModel, 'getQualifiedDeletedAtColumn')){
+                    $builder->where([$currentTable . '.deleted_at' => null]);
+                }
             }
 
             $currentTable = $relatedTableAlias;
