@@ -59,6 +59,7 @@ class SortJoinTraitTest extends TestCase
         $this->assertEquals(1, $items->first()->id);
         $this->assertEquals(2, $items->last()->id);
 
+        //normal order
         Order::find(1)->update(['number' => 1]);
         Order::find(2)->update(['number' => 2]);
         Order::find(3)->update(['number' => 3]);
@@ -67,6 +68,7 @@ class SortJoinTraitTest extends TestCase
         $this->assertEquals(2, $items->get(1)->id);
         $this->assertEquals(3, $items->get(2)->id);
 
+        //reverse order
         Order::find(1)->update(['number' => 3]);
         Order::find(2)->update(['number' => 2]);
         Order::find(3)->update(['number' => 1]);
@@ -75,9 +77,31 @@ class SortJoinTraitTest extends TestCase
         $this->assertEquals(2, $items->get(1)->id);
         $this->assertEquals(3, $items->get(0)->id);
 
+        //reverse order, desc sort
         $items = OrderItem::orderByJoin('order.number', 'desc')->get();
         $this->assertEquals(3, $items->get(2)->id);
         $this->assertEquals(2, $items->get(1)->id);
         $this->assertEquals(1, $items->get(0)->id);
+        $this->assertEquals(3, $items->count());
+
+        //normal order, test left join
+        Order::find(1)->update(['number' => 1]);
+        Order::find(2)->update(['number' => 2]);
+        Order::find(3)->update(['number' => 3]);
+        OrderItem::create(['name' => '4', 'order_id' => null]);
+        $items = OrderItem::orderByJoin('order.number', 'asc')->get();
+        $this->assertEquals(4, $items->get(0)->id);
+        $this->assertEquals(1, $items->get(1)->id);
+        $this->assertEquals(2, $items->get(2)->id);
+        $this->assertEquals(3, $items->get(3)->id);
+        $this->assertEquals(4, $items->count());
+
+        //normal order, test left join, desc
+        $items = OrderItem::orderByJoin('order.number', 'desc')->get();
+        $this->assertEquals(3, $items->get(0)->id);
+        $this->assertEquals(2, $items->get(1)->id);
+        $this->assertEquals(1, $items->get(2)->id);
+        $this->assertEquals(4, $items->get(3)->id);
+        $this->assertEquals(4, $items->count());
     }
 }
