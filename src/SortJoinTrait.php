@@ -16,9 +16,11 @@ trait SortJoinTrait
         $relations = explode('.', $relations);
 
         $sort = end($relations);
-        $tableBase    = $this->getTable();
-        $tableCurrent = $this->getTable();
-        $modelCurrent = $this;
+        $baseTable = $this->getTable();
+        $baseModel = $this;
+
+        $currentTable = $this->getTable();
+        $currentModel = $this;
 
         foreach($relations as $relation){
             if($relation == $sort){
@@ -26,38 +28,39 @@ trait SortJoinTrait
                 continue;
             }
 
-            $relatedRelation = $modelCurrent->$relation();
+            $relatedRelation = $currentModel->$relation();
             $relatedModel = $relatedRelation->getRelated();
-            $tableRelated = $relatedModel->getTable();
+            $relatedPrimaryKey = $relatedModel->primaryKey;
+            $relatedTable = $relatedModel->getTable();
 
             if(array_key_exists($relation, $this->joinedTables)){
-                $tableRelatedAlias = $this->joinedTables[$relation];
+                $relatedTableAlias = $this->joinedTables[$relation];
             }else{
-                $tableRelatedAlias = uniqid();
+                $relatedTableAlias = uniqid();
 
                 $keyRelated = $relatedRelation->getForeignKey();
                 if($relatedRelation instanceof BelongsTo){
-                    $builder->leftJoin($tableRelated . ' as ' . $tableRelatedAlias, $tableRelatedAlias . '.id', '=', $tableCurrent . '.' . $keyRelated);
+                    $builder->leftJoin($relatedTable . ' as ' . $relatedTableAlias, $relatedTableAlias . '.' . $relatedPrimaryKey, '=', $currentTable . '.' . $keyRelated);
                 }elseif($relatedRelation instanceof HasOne){
                     $keyRelated = last(explode('.', $keyRelated));
-                    $builder->leftJoin($tableRelated . ' as ' . $tableRelatedAlias, $tableRelatedAlias . '.' . $keyRelated, '=', $tableCurrent . '.id');
+                    $builder->leftJoin($relatedTable . ' as ' . $relatedTableAlias, $relatedTableAlias . '.' . $keyRelated, '=', $currentTable . '.' . $relatedPrimaryKey);
                 }
             }
 
-            $tableCurrent = $tableRelatedAlias;
-            $modelCurrent = $relatedModel;
+            $currentTable = $relatedTableAlias;
+            $currentModel = $relatedModel;
 
-            $this->joinedTables[$relation] = $tableRelatedAlias;
+            $this->joinedTables[$relation] = $relatedTableAlias;
         }
 
-        $builder->orderBy($tableCurrent . '.' . $sort, $sortBy);
+        $builder->orderBy($currentTable . '.' . $sort, $sortBy);
 
         if($this->selected){
             return $builder;
         }else{
             $this->selected = true;
 
-            return $builder->select ($tableBase . '.*')->groupBy ($tableBase . '.id');
+            return $builder->select ($baseTable . '.*')->groupBy ($baseTable . '.' . $baseModel->primaryKey);
         }
     }
 }
