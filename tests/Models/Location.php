@@ -11,4 +11,9 @@ class Location extends BaseModel
     protected $table = 'locations';
 
     protected $fillable = ['address', 'seller_id'];
+
+    public function seller()
+    {
+        return $this->belongsTo(sSeller::class);
+    }
 }

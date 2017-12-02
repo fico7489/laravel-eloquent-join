@@ -27,10 +27,10 @@ class SortJoinTraitTest extends TestCase
         $order2 = Order::create(['number' => '2', 'seller_id' => $seller2->id]);
         $order3 = Order::create(['number' => '3', 'seller_id' => $seller3->id]);
 
-        $orderItem = OrderItem::create(['name' => '1', 'seller_id' => $seller->id]);
-        $orderItem2 = OrderItem::create(['name' => '2', 'seller_id' => $seller2->id]);
-        $orderItem3 = OrderItem::create(['name' => '3', 'seller_id' => $seller3->id]);
-        $orderItem4 = OrderItem::create(['name' => '4', 'seller_id' => $seller->id]);
+        $orderItem = OrderItem::create(['name' => '1', 'order_id' => $seller->id]);
+        $orderItem2 = OrderItem::create(['name' => '2', 'order_id' => $seller2->id]);
+        $orderItem3 = OrderItem::create(['name' => '3', 'order_id' => $seller3->id]);
+        $orderItem4 = OrderItem::create(['name' => '4', 'order_id' => $seller->id]);
     }
 
     public function test_OrderByJoin()

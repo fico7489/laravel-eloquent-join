@@ -10,6 +10,6 @@ class Order extends BaseModel
 	
 	public function seller()
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsTo(Seller::class);
     }
 }
