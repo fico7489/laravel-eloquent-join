@@ -13,9 +13,15 @@ trait SortJoinTrait
 
     public function scopeOrderByJoin(Builder $builder, $relations, $sortBy = 'asc')
     {
+        list($currentTable, $sort) = $this->performJoin($builder, $relations);
+
+        $builder->orderBy($currentTable . '.' . $sort, $sortBy);
+    }
+
+    private function performJoin($builder, $relations){
         $relations = explode('.', $relations);
 
-        $sort = end($relations);
+        $field = end($relations);
         $baseTable = $this->getTable();
         $baseModel = $this;
 
@@ -23,8 +29,8 @@ trait SortJoinTrait
         $currentModel = $this;
 
         foreach($relations as $relation){
-            if($relation == $sort){
-                //last item in $relations argument is sort fiels
+            if($relation == $field){
+                //last item in $relations argument is sort|where field
                 continue;
             }
 
@@ -53,14 +59,11 @@ trait SortJoinTrait
             $this->joinedTables[$relation] = $relatedTableAlias;
         }
 
-        $builder->orderBy($currentTable . '.' . $sort, $sortBy);
-
-        if($this->selected){
-            return $builder;
-        }else{
+        if( ! $this->selected){
             $this->selected = true;
-
-            return $builder->select ($baseTable . '.*')->groupBy ($baseTable . '.' . $baseModel->primaryKey);
+            $builder->select ($baseTable . '.*')->groupBy ($baseTable . '.' . $baseModel->primaryKey);
         }
+
+        return [$currentTable, $field];
     }
 }
