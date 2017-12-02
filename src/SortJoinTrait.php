@@ -41,6 +41,7 @@ trait SortJoinTrait
 
         return $builder
             ->select ($tableBase . '.*')
+            ->groupBy ($tableBase . '.id')
             ->orderBy($tableCurrent . '.' . $sort, $sortBy);
     }
 }

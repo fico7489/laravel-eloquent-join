@@ -13,15 +13,15 @@ class SortJoinTraitTest extends TestCase
     {
         parent::setUp();
 
-        $seller = Seller::create(['title' => 'title']);
-        $seller2 = Seller::create(['title' => 'title2']);
-        $seller3 = Seller::create(['title' => 'title3']);
-        $seller4 = Seller::create(['title' => 'title4']);
+        $seller = Seller::create(['title' => 1]);
+        $seller2 = Seller::create(['title' => 2]);
+        $seller3 = Seller::create(['title' => 3]);
+        $seller4 = Seller::create(['title' => 4]);
 
-        $location = Location::create(['address' => 'address', 'seller_id' => $seller->id]);
-        $location2 = Location::create(['address' => 'address2', 'seller_id' => $seller2->id]);
-        $location3 = Location::create(['address' => 'address3', 'seller_id' => $seller3->id]);
-        $location4 = Location::create(['address' => 'address4', 'seller_id' => $seller3->id]);
+        $location = Location::create(['address' => 1, 'seller_id' => $seller->id]);
+        $location2 = Location::create(['address' => 2, 'seller_id' => $seller2->id]);
+        $location3 = Location::create(['address' => 3, 'seller_id' => $seller3->id]);
+        $location4 = Location::create(['address' => 3, 'seller_id' => $seller3->id]);
 
         $order = Order::create(['number' => '1', 'seller_id' => $seller->id]);
         $order2 = Order::create(['number' => '2', 'seller_id' => $seller2->id]);
@@ -108,19 +108,18 @@ class SortJoinTraitTest extends TestCase
     public function test_OrderByJoin_twoJoin()
     {
         //normal order
-        Seller::find(1)->update(['title' => 1]);
-        Seller::find(2)->update(['title' => 2]);
-        Seller::find(3)->update(['title' => 3]);
         $items = OrderItem::orderByJoin('order.seller.title')->get();
         $this->assertEquals(1, $items->get(0)->id);
         $this->assertEquals(2, $items->get(1)->id);
         $this->assertEquals(3, $items->get(2)->id);
+        $this->assertEquals(3, $items->count());
 
         //desc
         $items = OrderItem::orderByJoin('order.seller.title', 'desc')->get();
         $this->assertEquals(3, $items->get(0)->id);
         $this->assertEquals(2, $items->get(1)->id);
         $this->assertEquals(1, $items->get(2)->id);
+        $this->assertEquals(3, $items->count());
 
         //change order
         Seller::find(2)->update(['title' => 9]);
@@ -128,5 +127,34 @@ class SortJoinTraitTest extends TestCase
         $this->assertEquals(2, $items->get(0)->id);
         $this->assertEquals(3, $items->get(1)->id);
         $this->assertEquals(1, $items->get(2)->id);
+        $this->assertEquals(3, $items->count());
+    }
+
+    public function test_OrderByJoin_threeJoinHasOne()
+    {
+        //normal order
+        Location::find(1)->update(['address' => 1]);
+        Location::find(2)->update(['address' => 2]);
+        Location::find(3)->update(['address' => 3]);
+        $items = OrderItem::orderByJoin('order.seller.location.address')->get();
+        $this->assertEquals(1, $items->get(0)->id);
+        $this->assertEquals(2, $items->get(1)->id);
+        $this->assertEquals(3, $items->get(2)->id);
+        $this->assertEquals(3, $items->count());
+
+        //desc
+        $items = OrderItem::orderByJoin('order.seller.location.address', 'desc')->get();
+        $this->assertEquals(3, $items->get(0)->id);
+        $this->assertEquals(2, $items->get(1)->id);
+        $this->assertEquals(1, $items->get(2)->id);
+        $this->assertEquals(3, $items->count());
+
+        //change order
+        Location::find(2)->update(['address' => 9]);
+        $items = OrderItem::orderByJoin('order.seller.location.address', 'desc')->get();
+        $this->assertEquals(2, $items->get(0)->id);
+        $this->assertEquals(3, $items->get(1)->id);
+        $this->assertEquals(1, $items->get(2)->id);
+        $this->assertEquals(3, $items->count());
     }
 }
