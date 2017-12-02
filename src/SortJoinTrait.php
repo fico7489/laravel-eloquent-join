@@ -29,10 +29,10 @@ trait SortJoinTrait
 
             $keyRelated = $relatedRelation->getForeignKey();
             if($relatedRelation instanceof BelongsTo){
-                $builder->join($tableRelated . ' as ' . $tableRelatedAlias, $tableRelatedAlias . '.id', '=', $tableCurrent . '.' . $keyRelated);
+                $builder->leftJoin($tableRelated . ' as ' . $tableRelatedAlias, $tableRelatedAlias . '.id', '=', $tableCurrent . '.' . $keyRelated);
             }elseif($relatedRelation instanceof HasOne){
                 $keyRelated = last(explode('.', $keyRelated));
-                $builder->join($tableRelated . ' as ' . $tableRelatedAlias, $tableRelatedAlias . '.' . $keyRelated, '=', $tableCurrent . '.id');
+                $builder->leftJoin($tableRelated . ' as ' . $tableRelatedAlias, $tableRelatedAlias . '.' . $keyRelated, '=', $tableCurrent . '.id');
             }
 
             $tableCurrent = $tableRelatedAlias;

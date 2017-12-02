@@ -30,12 +30,54 @@ class SortJoinTraitTest extends TestCase
         $orderItem = OrderItem::create(['name' => '1', 'order_id' => $seller->id]);
         $orderItem2 = OrderItem::create(['name' => '2', 'order_id' => $seller2->id]);
         $orderItem3 = OrderItem::create(['name' => '3', 'order_id' => $seller3->id]);
-        $orderItem4 = OrderItem::create(['name' => '4', 'order_id' => $seller->id]);
+        //$orderItem4 = OrderItem::create(['name' => '4', 'order_id' => $seller->id]);
     }
 
-    public function test_OrderByJoin()
+    public function test_OrderByJoin_noJoin()
     {
-        $items = OrderItem::where(['order_items.id' => 1])->orderByJoin('order.id')->get();
-        $this->assertTrue(true);
+        $items = OrderItem::orderByJoin('name')->get();
+        $this->assertEquals(1, $items->first()->id);
+        $this->assertEquals(3, $items->last()->id);
+        $this->assertEquals(3, $items->count());
+
+        OrderItem::find(2)->update(['name' => 9]);
+        $items = OrderItem::orderByJoin('name')->get();
+        $this->assertEquals(1, $items->first()->id);
+        $this->assertEquals(2, $items->last()->id);
+        $this->assertEquals(3, $items->count());
+    }
+
+    public function test_OrderByJoin_oneJoin()
+    {
+        $items = OrderItem::orderByJoin('order.number')->get();
+        $this->assertEquals(1, $items->first()->id);
+        $this->assertEquals(3, $items->last()->id);
+        $this->assertEquals(3, $items->count());
+
+        Order::find(2)->update(['number' => 9]);
+        $items = OrderItem::orderByJoin('order.number')->get();
+        $this->assertEquals(1, $items->first()->id);
+        $this->assertEquals(2, $items->last()->id);
+
+        Order::find(1)->update(['number' => 1]);
+        Order::find(2)->update(['number' => 2]);
+        Order::find(3)->update(['number' => 3]);
+        $items = OrderItem::orderByJoin('order.number')->get();
+        $this->assertEquals(1, $items->get(0)->id);
+        $this->assertEquals(2, $items->get(1)->id);
+        $this->assertEquals(3, $items->get(2)->id);
+
+        Order::find(1)->update(['number' => 3]);
+        Order::find(2)->update(['number' => 2]);
+        Order::find(3)->update(['number' => 1]);
+        $items = OrderItem::orderByJoin('order.number')->get();
+        $this->assertEquals(1, $items->get(2)->id);
+        $this->assertEquals(2, $items->get(1)->id);
+        $this->assertEquals(3, $items->get(0)->id);
+
+        $items = OrderItem::orderByJoin('order.number', 'desc')->get();
+        $this->assertEquals(3, $items->get(2)->id);
+        $this->assertEquals(2, $items->get(1)->id);
+        $this->assertEquals(1, $items->get(0)->id);
     }
 }
