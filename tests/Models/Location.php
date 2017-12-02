@@ -6,9 +6,9 @@ use Illuminate\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class User extends BaseModel implements AuthenticatableContract
+class Location extends BaseModel
 {
     protected $table = 'locations';
 
-    protected $fillable = ['address'];
+    protected $fillable = ['address', 'seller_id'];
 }

@@ -16,10 +16,10 @@ class CreateDatabase extends Migration
      */
     public function up()
     {
-        Schema::create('order_item', function (Blueprint $table) {
+        Schema::create('order_items', function (Blueprint $table) {
 			$table->increments('id');
 			$table->string('name');
-			$table->integer('order_id')->unsigned()->index();
+			$table->integer('order_id')->unsigned()->index()->nullable();
 
 			$table->foreign('order_id')->references('id')->on('orders')
 				->onUpdate('cascade')->onDelete('cascade');
@@ -31,7 +31,7 @@ class CreateDatabase extends Migration
         Schema::create('orders', function (Blueprint $table) {
 			$table->increments('id');
 			$table->string('number')->nullable();
-			$table->integer('seller_id')->unsigned()->index();
+			$table->integer('seller_id')->unsigned()->index()->nullable();
 
 			$table->foreign('seller_id')->references('id')->on('sellers')
 				->onUpdate('cascade')->onDelete('cascade');
@@ -51,7 +51,7 @@ class CreateDatabase extends Migration
 		Schema::create('locations', function (Blueprint $table) {
 			$table->increments('id');
 			$table->string('address')->nullable();
-			$table->integer('seller_id')->unsigned()->index();
+			$table->integer('seller_id')->unsigned()->index()->nullable();
 
 			$table->foreign('seller_id')->references('id')->on('sellers')
 				->onUpdate('cascade')->onDelete('cascade');

@@ -2,11 +2,11 @@
 
 namespace Fico7489\Laravel\SortJoin\Tests\Models;
 
-class Role extends BaseModel
+class Order extends BaseModel
 {
     protected $table = 'orders';
 
-    protected $fillable = ['number'];
+    protected $fillable = ['number', 'seller_id'];
 	
 	public function seller()
     {

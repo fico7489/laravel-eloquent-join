@@ -6,7 +6,7 @@ class OrderItem extends BaseModel
 {
     protected $table = 'order_items';
 
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'order_id'];
 	
 	public function order()
     {

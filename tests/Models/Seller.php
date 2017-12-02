@@ -2,7 +2,7 @@
 
 namespace Fico7489\Laravel\SortJoin\Tests\Models;
 
-class User extends BaseModel
+class Seller extends BaseModel
 {
     protected $table = 'sellers';
 

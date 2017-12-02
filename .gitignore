@@ -1,2 +1,6 @@
 /vendor
 composer.lock
+/.idea
+/.php_cs.cache
+/.phpstorm.meta.php
+_ide_helper_models.php
