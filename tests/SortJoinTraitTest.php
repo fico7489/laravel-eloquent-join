@@ -168,4 +168,32 @@ class SortJoinTraitTest extends TestCase
         $query = \DB::getQueryLog()[0]['query'];
         $this->assertEquals(2, substr_count($query, 'left join'));
     }
+
+    public function test_WhereJoin()
+    {
+        Order::find(1)->update(['number' => 'aaaa']);
+        Order::find(2)->update(['number' => 'bbbb']);
+        Order::find(3)->update(['number' => 'cccc']);
+        $items = OrderItem::orderByJoin('order.number')
+            ->whereJoin('order.number', '=', 'dddd')
+            ->get();
+        $this->assertEquals(0, $items->count());
+
+        $items = OrderItem::orderByJoin('order.number')
+            ->whereJoin('order.number', '=', 'cccc')
+            ->get();
+        $this->assertEquals(1, $items->count());
+
+        $items = OrderItem::orderByJoin('order.number')
+            ->whereJoin('order.number', '=', 'bbbb')
+            ->whereJoin('order.number', '=', 'cccc')
+            ->get();
+        $this->assertEquals(0, $items->count());
+
+        $items = OrderItem::orderByJoin('order.number')
+            ->whereJoin('order.number', '=', 'bbbb')
+            ->orWhereJoin('order.number', '=', 'cccc')
+            ->get();
+        $this->assertEquals(2, $items->count());
+    }
 }
