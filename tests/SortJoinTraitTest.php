@@ -35,6 +35,7 @@ class SortJoinTraitTest extends TestCase
 
     public function test_OrderByJoin()
     {
+        $items = OrderItem::where(['order_items.id' => 1])->orderByJoin('order.id')->get();
         $this->assertTrue(true);
     }
 }
