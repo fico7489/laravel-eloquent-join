@@ -196,4 +196,33 @@ class SortJoinTraitTest extends TestCase
             ->get();
         $this->assertEquals(2, $items->count());
     }
+
+    public function test_SoftDeleteHas()
+    {
+        $items = OrderItem::orderByJoin('order.number')
+            ->whereJoin('order.number', '=', '1')
+            ->get();
+        $this->assertEquals(1, $items->count());
+
+        Order::find(1)->delete();
+        $items = OrderItem::orderByJoin('order.number')
+            ->whereJoin('order.number', '=', '1')
+            ->get();
+        $this->assertEquals(0, $items->count());
+    }
+
+    public function test_SoftDeleteNotHas()
+    {
+        $items = OrderItem::orderByJoin('order.seller.title')
+            ->whereJoin('order.seller.title', '=', '1')
+            ->get();
+        $this->assertEquals(1, $items->count());
+
+        Seller::find(1)->update(['deleted_at' => '2017-01-02']);
+        $items = OrderItem::orderByJoin('order.seller.title')
+            ->whereJoin('order.seller.title', '=', '1')
+            ->get();
+        $this->assertEquals(1, $items->count());
+        $this->assertTrue(Seller::find(1)->deleted_at != null);
+    }
 }

@@ -64,8 +64,8 @@ trait SortJoinTrait
                 }
 
                 //apply where deleted_at is null is model using soft deletes
-                if(method_exists($currentModel, 'getQualifiedDeletedAtColumn')){
-                    $builder->where([$currentTable . '.deleted_at' => null]);
+                if(method_exists($relatedModel, 'getQualifiedDeletedAtColumn')){
+                    $builder->where([$relatedTableAlias . '.deleted_at' => null]);
                 }
             }
 

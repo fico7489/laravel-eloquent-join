@@ -6,7 +6,7 @@ class Seller extends BaseModel
 {
     protected $table = 'sellers';
 
-    protected $fillable = ['title'];
+    protected $fillable = ['title', 'deleted_at'];
 
 	public function location()
     {
