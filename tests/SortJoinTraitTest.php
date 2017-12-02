@@ -156,4 +156,16 @@ class SortJoinTraitTest extends TestCase
         $this->assertEquals(1, $items->get(2)->id);
         $this->assertEquals(3, $items->count());
     }
+
+    public function test_OrderByJoin_joinOnlyOnce()
+    {
+        \DB::enableQueryLog();
+        $items = OrderItem::orderByJoin('order.id')
+            ->orderByJoin('order.seller.title')
+            ->orderByJoin('order.number')
+            ->groupBy('order_items.id')->get();
+
+        $query = \DB::getQueryLog()[0]['query'];
+        $this->assertEquals(2, substr_count($query, 'left join'));
+    }
 }
