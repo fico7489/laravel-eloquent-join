@@ -104,4 +104,29 @@ class SortJoinTraitTest extends TestCase
         $this->assertEquals(4, $items->get(3)->id);
         $this->assertEquals(4, $items->count());
     }
+
+    public function test_OrderByJoin_twoJoin()
+    {
+        //normal order
+        Seller::find(1)->update(['title' => 1]);
+        Seller::find(2)->update(['title' => 2]);
+        Seller::find(3)->update(['title' => 3]);
+        $items = OrderItem::orderByJoin('order.seller.title')->get();
+        $this->assertEquals(1, $items->get(0)->id);
+        $this->assertEquals(2, $items->get(1)->id);
+        $this->assertEquals(3, $items->get(2)->id);
+
+        //desc
+        $items = OrderItem::orderByJoin('order.seller.title', 'desc')->get();
+        $this->assertEquals(3, $items->get(0)->id);
+        $this->assertEquals(2, $items->get(1)->id);
+        $this->assertEquals(1, $items->get(2)->id);
+
+        //change order
+        Seller::find(2)->update(['title' => 9]);
+        $items = OrderItem::orderByJoin('order.seller.title', 'desc')->get();
+        $this->assertEquals(2, $items->get(0)->id);
+        $this->assertEquals(3, $items->get(1)->id);
+        $this->assertEquals(1, $items->get(2)->id);
+    }
 }
