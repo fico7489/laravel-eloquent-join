@@ -22,7 +22,7 @@ trait SortJoinTrait
 
     public function scopeOrWhereJoin(Builder $builder, $column, $operator = null, $value)
     {
-        $this->relationClauses[] = ['column' => $column, 'operator' => $operator, 'value' => $value, 'boolean' => 'and'];
+        $this->relationClauses[] = ['column' => $column, 'operator' => $operator, 'value' => $value, 'boolean' => 'or'];
         $column = $this->performJoin($builder, $column);
 
         return $builder->orWhere($column, $operator, $value);
