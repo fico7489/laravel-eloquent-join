@@ -32,13 +32,15 @@ class SortJoinTraitTest extends TestCase
         $orderItem3 = OrderItem::create(['name' => '3', 'order_id' => $seller3->id]);
     }
 
-    public function test_OrderByJoin_noJoin()
+    public function testOrderByJoinWithoutJoining()
     {
+        //first item is id = 1, last id = 3, count 3
         $items = OrderItem::orderByJoin('name')->get();
         $this->assertEquals(1, $items->first()->id);
         $this->assertEquals(3, $items->last()->id);
         $this->assertEquals(3, $items->count());
 
+        //first item is id = 1, last id = 2, count 3
         OrderItem::find(2)->update(['name' => 9]);
         $items = OrderItem::orderByJoin('name')->get();
         $this->assertEquals(1, $items->first()->id);
@@ -46,19 +48,23 @@ class SortJoinTraitTest extends TestCase
         $this->assertEquals(3, $items->count());
     }
 
-    public function test_OrderByJoin_oneJoin()
+    public function testOrderByJoinJoinFirstRelation()
     {
+        //first item is id = 1, last id = 3, count 3
         $items = OrderItem::orderByJoin('order.number')->get();
         $this->assertEquals(1, $items->first()->id);
         $this->assertEquals(3, $items->last()->id);
         $this->assertEquals(3, $items->count());
 
+        //first item is id = 1, last id = 3, count 3
         Order::find(2)->update(['number' => 9]);
         $items = OrderItem::orderByJoin('order.number')->get();
         $this->assertEquals(1, $items->first()->id);
         $this->assertEquals(2, $items->last()->id);
+        $this->assertEquals(3, $items->count());
+        $this->assertEquals(3, $items->count());
 
-        //normal order
+        //normal(default) order (id = 1, 2, 3)
         Order::find(1)->update(['number' => 1]);
         Order::find(2)->update(['number' => 2]);
         Order::find(3)->update(['number' => 3]);
@@ -66,24 +72,26 @@ class SortJoinTraitTest extends TestCase
         $this->assertEquals(1, $items->get(0)->id);
         $this->assertEquals(2, $items->get(1)->id);
         $this->assertEquals(3, $items->get(2)->id);
+        $this->assertEquals(3, $items->count());
 
-        //reverse order
+        //reverse order (id = 3, 2, 1)
         Order::find(1)->update(['number' => 3]);
         Order::find(2)->update(['number' => 2]);
         Order::find(3)->update(['number' => 1]);
         $items = OrderItem::orderByJoin('order.number')->get();
-        $this->assertEquals(1, $items->get(2)->id);
-        $this->assertEquals(2, $items->get(1)->id);
         $this->assertEquals(3, $items->get(0)->id);
-
-        //reverse order, desc sort
-        $items = OrderItem::orderByJoin('order.number', 'desc')->get();
-        $this->assertEquals(3, $items->get(2)->id);
         $this->assertEquals(2, $items->get(1)->id);
-        $this->assertEquals(1, $items->get(0)->id);
+        $this->assertEquals(1, $items->get(2)->id);
         $this->assertEquals(3, $items->count());
 
-        //normal order, test left join
+        //reverse order, desc sort (id = 1, 2, 3)
+        $items = OrderItem::orderByJoin('order.number', 'desc')->get();
+        $this->assertEquals(1, $items->get(0)->id);
+        $this->assertEquals(2, $items->get(1)->id);
+        $this->assertEquals(3, $items->get(2)->id);
+        $this->assertEquals(3, $items->count());
+
+        //normal(default) order (id = 4, 1, 2, 3), test left join (one item does not have order)
         Order::find(1)->update(['number' => 1]);
         Order::find(2)->update(['number' => 2]);
         Order::find(3)->update(['number' => 3]);
@@ -95,7 +103,7 @@ class SortJoinTraitTest extends TestCase
         $this->assertEquals(3, $items->get(3)->id);
         $this->assertEquals(4, $items->count());
 
-        //normal order, test left join, desc
+        //reverse order (id = 1, 2, 3, 4), test left join (one item does not have order)
         $items = OrderItem::orderByJoin('order.number', 'desc')->get();
         $this->assertEquals(3, $items->get(0)->id);
         $this->assertEquals(2, $items->get(1)->id);
