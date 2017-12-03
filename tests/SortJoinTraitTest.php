@@ -112,23 +112,23 @@ class SortJoinTraitTest extends TestCase
         $this->assertEquals(4, $items->count());
     }
 
-    public function test_OrderByJoin_twoJoin()
+    public function testOrderByJoinJoinSecondRelation()
     {
-        //normal order
+        //normal order (id = 1, 2, 3)
         $items = OrderItem::orderByJoin('order.seller.title')->get();
         $this->assertEquals(1, $items->get(0)->id);
         $this->assertEquals(2, $items->get(1)->id);
         $this->assertEquals(3, $items->get(2)->id);
         $this->assertEquals(3, $items->count());
 
-        //desc
+        //reverse order (id = 3, 2, 1)
         $items = OrderItem::orderByJoin('order.seller.title', 'desc')->get();
         $this->assertEquals(3, $items->get(0)->id);
         $this->assertEquals(2, $items->get(1)->id);
         $this->assertEquals(1, $items->get(2)->id);
         $this->assertEquals(3, $items->count());
 
-        //change order
+        //change order (id = 2, 3, 1)
         Seller::find(2)->update(['title' => 9]);
         $items = OrderItem::orderByJoin('order.seller.title', 'desc')->get();
         $this->assertEquals(2, $items->get(0)->id);
@@ -137,9 +137,9 @@ class SortJoinTraitTest extends TestCase
         $this->assertEquals(3, $items->count());
     }
 
-    public function test_OrderByJoin_threeJoinHasOne()
+    public function testOrderByJoinJoinThirdRelationHasOne()
     {
-        //normal order
+        //normal order (id = 1, 2, 3)
         Location::find(1)->update(['address' => 1]);
         Location::find(2)->update(['address' => 2]);
         Location::find(3)->update(['address' => 3]);
@@ -149,14 +149,14 @@ class SortJoinTraitTest extends TestCase
         $this->assertEquals(3, $items->get(2)->id);
         $this->assertEquals(3, $items->count());
 
-        //desc
+        //desc order (id = 3, 2, 1)
         $items = OrderItem::orderByJoin('order.seller.location.address', 'desc')->get();
         $this->assertEquals(3, $items->get(0)->id);
         $this->assertEquals(2, $items->get(1)->id);
         $this->assertEquals(1, $items->get(2)->id);
         $this->assertEquals(3, $items->count());
 
-        //change order
+        //change order (id = 2, 3 1)
         Location::find(2)->update(['address' => 9]);
         $items = OrderItem::orderByJoin('order.seller.location.address', 'desc')->get();
         $this->assertEquals(2, $items->get(0)->id);
@@ -165,7 +165,7 @@ class SortJoinTraitTest extends TestCase
         $this->assertEquals(3, $items->count());
     }
 
-    public function test_OrderByJoin_joinOnlyOnce()
+    public function testOrderByJoinJoinOnlyOnce()
     {
         \DB::enableQueryLog();
         $items = OrderItem::orderByJoin('order.id')
@@ -177,32 +177,44 @@ class SortJoinTraitTest extends TestCase
         $this->assertEquals(2, substr_count($query, 'left join'));
     }
 
-    public function test_WhereJoin()
+    public function testWhereJoin()
     {
         Order::find(1)->update(['number' => 'aaaa']);
         Order::find(2)->update(['number' => 'bbbb']);
         Order::find(3)->update(['number' => 'cccc']);
+
+        //test where does not exists
         $items = OrderItem::orderByJoin('order.number')
             ->whereJoin('order.number', '=', 'dddd')
             ->get();
         $this->assertEquals(0, $items->count());
 
+        //test where does exists
         $items = OrderItem::orderByJoin('order.number')
             ->whereJoin('order.number', '=', 'cccc')
             ->get();
         $this->assertEquals(1, $items->count());
 
+        //test more where does not exists
         $items = OrderItem::orderByJoin('order.number')
             ->whereJoin('order.number', '=', 'bbbb')
             ->whereJoin('order.number', '=', 'cccc')
             ->get();
         $this->assertEquals(0, $items->count());
 
+        //test more where with orWhere exists
         $items = OrderItem::orderByJoin('order.number')
             ->whereJoin('order.number', '=', 'bbbb')
             ->orWhereJoin('order.number', '=', 'cccc')
             ->get();
         $this->assertEquals(2, $items->count());
+
+        //test more where with orWhere does not exists
+        $items = OrderItem::orderByJoin('order.number')
+            ->whereJoin('order.number', '=', 'dddd')
+            ->orWhereJoin('order.number', '=', 'eeee')
+            ->get();
+        $this->assertEquals(0, $items->count());
     }
 
     public function test_SoftDeleteHas()
