@@ -217,7 +217,7 @@ class SortJoinTraitTest extends TestCase
         $this->assertEquals(0, $items->count());
     }
 
-    public function test_SoftDeleteHas()
+    public function testSoftDeleteHas()
     {
         $items = OrderItem::orderByJoin('order.number')
             ->whereJoin('order.number', '=', '1')
@@ -231,7 +231,7 @@ class SortJoinTraitTest extends TestCase
         $this->assertEquals(0, $items->count());
     }
 
-    public function test_SoftDeleteNotHas()
+    public function testSoftDeleteNotHas()
     {
         $items = OrderItem::orderByJoin('order.seller.title')
             ->whereJoin('order.seller.title', '=', '1')
