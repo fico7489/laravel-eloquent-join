@@ -69,11 +69,14 @@ trait SortJoinTrait
                     $builder->leftJoin($relatedTable . ' as ' . $relatedTableAlias, $relatedTableAlias . '.' . $keyRelated, '=', $currentTable . '.' . $relatedPrimaryKey);
                 }
 
-                $columnsWhere = collect($relatedModel->relationClauses)->pluck('column')->toArray();
-
                 //by default apply where deleted_at is null if model is using soft deletes, if any where clause have deleted_at columnn do not apply
+                $columnsWhere = collect($relatedModel->relationClauses)->pluck('column')->toArray();
                 if(method_exists($relatedModel, 'getQualifiedDeletedAtColumn') &&  ! in_array('deleted_at', $columnsWhere)){
                     $builder->where([$relatedTableAlias . '.deleted_at' => null]);
+                }
+
+                foreach($relatedModel->relationClauses as $relationClause){
+                    $builder->where($relationClause['column'], $relationClause['operator'], $relationClause['value'], $relationClause['boolean']);
                 }
             }
 
