@@ -12,4 +12,16 @@ class Seller extends BaseModel
     {
         return $this->hasOne(Location::class);
     }
+
+    public function locationPrimary()
+    {
+        return $this->hasOne(Location::class)
+            ->whereJoin('is_primary', '=', 1);
+    }
+
+    public function locationSecondary()
+    {
+        return $this->hasOne(Location::class)
+            ->whereJoin('is_secondary', '=', 1);
+    }
 }

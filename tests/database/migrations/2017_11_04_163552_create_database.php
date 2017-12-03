@@ -48,13 +48,15 @@ class CreateDatabase extends Migration
             $table->softDeletes();
         });
 		
-		Schema::create('locations', function (Blueprint $table) {
-			$table->increments('id');
-			$table->string('address')->nullable();
-			$table->integer('seller_id')->unsigned()->index()->nullable();
+        Schema::create('locations', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('address')->nullable();
+            $table->boolean('is_primary')->default(0);
+            $table->boolean('is_secondary')->default(0);
+            $table->integer('seller_id')->unsigned()->index()->nullable();
 
-			$table->foreign('seller_id')->references('id')->on('sellers')
-				->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('seller_id')->references('id')->on('sellers')
+                ->onUpdate('cascade')->onDelete('cascade');
 
             $table->timestamps();
             $table->softDeletes();

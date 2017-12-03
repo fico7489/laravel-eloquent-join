@@ -10,10 +10,10 @@ class Location extends BaseModel
 
     protected $table = 'locations';
 
-    protected $fillable = ['address', 'seller_id'];
+    protected $fillable = ['address', 'seller_id', 'is_primary', 'is_secondary'];
 
     public function seller()
     {
-        return $this->belongsTo(sSeller::class);
+        return $this->belongsTo(Seller::class);
     }
 }

@@ -14,16 +14,16 @@ trait SortJoinTrait
 
     public function scopeWhereJoin(Builder $builder, $column, $operator = null, $value = null, $boolean = 'and')
     {
-        $column = $this->performJoin($builder, $column);
         $this->relationClauses[] = ['column' => $column, 'operator' => $operator, 'value' => $value, 'boolean' => $boolean];
+        $column = $this->performJoin($builder, $column);
 
         return $builder->where($column, $operator, $value, $boolean);
     }
 
     public function scopeOrWhereJoin(Builder $builder, $column, $operator = null, $value)
     {
-        $column = $this->performJoin($builder, $column);
         $this->relationClauses[] = ['column' => $column, 'operator' => $operator, 'value' => $value, 'boolean' => 'and'];
+        $column = $this->performJoin($builder, $column);
 
         return $builder->orWhere($column, $operator, $value);
     }
@@ -69,8 +69,10 @@ trait SortJoinTrait
                     $builder->leftJoin($relatedTable . ' as ' . $relatedTableAlias, $relatedTableAlias . '.' . $keyRelated, '=', $currentTable . '.' . $relatedPrimaryKey);
                 }
 
-                //apply where deleted_at is null is model using soft deletes
-                if(method_exists($relatedModel, 'getQualifiedDeletedAtColumn')){
+                $columnsWhere = collect($relatedModel->relationClauses)->pluck('column')->toArray();
+
+                //by default apply where deleted_at is null if model is using soft deletes, if any where clause have deleted_at columnn do not apply
+                if(method_exists($relatedModel, 'getQualifiedDeletedAtColumn') &&  ! in_array('deleted_at', $columnsWhere)){
                     $builder->where([$relatedTableAlias . '.deleted_at' => null]);
                 }
             }
