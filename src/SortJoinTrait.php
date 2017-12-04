@@ -7,6 +7,7 @@ use Fico7489\Laravel\SortJoin\Relations\HasOneJoin;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Str;
 
 trait SortJoinTrait
 {

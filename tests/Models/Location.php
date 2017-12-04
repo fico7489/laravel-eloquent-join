@@ -14,6 +14,6 @@ class Location extends BaseModel
 
     public function seller()
     {
-        return $this->belongsTo(Seller::class);
+        return $this->belongsToJoin(Seller::class);
     }
 }
