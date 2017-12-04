@@ -55,7 +55,6 @@ trait SortJoinTrait
 
             $relatedRelation = $currentModel->$relation();
             $relatedModel = $relatedRelation->getRelated();
-            //print_r($relatedModel->relationClauses);
             $relatedPrimaryKey = $relatedModel->primaryKey;
             $relatedTable = $relatedModel->getTable();
 
