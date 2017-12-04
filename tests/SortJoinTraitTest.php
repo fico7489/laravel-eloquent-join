@@ -198,6 +198,10 @@ class SortJoinTraitTest extends TestCase
             ->get();
         $this->assertEquals(1, $items->count());
 
+        //test where does exists, without orderByJoin
+        $items = OrderItem::whereJoin('order.number', '=', 'cccc')->get();
+        $this->assertEquals(1, $items->count());
+
         //test more where does not exists
         $items = OrderItem::orderByJoin('order.number')
             ->whereJoin('order.number', '=', 'bbbb')
