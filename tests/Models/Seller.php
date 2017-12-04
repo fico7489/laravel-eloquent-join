@@ -10,7 +10,9 @@ class Seller extends BaseModel
 
 	public function location()
     {
-        return $this->hasOne(Location::class)->where(['is_primary' => 0, 'is_secondary' => 0]);
+        return $this->hasOneJoin(Location::class)
+            ->whereJoin('is_primary', '=', 0)
+            ->whereJoin('is_secondary', '=', 0);
     }
 
     public function locations()
@@ -20,19 +22,19 @@ class Seller extends BaseModel
 
     public function locationPrimary()
     {
-        return $this->hasOne(Location::class)
+        return $this->hasOneJoin(Location::class)
             ->whereJoin('is_primary', '=', 1);
     }
 
     public function locationSecondary()
     {
-        return $this->hasOne(Location::class)
+        return $this->hasOneJoin(Location::class)
             ->whereJoin('is_secondary', '=', 1);
     }
 
     public function locationPrimaryOrSecondary()
     {
-        return $this->hasOne(Location::class)
+        return $this->hasOneJoin(Location::class)
             ->whereJoin('is_primary', '=', 1)
             ->orWhereJoin('is_secondary', '=', 1);
     }

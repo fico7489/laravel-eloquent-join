@@ -254,7 +254,7 @@ class SortJoinTraitTest extends TestCase
         $items = Seller::orderByJoin('location.id', 'desc')->get();
         $log = \DB::getQueryLog();
         $query = end($log)['query'];
-        $queryTest = '/select "sellers".* from "sellers" left join "locations" as "(.*)" on "(.*)"."seller_id" = "sellers"."id" where \("(.*)"."deleted_at" is null\) group by "sellers"."id" order by "(.*)"."id" desc/';
+        $queryTest = '/select "sellers".* from "sellers" left join "locations" as "(.*)" on "(.*)"."seller_id" = "sellers"."id" where \("(.*)"."deleted_at" is null\) and "is_primary" = \? and "is_secondary" = \? group by "sellers"."id" order by "(.*)"."id" desc/';
         $this->assertRegExp($queryTest, $query);
 
         \DB::enableQueryLog();
