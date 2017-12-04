@@ -1,6 +1,6 @@
 <?php
 
-namespace Fico7489\Laravel\SortJoin;
+namespace Fico7489\Laravel\SortJoin\Traits;
 
 use Fico7489\Laravel\SortJoin\Relations\BelongsToJoin;
 use Fico7489\Laravel\SortJoin\Relations\HasOneJoin;
