@@ -15,19 +15,26 @@ trait SortJoinTrait
     private $joinedTables = [];
     private $relationClauses = [];
 
-    public function scopeWhereJoin(Builder $builder, $column, $operator = null, $value = null, $boolean = 'and')
+    public function scopeWhereJoinRelation(Builder $builder, $column, $operator = null, $value = null, $boolean = 'and')
     {
         $this->relationClauses[] = ['column' => $column, 'operator' => $operator, 'value' => $value, 'boolean' => $boolean];
-        $column = $this->performJoin($builder, $column);
+    }
 
+    public function scopeOrWhereJoinRelation(Builder $builder, $column, $operator = null, $value)
+    {
+        $this->relationClauses[] = ['column' => $column, 'operator' => $operator, 'value' => $value, 'boolean' => 'or'];
+    }
+
+
+    public function scopeWhereJoin(Builder $builder, $column, $operator = null, $value = null, $boolean = 'and')
+    {
+        $column = $this->performJoin($builder, $column);
         return $builder->where($column, $operator, $value, $boolean);
     }
 
     public function scopeOrWhereJoin(Builder $builder, $column, $operator = null, $value)
     {
-        $this->relationClauses[] = ['column' => $column, 'operator' => $operator, 'value' => $value, 'boolean' => 'or'];
         $column = $this->performJoin($builder, $column);
-
         return $builder->orWhere($column, $operator, $value);
     }
 
@@ -36,6 +43,7 @@ trait SortJoinTrait
         $column = $this->performJoin($builder, $column);
         return $builder->orderBy($column, $sortBy);
     }
+
 
     private function performJoin($builder, $relations)
     {

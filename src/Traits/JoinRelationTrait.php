@@ -13,10 +13,10 @@ trait JoinRelationTrait
      */
     public function __call($method, $parameters)
     {
-        $method = $method == 'where' ? 'whereJoin' : $method;
-        $method = $method == 'orWhere' ? 'orWhereJoin' : $method;
+        $method = $method == 'where' ? 'whereJoinRelation' : $method;
+        $method = $method == 'orWhere' ? 'orWhereJoinRelation' : $method;
 
-        if (! in_array($method, ['whereJoin', 'orWhereJoin'])) {
+        if (! in_array($method, ['whereJoinRelation', 'orWhereJoinRelation'])) {
             throw new \Exception('Only where and orWhere are allowed on Join relations.');
         }
 
