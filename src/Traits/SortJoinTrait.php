@@ -10,6 +10,7 @@ trait SortJoinTrait
 {
     use ExtendRelationsTrait;
 
+    private $useTableAlias = true;
     private $selected = false;
     private $joinedTables = [];
 
@@ -76,7 +77,7 @@ trait SortJoinTrait
             if (array_key_exists($relation, $this->joinedTables)) {
                 $relatedTableAlias = $this->joinedTables[$relation];
             } else {
-                $relatedTableAlias = uniqid();
+                $relatedTableAlias = $this->useTableAlias ? uniqid() : $relatedTable;
 
                 if ($relatedRelation instanceof BelongsToJoin) {
                     $keyRelated = $relatedRelation->getForeignKey();
