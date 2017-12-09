@@ -17,13 +17,14 @@ trait SortJoinTrait
     public function scopeWhereJoinRelation(Builder $builder, $column, $operator = null, $value = null, $boolean = 'and')
     {
         $this->relationClauses[] = ['column' => $column, 'operator' => $operator, 'value' => $value, 'boolean' => $boolean];
+        return $builder->where($column, $operator, $value, $boolean);
     }
 
     public function scopeOrWhereJoinRelation(Builder $builder, $column, $operator = null, $value)
     {
         $this->relationClauses[] = ['column' => $column, 'operator' => $operator, 'value' => $value, 'boolean' => 'or'];
+        return $builder->orWhere($column, $operator, $value, 'or');
     }
-
 
     public function scopeWhereJoin(Builder $builder, $column, $operator = null, $value = null, $boolean = 'and')
     {

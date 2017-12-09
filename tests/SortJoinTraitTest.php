@@ -218,5 +218,11 @@ class SortJoinTraitTest extends TestCase
         $items = Seller::orderByJoin('locationPrimaryOrSecondary.id', 'desc')->get();
         $queryTest = '/select "sellers".* from "sellers" left join "locations" as "(.*)" on "(.*)"."seller_id" = "sellers"."id" where \(\("(.*)"."deleted_at" is null\) and "is_primary" = \? or "is_secondary" = \?\) group by "sellers"."id" order by "(.*)"."id" desc/';
         $this->assertRegExp($queryTest, $this->fetchQuery());
+
+        $seller = Seller::find(1);
+        \DB::enableQueryLog();
+        $locationPrimary = $seller->locationPrimary;
+        $queryTest = '/select * from "locations" where "locations"."seller_id" = \? and "locations"."seller_id" is not null and "is_primary" = \? and "locations"."deleted_at" is null limit \d/';
+        //$this->assertRegExp($queryTest, $this->fetchQuery());
     }
 }
