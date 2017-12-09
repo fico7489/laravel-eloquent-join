@@ -34,141 +34,82 @@ class SortJoinTraitTest extends TestCase
         $orderItem2 = OrderItem::create(['name' => '2', 'order_id' => $seller2->id]);
         $orderItem3 = OrderItem::create(['name' => '3', 'order_id' => $seller3->id]);
     }
+    
+    private function fetchQuery()
+    {
+        $log = \DB::getQueryLog();
+        return end($log)['query'];
+    }
+
+    private function checkOrder($items, $order, $count)
+    {
+        $this->assertEquals($order[0], $items->get(0)->id);
+        $this->assertEquals($order[1], $items->get(1)->id);
+        $this->assertEquals($order[2], $items->get(2)->id);
+        $this->assertEquals($count, $items->count());
+    }
 
     public function testOrderByJoinWithoutJoining()
     {
-        //first item is id = 1, last id = 3, count 3
         $items = OrderItem::orderByJoin('name')->get();
-        $this->assertEquals(1, $items->get(0)->id);
-        $this->assertEquals(2, $items->get(1)->id);
-        $this->assertEquals(3, $items->get(2)->id);
-        $this->assertEquals(3, $items->count());
+        $this->checkOrder($items, [1, 2, 3], 3);
 
-        //first item is id = 1, last id = 2, count 3
         OrderItem::find(2)->update(['name' => 9]);
         $items = OrderItem::orderByJoin('name')->get();
-        $this->assertEquals(1, $items->get(0)->id);
-        $this->assertEquals(3, $items->get(1)->id);
-        $this->assertEquals(2, $items->get(2)->id);
-        $this->assertEquals(3, $items->count());
+        $this->checkOrder($items, [1, 3, 2], 3);
+
+        $items = OrderItem::orderByJoin('name', 'desc')->get();
+        $this->checkOrder($items, [2, 3, 1], 3);
     }
 
     public function testOrderByJoinJoinFirstRelation()
     {
-        //first item is id = 1, last id = 3, count 3
         $items = OrderItem::orderByJoin('order.number')->get();
-        $this->assertEquals(1, $items->get(0)->id);
-        $this->assertEquals(2, $items->get(1)->id);
-        $this->assertEquals(3, $items->get(2)->id);
-        $this->assertEquals(3, $items->count());
+        $this->checkOrder($items, [1, 2, 3], 3);
 
-        //first item is id = 1, last id = 3, count 3
         Order::find(2)->update(['number' => 9]);
         $items = OrderItem::orderByJoin('order.number')->get();
-        $this->assertEquals(1, $items->get(0)->id);
-        $this->assertEquals(3, $items->get(1)->id);
-        $this->assertEquals(2, $items->get(2)->id);
-        $this->assertEquals(3, $items->count());
+        $this->checkOrder($items, [1, 3, 2], 3);
 
-        //normal(default) order (id = 1, 2, 3)
-        Order::find(1)->update(['number' => 1]);
-        Order::find(2)->update(['number' => 2]);
-        Order::find(3)->update(['number' => 3]);
-        $items = OrderItem::orderByJoin('order.number')->get();
-        $this->assertEquals(1, $items->get(0)->id);
-        $this->assertEquals(2, $items->get(1)->id);
-        $this->assertEquals(3, $items->get(2)->id);
-        $this->assertEquals(3, $items->count());
-
-        //reverse order (id = 3, 2, 1)
-        Order::find(1)->update(['number' => 3]);
-        Order::find(2)->update(['number' => 2]);
-        Order::find(3)->update(['number' => 1]);
-        $items = OrderItem::orderByJoin('order.number')->get();
-        $this->assertEquals(3, $items->get(0)->id);
-        $this->assertEquals(2, $items->get(1)->id);
-        $this->assertEquals(1, $items->get(2)->id);
-        $this->assertEquals(3, $items->count());
-
-        //reverse order, desc sort (id = 1, 2, 3)
         $items = OrderItem::orderByJoin('order.number', 'desc')->get();
-        $this->assertEquals(1, $items->get(0)->id);
-        $this->assertEquals(2, $items->get(1)->id);
-        $this->assertEquals(3, $items->get(2)->id);
-        $this->assertEquals(3, $items->count());
+        $this->checkOrder($items, [2, 3, 1], 3);
 
-        //normal(default) order (id = 4, 1, 2, 3), test left join (one item does not have order)
-        Order::find(1)->update(['number' => 1]);
-        Order::find(2)->update(['number' => 2]);
-        Order::find(3)->update(['number' => 3]);
         OrderItem::create(['name' => '4', 'order_id' => null]);
-        $items = OrderItem::orderByJoin('order.number', 'asc')->get();
-        $this->assertEquals(4, $items->get(0)->id);
-        $this->assertEquals(1, $items->get(1)->id);
-        $this->assertEquals(2, $items->get(2)->id);
-        $this->assertEquals(3, $items->get(3)->id);
-        $this->assertEquals(4, $items->count());
-
-        //reverse order (id = 1, 2, 3, 4), test left join (one item does not have order)
         $items = OrderItem::orderByJoin('order.number', 'desc')->get();
-        $this->assertEquals(3, $items->get(0)->id);
-        $this->assertEquals(2, $items->get(1)->id);
-        $this->assertEquals(1, $items->get(2)->id);
-        $this->assertEquals(4, $items->get(3)->id);
-        $this->assertEquals(4, $items->count());
+        $this->checkOrder($items, [2, 3, 1], 4);
+
+        $items = OrderItem::orderByJoin('order.number', 'asc')->get();
+        $this->checkOrder($items, [4, 1, 3], 4);
     }
 
     public function testOrderByJoinJoinSecondRelation()
     {
-        //normal order (id = 1, 2, 3)
         $items = OrderItem::orderByJoin('order.seller.title')->get();
-        $this->assertEquals(1, $items->get(0)->id);
-        $this->assertEquals(2, $items->get(1)->id);
-        $this->assertEquals(3, $items->get(2)->id);
-        $this->assertEquals(3, $items->count());
+        $this->checkOrder($items, [1, 2, 3], 3);
 
-        //reverse order (id = 3, 2, 1)
         $items = OrderItem::orderByJoin('order.seller.title', 'desc')->get();
-        $this->assertEquals(3, $items->get(0)->id);
-        $this->assertEquals(2, $items->get(1)->id);
-        $this->assertEquals(1, $items->get(2)->id);
-        $this->assertEquals(3, $items->count());
+        $this->checkOrder($items, [3, 2, 1], 3);
 
-        //change order (id = 2, 3, 1)
         Seller::find(2)->update(['title' => 9]);
         $items = OrderItem::orderByJoin('order.seller.title', 'desc')->get();
-        $this->assertEquals(2, $items->get(0)->id);
-        $this->assertEquals(3, $items->get(1)->id);
-        $this->assertEquals(1, $items->get(2)->id);
-        $this->assertEquals(3, $items->count());
+        $this->checkOrder($items, [2, 3, 1], 3);
+
+        OrderItem::create(['name' => '4', 'order_id' => null]);
+        $items = OrderItem::orderByJoin('order.seller.title', 'asc')->get();
+        $this->checkOrder($items, [4, 1, 3], 4);
     }
 
     public function testOrderByJoinJoinThirdRelationHasOne()
     {
-        //normal order (id = 1, 2, 3)
-        Location::find(1)->update(['address' => 1]);
-        Location::find(2)->update(['address' => 2]);
-        Location::find(3)->update(['address' => 3]);
         $items = OrderItem::orderByJoin('order.seller.location.address')->get();
-        $this->assertEquals(1, $items->get(0)->id);
-        $this->assertEquals(2, $items->get(1)->id);
-        $this->assertEquals(3, $items->get(2)->id);
-        $this->assertEquals(3, $items->count());
+        $this->checkOrder($items, [1, 2, 3], 3);
 
-        //desc order (id = 3, 2, 1)
         $items = OrderItem::orderByJoin('order.seller.location.address', 'desc')->get();
-        $this->assertEquals(3, $items->get(0)->id);
-        $this->assertEquals(2, $items->get(1)->id);
-        $this->assertEquals(1, $items->get(2)->id);
-        $this->assertEquals(3, $items->count());
+        $this->checkOrder($items, [3, 2 , 1], 3);
 
-        //change order (id = 2, 3 1)
         Location::find(2)->update(['address' => 9]);
         $items = OrderItem::orderByJoin('order.seller.location.address', 'desc')->get();
-        $this->assertEquals(2, $items->get(0)->id);
-        $this->assertEquals(3, $items->get(1)->id);
-        $this->assertEquals(1, $items->get(2)->id);
-        $this->assertEquals(3, $items->count());
+        $this->checkOrder($items, [2, 3 , 1], 3);
     }
 
     public function testOrderByJoinJoinOnlyOnce()
@@ -260,31 +201,22 @@ class SortJoinTraitTest extends TestCase
     {
         \DB::enableQueryLog();
         $items = Seller::orderByJoin('location.id', 'desc')->get();
-        $log = \DB::getQueryLog();
-        $query = end($log)['query'];
         $queryTest = '/select "sellers".* from "sellers" left join "locations" as "(.*)" on "(.*)"."seller_id" = "sellers"."id" where \("(.*)"."deleted_at" is null\) and "is_primary" = \? and "is_secondary" = \? group by "sellers"."id" order by "(.*)"."id" desc/';
-        $this->assertRegExp($queryTest, $query);
+        $this->assertRegExp($queryTest, $this->fetchQuery());
 
         \DB::enableQueryLog();
         $items = Seller::orderByJoin('locationPrimary.id', 'desc')->get();
-        $log = \DB::getQueryLog();
-        $query = end($log)['query'];
-        //echo $query;exit;
         $queryTest = '/select "sellers".* from "sellers" left join "locations" as "(.*)" on "(.*)"."seller_id" = "sellers"."id" where \("(.*)"."deleted_at" is null\) and "is_primary" = \? group by "sellers"."id" order by "(.*)"."id" desc/';
-        $this->assertRegExp($queryTest, $query);
+        $this->assertRegExp($queryTest, $this->fetchQuery());
 
         \DB::enableQueryLog();
         $items = Seller::orderByJoin('locationSecondary.id', 'desc')->get();
-        $log = \DB::getQueryLog();
-        $query = end($log)['query'];
         $queryTest = '/select "sellers".* from "sellers" left join "locations" as "(.*)" on "(.*)"."seller_id" = "sellers"."id" where \("(.*)"."deleted_at" is null\) and "is_secondary" = \? group by "sellers"."id" order by "(.*)"."id" desc/';
-        $this->assertRegExp($queryTest, $query);
+        $this->assertRegExp($queryTest, $this->fetchQuery());
 
         \DB::enableQueryLog();
         $items = Seller::orderByJoin('locationPrimaryOrSecondary.id', 'desc')->get();
-        $log = \DB::getQueryLog();
-        $query = end($log)['query'];
         $queryTest = '/select "sellers".* from "sellers" left join "locations" as "(.*)" on "(.*)"."seller_id" = "sellers"."id" where \(\("(.*)"."deleted_at" is null\) and "is_primary" = \? or "is_secondary" = \?\) group by "sellers"."id" order by "(.*)"."id" desc/';
-        $this->assertRegExp($queryTest, $query);
+        $this->assertRegExp($queryTest, $this->fetchQuery());
     }
 }
