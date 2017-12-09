@@ -11,8 +11,8 @@ class Order extends BaseModel
     protected $table = 'orders';
 
     protected $fillable = ['number', 'seller_id'];
-	
-	public function seller()
+    
+    public function seller()
     {
         return $this->belongsToJoin(Seller::class);
     }

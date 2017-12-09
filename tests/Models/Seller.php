@@ -8,7 +8,7 @@ class Seller extends BaseModel
 
     protected $fillable = ['title', 'deleted_at'];
 
-	public function location()
+    public function location()
     {
         return $this->hasOneJoin(Location::class)
             ->where('is_primary', '=', 0)

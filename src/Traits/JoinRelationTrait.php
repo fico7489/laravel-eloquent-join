@@ -16,7 +16,7 @@ trait JoinRelationTrait
         $method = $method == 'where' ? 'whereJoin' : $method;
         $method = $method == 'orWhere' ? 'orWhereJoin' : $method;
 
-        if( ! in_array($method, ['whereJoin', 'orWhereJoin'])){
+        if (! in_array($method, ['whereJoin', 'orWhereJoin'])) {
             throw new \Exception('Only where and orWhere are allowed on Join relations.');
         }
 

@@ -253,7 +253,8 @@ class SortJoinTraitTest extends TestCase
         $this->assertTrue(Seller::find(1)->deleted_at != null);
     }
 
-    public function testWhereJoinOnRelation(){
+    public function testWhereJoinOnRelation()
+    {
         \DB::enableQueryLog();
         $items = Seller::orderByJoin('location.id', 'desc')->get();
         $log = \DB::getQueryLog();

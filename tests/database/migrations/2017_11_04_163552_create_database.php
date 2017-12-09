@@ -3,7 +3,6 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-
 /**
  * Class CreateDatabase
  */
@@ -17,37 +16,37 @@ class CreateDatabase extends Migration
     public function up()
     {
         Schema::create('order_items', function (Blueprint $table) {
-			$table->increments('id');
-			$table->string('name');
-			$table->integer('order_id')->unsigned()->index()->nullable();
+            $table->increments('id');
+            $table->string('name');
+            $table->integer('order_id')->unsigned()->index()->nullable();
 
-			$table->foreign('order_id')->references('id')->on('orders')
-				->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('order_id')->references('id')->on('orders')
+                ->onUpdate('cascade')->onDelete('cascade');
 
             $table->timestamps();
             $table->softDeletes();
         });
 
         Schema::create('orders', function (Blueprint $table) {
-			$table->increments('id');
-			$table->string('number')->nullable();
-			$table->integer('seller_id')->unsigned()->index()->nullable();
+            $table->increments('id');
+            $table->string('number')->nullable();
+            $table->integer('seller_id')->unsigned()->index()->nullable();
 
-			$table->foreign('seller_id')->references('id')->on('sellers')
-				->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('seller_id')->references('id')->on('sellers')
+                ->onUpdate('cascade')->onDelete('cascade');
 
             $table->timestamps();
             $table->softDeletes();
         });
-		
-		Schema::create('sellers', function (Blueprint $table) {
+        
+        Schema::create('sellers', function (Blueprint $table) {
             $table->increments('id');
             $table->string('title')->nullable();
 
             $table->timestamps();
             $table->softDeletes();
         });
-		
+        
         Schema::create('locations', function (Blueprint $table) {
             $table->increments('id');
             $table->string('address')->nullable();

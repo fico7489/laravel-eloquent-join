@@ -12,7 +12,7 @@ class OrderItem extends BaseModel
 
     protected $fillable = ['name', 'order_id'];
 
-	public function order()
+    public function order()
     {
         return $this->belongsToJoin(Order::class);
     }

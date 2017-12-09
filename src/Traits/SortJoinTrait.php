@@ -37,7 +37,8 @@ trait SortJoinTrait
         return $builder->orderBy($column, $sortBy);
     }
 
-    private function performJoin($builder, $relations){
+    private function performJoin($builder, $relations)
+    {
         $relations = explode('.', $relations);
 
         $column = end($relations);
@@ -47,8 +48,8 @@ trait SortJoinTrait
         $currentTable = $this->getTable();
         $currentModel = $this;
 
-        foreach($relations as $relation){
-            if($relation == $column){
+        foreach ($relations as $relation) {
+            if ($relation == $column) {
                 //last item in $relations argument is sort|where column
                 continue;
             }
@@ -58,26 +59,26 @@ trait SortJoinTrait
             $relatedPrimaryKey = $relatedModel->primaryKey;
             $relatedTable = $relatedModel->getTable();
 
-            if(array_key_exists($relation, $this->joinedTables)){
+            if (array_key_exists($relation, $this->joinedTables)) {
                 $relatedTableAlias = $this->joinedTables[$relation];
-            }else{
+            } else {
                 $relatedTableAlias = uniqid();
 
                 $keyRelated = $relatedRelation->getForeignKey();
-                if($relatedRelation instanceof BelongsTo){
+                if ($relatedRelation instanceof BelongsTo) {
                     $builder->leftJoin($relatedTable . ' as ' . $relatedTableAlias, $relatedTableAlias . '.' . $relatedPrimaryKey, '=', $currentTable . '.' . $keyRelated);
-                }elseif($relatedRelation instanceof HasOne){
+                } elseif ($relatedRelation instanceof HasOne) {
                     $keyRelated = last(explode('.', $keyRelated));
                     $builder->leftJoin($relatedTable . ' as ' . $relatedTableAlias, $relatedTableAlias . '.' . $keyRelated, '=', $currentTable . '.' . $relatedPrimaryKey);
                 }
 
                 //by default apply where deleted_at is null if model is using soft deletes, if any where clause have deleted_at columnn do not apply
                 $columnsWhere = collect($relatedModel->relationClauses)->pluck('column')->toArray();
-                if(method_exists($relatedModel, 'getQualifiedDeletedAtColumn') &&  ! in_array('deleted_at', $columnsWhere)){
+                if (method_exists($relatedModel, 'getQualifiedDeletedAtColumn') &&  ! in_array('deleted_at', $columnsWhere)) {
                     $builder->where([$relatedTableAlias . '.deleted_at' => null]);
                 }
 
-                foreach($relatedModel->relationClauses as $relationClause){
+                foreach ($relatedModel->relationClauses as $relationClause) {
                     $builder->where($relationClause['column'], $relationClause['operator'], $relationClause['value'], $relationClause['boolean']);
                 }
             }
@@ -88,9 +89,9 @@ trait SortJoinTrait
             $this->joinedTables[$relation] = $relatedTableAlias;
         }
 
-        if( ! $this->selected){
+        if (! $this->selected) {
             $this->selected = true;
-            $builder->select ($baseTable . '.*')->groupBy ($baseTable . '.' . $baseModel->primaryKey);
+            $builder->select($baseTable . '.*')->groupBy($baseTable . '.' . $baseModel->primaryKey);
         }
 
         return $currentTable . '.' . $column;
