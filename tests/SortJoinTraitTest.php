@@ -34,7 +34,7 @@ class SortJoinTraitTest extends TestCase
         $orderItem2 = OrderItem::create(['name' => '2', 'order_id' => $seller2->id]);
         $orderItem3 = OrderItem::create(['name' => '3', 'order_id' => $seller3->id]);
     }
-    
+
     private function fetchQuery()
     {
         $log = \DB::getQueryLog();
