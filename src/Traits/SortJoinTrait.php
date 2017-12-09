@@ -2,6 +2,8 @@
 
 namespace Fico7489\Laravel\SortJoin\Traits;
 
+use Fico7489\Laravel\SortJoin\Relations\BelongsToJoin;
+use Fico7489\Laravel\SortJoin\Relations\HasOneJoin;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -78,15 +80,17 @@ trait SortJoinTrait
             } else {
                 $relatedTableAlias = uniqid();
 
-                if ($relatedRelation instanceof BelongsTo) {
+                if ($relatedRelation instanceof BelongsToJoin) {
                     $keyRelated = $relatedRelation->getForeignKey();
 
                     $builder->leftJoin($relatedTable . ' as ' . $relatedTableAlias, $relatedTableAlias . '.' . $relatedPrimaryKey, '=', $currentTable . '.' . $keyRelated);
-                } elseif ($relatedRelation instanceof HasOne) {
+                } elseif ($relatedRelation instanceof HasOneJoin) {
                     $keyRelated = $relatedRelation->getQualifiedForeignKeyName();
 
                     $keyRelated = last(explode('.', $keyRelated));
                     $builder->leftJoin($relatedTable . ' as ' . $relatedTableAlias, $relatedTableAlias . '.' . $keyRelated, '=', $currentTable . '.' . $relatedPrimaryKey);
+                } else {
+                    throw new \Exception('Only allowed relations for join queries: BelongsToJoin, HasOneJoin');
                 }
 
                 if (method_exists($relatedModel, 'getQualifiedDeletedAtColumn')) {
