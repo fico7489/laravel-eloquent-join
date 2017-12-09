@@ -5,8 +5,6 @@ namespace Fico7489\Laravel\SortJoin\Traits;
 use Fico7489\Laravel\SortJoin\Relations\BelongsToJoin;
 use Fico7489\Laravel\SortJoin\Relations\HasOneJoin;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 trait SortJoinTrait
 {
