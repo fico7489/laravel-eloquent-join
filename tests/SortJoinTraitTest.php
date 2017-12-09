@@ -170,16 +170,25 @@ class SortJoinTraitTest extends TestCase
 
     public function testSoftDeleteHas()
     {
-        $items = OrderItem::orderByJoin('order.number')
-            ->whereJoin('order.number', '=', '1')
-            ->get();
-        $this->assertEquals(1, $items->count());
+        \DB::enableQueryLog();
+        $items = OrderItem::orderByJoin('name')->get();
+        $queryTest = '/select "order_items".* from "order_items" where "order_items"."deleted_at" is null group by "order_items"."id" order by "order_items"."name" asc/';
+        $this->assertRegExp($queryTest, $this->fetchQuery());
 
-        Order::find(1)->delete();
-        $items = OrderItem::orderByJoin('order.number')
-            ->whereJoin('order.number', '=', '1')
-            ->get();
-        $this->assertEquals(0, $items->count());
+        \DB::enableQueryLog();
+        $items = OrderItem::orderByJoin('name')->withoutTrashed()->get();
+        $queryTest = '/select "order_items".* from "order_items" where "order_items"."deleted_at" is null group by "order_items"."id" order by "order_items"."name" asc/';
+        $this->assertRegExp($queryTest, $this->fetchQuery());
+
+        \DB::enableQueryLog();
+        $items = OrderItem::orderByJoin('name')->onlyTrashed()->get();
+        $queryTest = '/select "order_items".* from "order_items" where "order_items"."deleted_at" is not null group by "order_items"."id" order by "order_items"."name" asc/';
+        $this->assertRegExp($queryTest, $this->fetchQuery());
+
+        \DB::enableQueryLog();
+        $items = OrderItem::orderByJoin('name')->withTrashed()->get();
+        $queryTest = '/select "order_items".* from "order_items" group by "order_items"."id" order by "order_items"."name" asc/';
+        $this->assertRegExp($queryTest, $this->fetchQuery());
     }
 
     public function testSoftDeleteNotHas()
