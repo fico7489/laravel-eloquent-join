@@ -202,25 +202,25 @@ class SortJoinTraitTest extends TestCase
         //location have two where  ['is_primary => 0', 'is_secondary' => 0]
         \DB::enableQueryLog();
         $items = Seller::orderByJoin('location.id', 'desc')->get();
-        $queryTest = '/select "sellers".* from "sellers" left join "locations" as "(.*)" on "(.*)"."seller_id" = "sellers"."id" where \("(.*)"."deleted_at" is null\) and "is_primary" = \? and "is_secondary" = \? group by "sellers"."id" order by "(.*)"."id" desc/';
+        $queryTest = '/select "sellers".* from "sellers" left join "locations" as "(.*)" on "(.*)"."seller_id" = "sellers"."id" where "(.*)"."deleted_at" is null and "is_primary" = \? and "is_secondary" = \? group by "sellers"."id" order by "(.*)"."id" desc/';
         $this->assertRegExp($queryTest, $this->fetchQuery());
 
         //locationPrimary have one where ['is_primary => 1']
         \DB::enableQueryLog();
         $items = Seller::orderByJoin('locationPrimary.id', 'desc')->get();
-        $queryTest = '/select "sellers".* from "sellers" left join "locations" as "(.*)" on "(.*)"."seller_id" = "sellers"."id" where \("(.*)"."deleted_at" is null\) and "is_primary" = \? group by "sellers"."id" order by "(.*)"."id" desc/';
+        $queryTest = '/select "sellers".* from "sellers" left join "locations" as "(.*)" on "(.*)"."seller_id" = "sellers"."id" where "(.*)"."deleted_at" is null and "is_primary" = \? group by "sellers"."id" order by "(.*)"."id" desc/';
         $this->assertRegExp($queryTest, $this->fetchQuery());
 
         //locationPrimary have one where ['is_secondary => 1']
         \DB::enableQueryLog();
         $items = Seller::orderByJoin('locationSecondary.id', 'desc')->get();
-        $queryTest = '/select "sellers".* from "sellers" left join "locations" as "(.*)" on "(.*)"."seller_id" = "sellers"."id" where \("(.*)"."deleted_at" is null\) and "is_secondary" = \? group by "sellers"."id" order by "(.*)"."id" desc/';
+        $queryTest = '/select "sellers".* from "sellers" left join "locations" as "(.*)" on "(.*)"."seller_id" = "sellers"."id" where "(.*)"."deleted_at" is null and "is_secondary" = \? group by "sellers"."id" order by "(.*)"."id" desc/';
         $this->assertRegExp($queryTest, $this->fetchQuery());
 
         //locationPrimary have one where ['is_primary => 1'] and one orWhere ['is_secondary => 1']
         \DB::enableQueryLog();
         $items = Seller::orderByJoin('locationPrimaryOrSecondary.id', 'desc')->get();
-        $queryTest = '/select "sellers".* from "sellers" left join "locations" as "(.*)" on "(.*)"."seller_id" = "sellers"."id" where \(\("(.*)"."deleted_at" is null\) and "is_primary" = \? or "is_secondary" = \?\) group by "sellers"."id" order by "(.*)"."id" desc/';
+        $queryTest = '/select "sellers".* from "sellers" left join "locations" as "(.*)" on "(.*)"."seller_id" = "sellers"."id" where \("(.*)"."deleted_at" is null and "is_primary" = \? or "is_secondary" = \?\) group by "sellers"."id" order by "(.*)"."id" desc/';
         $this->assertRegExp($queryTest, $this->fetchQuery());
     }
 

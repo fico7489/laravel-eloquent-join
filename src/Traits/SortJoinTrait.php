@@ -14,7 +14,7 @@ trait SortJoinTrait
     private $joinedTables = [];
 
     private $relationClauses = [];
-    private $softDelete = 'WithoutTrashed';
+    private $softDelete = 'withoutTrashed';
 
     public function scopeSetWhereForJoin(Builder $builder, $column, $operator = null, $value = null, $boolean = 'and')
     {
@@ -89,10 +89,14 @@ trait SortJoinTrait
                     $builder->leftJoin($relatedTable . ' as ' . $relatedTableAlias, $relatedTableAlias . '.' . $keyRelated, '=', $currentTable . '.' . $relatedPrimaryKey);
                 }
 
-                //by default apply where deleted_at is null if model is using soft deletes, if any where clause have deleted_at columnn do not apply
-                $columnsWhere = collect($relatedModel->relationClauses)->pluck('column')->toArray();
-                if (method_exists($relatedModel, 'getQualifiedDeletedAtColumn') &&  ! in_array('deleted_at', $columnsWhere)) {
-                    $builder->where([$relatedTableAlias . '.deleted_at' => null]);
+                if (method_exists($relatedModel, 'getQualifiedDeletedAtColumn')) {
+                    if ($this->softDelete == 'withTrashed') {
+                        //do nothing
+                    } elseif ($this->softDelete == 'withoutTrashed') {
+                        $builder->where($relatedTableAlias . '.deleted_at', '=', null);
+                    } elseif ($this->softDelete == 'onlyTrashed') {
+                        $builder->where($relatedTableAlias . '.deleted_at', '<>', null);
+                    }
                 }
 
                 foreach ($relatedModel->relationClauses as $relationClause) {
