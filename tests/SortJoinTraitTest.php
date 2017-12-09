@@ -227,9 +227,15 @@ class SortJoinTraitTest extends TestCase
     public function testWhereOnRelationWithoutOrderByJoin()
     {
         $seller = Seller::find(1);
+
         \DB::enableQueryLog();
         $seller->locationPrimary;
         $queryTest = '/select \* from "locations" where "locations"."seller_id" = \? and "locations"."seller_id" is not null and "is_primary" = \? and "locations"."deleted_at" is null limit \d/';
+        $this->assertRegExp($queryTest, $this->fetchQuery());
+
+        \DB::enableQueryLog();
+        $seller->locationPrimary()->where(['is_secondary' => 1])->get();
+        $queryTest = '/select \* from "locations" where "locations"."seller_id" = \? and "locations"."seller_id" is not null and "is_primary" = \? and \("is_secondary" = \?\) and "locations"."deleted_at" is null/';
         $this->assertRegExp($queryTest, $this->fetchQuery());
     }
 }
