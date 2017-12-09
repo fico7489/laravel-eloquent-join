@@ -197,39 +197,39 @@ class SortJoinTraitTest extends TestCase
         $this->assertTrue(Seller::find(1)->deleted_at != null);
     }
 
-    public function testWhereJoinOnRelation()
+    public function testWhereOnRelationWithOrderByJoin()
     {
+        //location have two where  ['is_primary => 0', 'is_secondary' => 0]
         \DB::enableQueryLog();
         $items = Seller::orderByJoin('location.id', 'desc')->get();
         $queryTest = '/select "sellers".* from "sellers" left join "locations" as "(.*)" on "(.*)"."seller_id" = "sellers"."id" where \("(.*)"."deleted_at" is null\) and "is_primary" = \? and "is_secondary" = \? group by "sellers"."id" order by "(.*)"."id" desc/';
         $this->assertRegExp($queryTest, $this->fetchQuery());
 
+        //locationPrimary have one where ['is_primary => 1']
         \DB::enableQueryLog();
         $items = Seller::orderByJoin('locationPrimary.id', 'desc')->get();
         $queryTest = '/select "sellers".* from "sellers" left join "locations" as "(.*)" on "(.*)"."seller_id" = "sellers"."id" where \("(.*)"."deleted_at" is null\) and "is_primary" = \? group by "sellers"."id" order by "(.*)"."id" desc/';
         $this->assertRegExp($queryTest, $this->fetchQuery());
 
+        //locationPrimary have one where ['is_secondary => 1']
         \DB::enableQueryLog();
         $items = Seller::orderByJoin('locationSecondary.id', 'desc')->get();
         $queryTest = '/select "sellers".* from "sellers" left join "locations" as "(.*)" on "(.*)"."seller_id" = "sellers"."id" where \("(.*)"."deleted_at" is null\) and "is_secondary" = \? group by "sellers"."id" order by "(.*)"."id" desc/';
         $this->assertRegExp($queryTest, $this->fetchQuery());
 
+        //locationPrimary have one where ['is_primary => 1'] and one orWhere ['is_secondary => 1']
         \DB::enableQueryLog();
         $items = Seller::orderByJoin('locationPrimaryOrSecondary.id', 'desc')->get();
         $queryTest = '/select "sellers".* from "sellers" left join "locations" as "(.*)" on "(.*)"."seller_id" = "sellers"."id" where \(\("(.*)"."deleted_at" is null\) and "is_primary" = \? or "is_secondary" = \?\) group by "sellers"."id" order by "(.*)"."id" desc/';
         $this->assertRegExp($queryTest, $this->fetchQuery());
+    }
 
+    public function testWhereOnRelationWithoutOrderByJoin()
+    {
         $seller = Seller::find(1);
         \DB::enableQueryLog();
-        $locationPrimary = $seller->locationPrimary;
+        $seller->locationPrimary;
         $queryTest = '/select \* from "locations" where "locations"."seller_id" = \? and "locations"."seller_id" is not null and "is_primary" = \? and "locations"."deleted_at" is null limit \d/';
         $this->assertRegExp($queryTest, $this->fetchQuery());
-
-        $orderItem = OrderItem::find(1);
-        \DB::enableQueryLog();
-        //->where(['is_primary' => 1])->where('is_secondary', '=', 0)
-        //$locationPrimary = $orderItem->order()->withoutGlobalScopes()->get();
-        //echo "\n";
-        //print_r($this->fetchQuery());
     }
 }
