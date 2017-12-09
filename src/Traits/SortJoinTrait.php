@@ -12,19 +12,25 @@ trait SortJoinTrait
 
     private $selected = false;
     private $joinedTables = [];
-    private $relationClauses = [];
 
-    public function scopeWhereJoinRelation(Builder $builder, $column, $operator = null, $value = null, $boolean = 'and')
+    private $relationClauses = [];
+    private $softDelete = 'WithoutTrashed';
+
+    public function scopeSetWhereForJoin(Builder $builder, $column, $operator = null, $value = null, $boolean = 'and')
     {
         $this->relationClauses[] = ['column' => $column, 'operator' => $operator, 'value' => $value, 'boolean' => $boolean];
-        return $builder->where($column, $operator, $value, $boolean);
     }
 
-    public function scopeOrWhereJoinRelation(Builder $builder, $column, $operator = null, $value)
+    public function scopeSetOrWhereForJoin(Builder $builder, $column, $operator = null, $value)
     {
         $this->relationClauses[] = ['column' => $column, 'operator' => $operator, 'value' => $value, 'boolean' => 'or'];
-        return $builder->orWhere($column, $operator, $value, 'or');
     }
+
+    public function scopeSetSoftDelete(Builder $builder, $param)
+    {
+        $this->softDelete = $param;
+    }
+
 
     public function scopeWhereJoin(Builder $builder, $column, $operator = null, $value = null, $boolean = 'and')
     {

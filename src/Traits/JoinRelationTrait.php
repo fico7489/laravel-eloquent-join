@@ -13,11 +13,22 @@ trait JoinRelationTrait
      */
     public function __call($method, $parameters)
     {
-        $method = $method == 'where' ? 'whereJoinRelation' : $method;
-        $method = $method == 'orWhere' ? 'orWhereJoinRelation' : $method;
+        $softDeleteOptions = ['withTrashed', 'withoutTrashed', 'onlyTrashed'];
+        $allowedOptions = array_merge(['where', 'orWhere'], $softDeleteOptions);
 
-        if (! in_array($method, ['whereJoinRelation', 'orWhereJoinRelation'])) {
-            throw new \Exception('Only where and orWhere are allowed on Join relations.');
+        if ($method == 'where') {
+            parent::__call('setWhereForJoin', $parameters);
+        } elseif ($method == 'orWhere') {
+            parent::__call('setOrWhereForJoin', $parameters);
+        }
+
+
+        if (in_array($method, $softDeleteOptions)) {
+            parent::__call('setSoftDelete', $parameters);
+        }
+
+        if (! in_array($method, $allowedOptions)) {
+            throw new \Exception('Only allowed clauses on Join relations : ' . implode(', ', $allowedOptions));
         }
 
         return parent::__call($method, $parameters);

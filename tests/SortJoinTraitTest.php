@@ -224,5 +224,12 @@ class SortJoinTraitTest extends TestCase
         $locationPrimary = $seller->locationPrimary;
         $queryTest = '/select \* from "locations" where "locations"."seller_id" = \? and "locations"."seller_id" is not null and "is_primary" = \? and "locations"."deleted_at" is null limit \d/';
         $this->assertRegExp($queryTest, $this->fetchQuery());
+
+        $orderItem = OrderItem::find(1);
+        \DB::enableQueryLog();
+        //->where(['is_primary' => 1])->where('is_secondary', '=', 0)
+        //$locationPrimary = $orderItem->order()->withoutGlobalScopes()->get();
+        //echo "\n";
+        //print_r($this->fetchQuery());
     }
 }
