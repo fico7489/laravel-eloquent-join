@@ -168,42 +168,58 @@ class SortJoinTraitTest extends TestCase
         $this->assertEquals(0, $items->count());
     }
 
-    public function testSoftDeleteHas()
+    public function testSoftDeleteHasNotRelated()
     {
+        //default (withoutTrashed)
         \DB::enableQueryLog();
         $items = OrderItem::orderByJoin('name')->get();
         $queryTest = '/select "order_items".* from "order_items" where "order_items"."deleted_at" is null group by "order_items"."id" order by "order_items"."name" asc/';
         $this->assertRegExp($queryTest, $this->fetchQuery());
 
+        //withoutTrashed
         \DB::enableQueryLog();
         $items = OrderItem::orderByJoin('name')->withoutTrashed()->get();
         $queryTest = '/select "order_items".* from "order_items" where "order_items"."deleted_at" is null group by "order_items"."id" order by "order_items"."name" asc/';
         $this->assertRegExp($queryTest, $this->fetchQuery());
 
+        //onlyTrashed
         \DB::enableQueryLog();
         $items = OrderItem::orderByJoin('name')->onlyTrashed()->get();
         $queryTest = '/select "order_items".* from "order_items" where "order_items"."deleted_at" is not null group by "order_items"."id" order by "order_items"."name" asc/';
         $this->assertRegExp($queryTest, $this->fetchQuery());
 
+        //withTrashed
         \DB::enableQueryLog();
         $items = OrderItem::orderByJoin('name')->withTrashed()->get();
         $queryTest = '/select "order_items".* from "order_items" group by "order_items"."id" order by "order_items"."name" asc/';
         $this->assertRegExp($queryTest, $this->fetchQuery());
     }
 
-    public function testSoftDeleteNotHas()
+    public function testSoftDeleteHasRelated()
     {
-        $items = OrderItem::orderByJoin('order.seller.title')
-            ->whereJoin('order.seller.title', '=', '1')
-            ->get();
-        $this->assertEquals(1, $items->count());
+        //default (withoutTrashed)
+        \DB::enableQueryLog();
+        $items = OrderItem::orderByJoin('order.number')->get();
+        $queryTest = '/select "order_items".* from "order_items" left join "orders" as "(.*)" on "(.*)"."id" = "order_items"."order_id" where "(.*)"."deleted_at" is null and "order_items"."deleted_at" is null group by "order_items"."id/';
+        $this->assertRegExp($queryTest, $this->fetchQuery());
 
-        Seller::find(1)->update(['deleted_at' => '2017-01-02']);
-        $items = OrderItem::orderByJoin('order.seller.title')
-            ->whereJoin('order.seller.title', '=', '1')
-            ->get();
-        $this->assertEquals(1, $items->count());
-        $this->assertTrue(Seller::find(1)->deleted_at != null);
+        //withoutTrashed
+        \DB::enableQueryLog();
+        $items = OrderItem::orderByJoin('order.number')->withoutTrashed()->get();
+        $queryTest = '/select "order_items".* from "order_items" left join "orders" as "(.*)" on "(.*)"."id" = "order_items"."order_id" where "(.*)"."deleted_at" is null and "order_items"."deleted_at" is null group by "order_items"."id/';
+        $this->assertRegExp($queryTest, $this->fetchQuery());
+
+        //onlyTrashed
+        \DB::enableQueryLog();
+        $items = OrderItem::orderByJoin('order.number')->onlyTrashed()->get();
+        $queryTest = '/select "order_items".* from "order_items" left join "orders" as "(.*)" on "(.*)"."id" = "order_items"."order_id" where "(.*)"."deleted_at" is null and "order_items"."deleted_at" is not null group by "order_items"."id/';
+        $this->assertRegExp($queryTest, $this->fetchQuery());
+
+        //withTrashed
+        \DB::enableQueryLog();
+        $items = OrderItem::orderByJoin('order.number')->withTrashed()->get();
+        $queryTest = '/select "order_items".* from "order_items" left join "orders" as "(.*)" on "(.*)"."id" = "order_items"."order_id" where "(.*)"."deleted_at" is null group by "order_items"."id/';
+        $this->assertRegExp($queryTest, $this->fetchQuery());
     }
 
     public function testWhereOnRelationWithOrderByJoin()
