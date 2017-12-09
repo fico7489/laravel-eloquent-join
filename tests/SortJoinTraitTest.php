@@ -39,15 +39,17 @@ class SortJoinTraitTest extends TestCase
     {
         //first item is id = 1, last id = 3, count 3
         $items = OrderItem::orderByJoin('name')->get();
-        $this->assertEquals(1, $items->first()->id);
-        $this->assertEquals(3, $items->last()->id);
+        $this->assertEquals(1, $items->get(0)->id);
+        $this->assertEquals(2, $items->get(1)->id);
+        $this->assertEquals(3, $items->get(2)->id);
         $this->assertEquals(3, $items->count());
 
         //first item is id = 1, last id = 2, count 3
         OrderItem::find(2)->update(['name' => 9]);
         $items = OrderItem::orderByJoin('name')->get();
-        $this->assertEquals(1, $items->first()->id);
-        $this->assertEquals(2, $items->last()->id);
+        $this->assertEquals(1, $items->get(0)->id);
+        $this->assertEquals(3, $items->get(1)->id);
+        $this->assertEquals(2, $items->get(2)->id);
         $this->assertEquals(3, $items->count());
     }
 
@@ -55,16 +57,17 @@ class SortJoinTraitTest extends TestCase
     {
         //first item is id = 1, last id = 3, count 3
         $items = OrderItem::orderByJoin('order.number')->get();
-        $this->assertEquals(1, $items->first()->id);
-        $this->assertEquals(3, $items->last()->id);
+        $this->assertEquals(1, $items->get(0)->id);
+        $this->assertEquals(2, $items->get(1)->id);
+        $this->assertEquals(3, $items->get(2)->id);
         $this->assertEquals(3, $items->count());
 
         //first item is id = 1, last id = 3, count 3
         Order::find(2)->update(['number' => 9]);
         $items = OrderItem::orderByJoin('order.number')->get();
-        $this->assertEquals(1, $items->first()->id);
-        $this->assertEquals(2, $items->last()->id);
-        $this->assertEquals(3, $items->count());
+        $this->assertEquals(1, $items->get(0)->id);
+        $this->assertEquals(3, $items->get(1)->id);
+        $this->assertEquals(2, $items->get(2)->id);
         $this->assertEquals(3, $items->count());
 
         //normal(default) order (id = 1, 2, 3)
