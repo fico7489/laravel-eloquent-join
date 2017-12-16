@@ -9,38 +9,6 @@ use Fico7489\Laravel\EloquentJoin\Tests\Models\Location;
 
 class EloquentJoinTraitTest extends TestCase
 {
-    public function setUp()
-    {
-        parent::setUp();
-
-        $seller = Seller::create(['title' => 1]);
-        $seller2 = Seller::create(['title' => 2]);
-        $seller3 = Seller::create(['title' => 3]);
-        Seller::create(['title' => 4]);
-
-        Location::create(['address' => 1, 'seller_id' => $seller->id]);
-        Location::create(['address' => 2, 'seller_id' => $seller2->id]);
-        Location::create(['address' => 3, 'seller_id' => $seller3->id]);
-        Location::create(['address' => 3, 'seller_id' => $seller3->id]);
-
-        Location::create(['address' => 4, 'seller_id' => $seller3->id, 'is_primary' => 1]);
-        Location::create(['address' => 5, 'seller_id' => $seller3->id, 'is_secondary' => 1]);
-
-        Order::create(['number' => '1', 'seller_id' => $seller->id]);
-        Order::create(['number' => '2', 'seller_id' => $seller2->id]);
-        Order::create(['number' => '3', 'seller_id' => $seller3->id]);
-
-        OrderItem::create(['name' => '1', 'order_id' => $seller->id]);
-        OrderItem::create(['name' => '2', 'order_id' => $seller2->id]);
-        OrderItem::create(['name' => '3', 'order_id' => $seller3->id]);
-    }
-
-    private function fetchQuery()
-    {
-        $log = \DB::getQueryLog();
-        return end($log)['query'];
-    }
-
     private function checkOrder($items, $order, $count)
     {
         $this->assertEquals($order[0], $items->get(0)->id);
@@ -141,60 +109,6 @@ class EloquentJoinTraitTest extends TestCase
         //test more where with orWhere does not exists
         $items = OrderItem::orderByJoin('order.number')->whereJoin('order.number', '=', 'dddd')->orWhereJoin('order.number', '=', 'eeee')->get();
         $this->assertEquals(0, $items->count());
-    }
-
-    public function testSoftDeleteHasNotRelated()
-    {
-        //default (withoutTrashed)
-        \DB::enableQueryLog();
-        $items = OrderItem::orderByJoin('name')->get();
-        $queryTest = '/select \* from "order_items" where "order_items"."deleted_at" is null order by "order_items"."name" asc/';
-        $this->assertRegExp($queryTest, $this->fetchQuery());
-
-        //withoutTrashed
-        \DB::enableQueryLog();
-        $items = OrderItem::orderByJoin('name')->withoutTrashed()->get();
-        $queryTest = '/select \* from "order_items" where "order_items"."deleted_at" is null order by "order_items"."name" asc/';
-        $this->assertRegExp($queryTest, $this->fetchQuery());
-
-        //onlyTrashed
-        \DB::enableQueryLog();
-        $items = OrderItem::orderByJoin('name')->onlyTrashed()->get();
-        $queryTest = '/select \* from "order_items" where "order_items"."deleted_at" is not null order by "order_items"."name" asc/';
-        $this->assertRegExp($queryTest, $this->fetchQuery());
-
-        //withTrashed
-        \DB::enableQueryLog();
-        $items = OrderItem::orderByJoin('name')->withTrashed()->get();
-        $queryTest = '/select \* from "order_items" order by "order_items"."name" asc/';
-        $this->assertRegExp($queryTest, $this->fetchQuery());
-    }
-
-    public function testSoftDeleteHasRelated()
-    {
-        //default (withoutTrashed)
-        \DB::enableQueryLog();
-        $items = OrderItem::orderByJoin('order.number')->get();
-        $queryTest = '/select "order_items".* from "order_items" left join "orders" on "(.*)"."id" = "order_items"."order_id" where "(.*)"."deleted_at" is null and "order_items"."deleted_at" is null group by "order_items"."id/';
-        $this->assertRegExp($queryTest, $this->fetchQuery());
-
-        //withoutTrashed
-        \DB::enableQueryLog();
-        $items = OrderItem::orderByJoin('order.number')->withoutTrashed()->get();
-        $queryTest = '/select "order_items".* from "order_items" left join "orders" on "(.*)"."id" = "order_items"."order_id" where "(.*)"."deleted_at" is null and "order_items"."deleted_at" is null group by "order_items"."id/';
-        $this->assertRegExp($queryTest, $this->fetchQuery());
-
-        //onlyTrashed
-        \DB::enableQueryLog();
-        $items = OrderItem::orderByJoin('order.number')->onlyTrashed()->get();
-        $queryTest = '/select "order_items".* from "order_items" left join "orders" on "(.*)"."id" = "order_items"."order_id" where "(.*)"."deleted_at" is null and "order_items"."deleted_at" is not null group by "order_items"."id/';
-        $this->assertRegExp($queryTest, $this->fetchQuery());
-
-        //withTrashed
-        \DB::enableQueryLog();
-        $items = OrderItem::orderByJoin('order.number')->withTrashed()->get();
-        $queryTest = '/select "order_items".* from "order_items" left join "orders" on "(.*)"."id" = "order_items"."order_id" where "(.*)"."deleted_at" is null group by "order_items"."id/';
-        $this->assertRegExp($queryTest, $this->fetchQuery());
     }
 
     public function testWhereOnRelationWithOrderByJoin()
