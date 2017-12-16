@@ -25,4 +25,13 @@ class ExceptionTest extends TestCase
             $this->assertEquals("Only this where type ->where('column', 'operator', 'value') is allowed on HasOneJoin and BelongsToJoin relations.", $e->getMessage());
         }
     }
+
+    public function testInvalidRelation()
+    {
+        try {
+            Seller::whereJoin('locations.address', '=', 'test')->get();
+        } catch (EloquentJoinException $e) {
+            $this->assertEquals("Only allowed relations for whereJoin, orWhereJoin and orderByJoin are BelongsToJoin, HasOneJoin", $e->getMessage());
+        }
+    }
 }

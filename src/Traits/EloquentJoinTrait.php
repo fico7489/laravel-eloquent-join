@@ -11,33 +11,50 @@ trait EloquentJoinTrait
 {
     use ExtendRelationsTrait;
 
+    //use table alias for join (real table name or uniqid())
     private $useTableAlias = false;
+
+    //store if ->select(...) is already called on builder (we want only one select)
     private $selected = false;
+
+    //store joined tables, we want join table only once (e.g. when you call orderByJoin more time)
     private $joinedTables = [];
 
+
+    //store not allowed clauses on join relations for throw exception (e.g. whereHas, orderBy etc.)
     private $relationNotAllowedClauses = [];
+
+    //store where clauses which we will use for join
     private $relationWhereClauses = [];
+
+    //store soft delete clauses (withoutTrashed|onlyTrashed|WithTrashed)
     private $softDelete = 'withoutTrashed';
 
+
+    //set invalid clauses on join relations
     public function scopeSetInvalidJoin(Builder $builder, $method, $parameters)
     {
         $this->relationNotAllowedClauses[$method] = $parameters;
     }
 
+    //set where clause for join relations
     public function scopeSetWhereForJoin(Builder $builder, $column, $operator = null, $value = null, $boolean = 'and')
     {
         $this->relationWhereClauses[] = ['column' => $column, 'operator' => $operator, 'value' => $value, 'boolean' => $boolean];
     }
 
+    //set orWhere clause for join relations
     public function scopeSetOrWhereForJoin(Builder $builder, $column, $operator = null, $value)
     {
         $this->relationWhereClauses[] = ['column' => $column, 'operator' => $operator, 'value' => $value, 'boolean' => 'or'];
     }
 
+    //set soft delete clauses for join relations
     public function scopeSetSoftDelete(Builder $builder, $param)
     {
         $this->softDelete = $param;
     }
+
 
     public function scopeWhereJoin(Builder $builder, $column, $operator = null, $value = null, $boolean = 'and')
     {
@@ -106,7 +123,7 @@ trait EloquentJoinTrait
                         $this->leftJoinQuery($join, $relatedModel, $relatedTableAlias, $keyRelated, $currentTable, $relatedPrimaryKey);
                     });
                 } else {
-                    throw new \Exception('Only allowed relations for join queries: BelongsToJoin, HasOneJoin');
+                    throw new EloquentJoinException('Only allowed relations for whereJoin, orWhereJoin and orderByJoin are BelongsToJoin, HasOneJoin');
                 }
             }
 
@@ -124,7 +141,7 @@ trait EloquentJoinTrait
         return $currentTable . '.' . $column;
     }
 
-    private function leftJoinQuery($join, $relatedModel, $relatedTableAlias, $keyRelated, $currentTable, $relatedPrimaryKey)
+    private function leftJoinQuery($join, $relatedModel, $relatedTableAlias)
     {
         foreach ($relatedModel->relationWhereClauses as $relationClause) {
             $join->where($relatedTableAlias . '.' . $relationClause['column'], $relationClause['operator'], $relationClause['value'], $relationClause['boolean']);
