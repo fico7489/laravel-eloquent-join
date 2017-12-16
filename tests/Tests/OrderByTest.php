@@ -1,11 +1,12 @@
 <?php
 
-namespace Fico7489\Laravel\EloquentJoin\Tests;
+namespace Fico7489\Laravel\EloquentJoin\Tests\Tests;
 
 use Fico7489\Laravel\EloquentJoin\Tests\Models\Location;
 use Fico7489\Laravel\EloquentJoin\Tests\Models\Order;
 use Fico7489\Laravel\EloquentJoin\Tests\Models\OrderItem;
 use Fico7489\Laravel\EloquentJoin\Tests\Models\Seller;
+use Fico7489\Laravel\EloquentJoin\Tests\TestCase;
 
 class OrderByTest extends TestCase
 {
