@@ -148,25 +148,25 @@ class EloquentJoinTraitTest extends TestCase
         //default (withoutTrashed)
         \DB::enableQueryLog();
         $items = OrderItem::orderByJoin('name')->get();
-        $queryTest = '/select "order_items".* from "order_items" where "order_items"."deleted_at" is null group by "order_items"."id" order by "order_items"."name" asc/';
+        $queryTest = '/select \* from "order_items" where "order_items"."deleted_at" is null order by "order_items"."name" asc/';
         $this->assertRegExp($queryTest, $this->fetchQuery());
 
         //withoutTrashed
         \DB::enableQueryLog();
         $items = OrderItem::orderByJoin('name')->withoutTrashed()->get();
-        $queryTest = '/select "order_items".* from "order_items" where "order_items"."deleted_at" is null group by "order_items"."id" order by "order_items"."name" asc/';
+        $queryTest = '/select \* from "order_items" where "order_items"."deleted_at" is null order by "order_items"."name" asc/';
         $this->assertRegExp($queryTest, $this->fetchQuery());
 
         //onlyTrashed
         \DB::enableQueryLog();
         $items = OrderItem::orderByJoin('name')->onlyTrashed()->get();
-        $queryTest = '/select "order_items".* from "order_items" where "order_items"."deleted_at" is not null group by "order_items"."id" order by "order_items"."name" asc/';
+        $queryTest = '/select \* from "order_items" where "order_items"."deleted_at" is not null order by "order_items"."name" asc/';
         $this->assertRegExp($queryTest, $this->fetchQuery());
 
         //withTrashed
         \DB::enableQueryLog();
         $items = OrderItem::orderByJoin('name')->withTrashed()->get();
-        $queryTest = '/select "order_items".* from "order_items" group by "order_items"."id" order by "order_items"."name" asc/';
+        $queryTest = '/select \* from "order_items" order by "order_items"."name" asc/';
         $this->assertRegExp($queryTest, $this->fetchQuery());
     }
 
@@ -175,25 +175,25 @@ class EloquentJoinTraitTest extends TestCase
         //default (withoutTrashed)
         \DB::enableQueryLog();
         $items = OrderItem::orderByJoin('order.number')->get();
-        $queryTest = '/select "order_items".* from "order_items" left join "orders" as "(.*)" on "(.*)"."id" = "order_items"."order_id" where "(.*)"."deleted_at" is null and "order_items"."deleted_at" is null group by "order_items"."id/';
+        $queryTest = '/select "order_items".* from "order_items" left join "orders" on "(.*)"."id" = "order_items"."order_id" where "(.*)"."deleted_at" is null and "order_items"."deleted_at" is null group by "order_items"."id/';
         $this->assertRegExp($queryTest, $this->fetchQuery());
 
         //withoutTrashed
         \DB::enableQueryLog();
         $items = OrderItem::orderByJoin('order.number')->withoutTrashed()->get();
-        $queryTest = '/select "order_items".* from "order_items" left join "orders" as "(.*)" on "(.*)"."id" = "order_items"."order_id" where "(.*)"."deleted_at" is null and "order_items"."deleted_at" is null group by "order_items"."id/';
+        $queryTest = '/select "order_items".* from "order_items" left join "orders" on "(.*)"."id" = "order_items"."order_id" where "(.*)"."deleted_at" is null and "order_items"."deleted_at" is null group by "order_items"."id/';
         $this->assertRegExp($queryTest, $this->fetchQuery());
 
         //onlyTrashed
         \DB::enableQueryLog();
         $items = OrderItem::orderByJoin('order.number')->onlyTrashed()->get();
-        $queryTest = '/select "order_items".* from "order_items" left join "orders" as "(.*)" on "(.*)"."id" = "order_items"."order_id" where "(.*)"."deleted_at" is null and "order_items"."deleted_at" is not null group by "order_items"."id/';
+        $queryTest = '/select "order_items".* from "order_items" left join "orders" on "(.*)"."id" = "order_items"."order_id" where "(.*)"."deleted_at" is null and "order_items"."deleted_at" is not null group by "order_items"."id/';
         $this->assertRegExp($queryTest, $this->fetchQuery());
 
         //withTrashed
         \DB::enableQueryLog();
         $items = OrderItem::orderByJoin('order.number')->withTrashed()->get();
-        $queryTest = '/select "order_items".* from "order_items" left join "orders" as "(.*)" on "(.*)"."id" = "order_items"."order_id" where "(.*)"."deleted_at" is null group by "order_items"."id/';
+        $queryTest = '/select "order_items".* from "order_items" left join "orders" on "(.*)"."id" = "order_items"."order_id" where "(.*)"."deleted_at" is null group by "order_items"."id/';
         $this->assertRegExp($queryTest, $this->fetchQuery());
     }
 
@@ -202,25 +202,25 @@ class EloquentJoinTraitTest extends TestCase
         //location have two where  ['is_primary => 0', 'is_secondary' => 0]
         \DB::enableQueryLog();
         $items = Seller::orderByJoin('location.id', 'desc')->get();
-        $queryTest = '/select "sellers".* from "sellers" left join "locations" as "(.*)" on "(.*)"."seller_id" = "sellers"."id" where "(.*)"."deleted_at" is null and "is_primary" = \? and "is_secondary" = \? group by "sellers"."id" order by "(.*)"."id" desc/';
+        $queryTest = '/select "sellers".* from "sellers" left join "locations" on "(.*)"."seller_id" = "sellers"."id" where "(.*)"."deleted_at" is null and "locations"."is_primary" = \? and "locations"."is_secondary" = \? group by "sellers"."id" order by "(.*)"."id" desc/';
         $this->assertRegExp($queryTest, $this->fetchQuery());
 
         //locationPrimary have one where ['is_primary => 1']
         \DB::enableQueryLog();
         $items = Seller::orderByJoin('locationPrimary.id', 'desc')->get();
-        $queryTest = '/select "sellers".* from "sellers" left join "locations" as "(.*)" on "(.*)"."seller_id" = "sellers"."id" where "(.*)"."deleted_at" is null and "is_primary" = \? group by "sellers"."id" order by "(.*)"."id" desc/';
+        $queryTest = '/select "sellers".* from "sellers" left join "locations" on "(.*)"."seller_id" = "sellers"."id" where "(.*)"."deleted_at" is null and "locations"."is_primary" = \? group by "sellers"."id" order by "(.*)"."id" desc/';
         $this->assertRegExp($queryTest, $this->fetchQuery());
 
         //locationPrimary have one where ['is_secondary => 1']
         \DB::enableQueryLog();
         $items = Seller::orderByJoin('locationSecondary.id', 'desc')->get();
-        $queryTest = '/select "sellers".* from "sellers" left join "locations" as "(.*)" on "(.*)"."seller_id" = "sellers"."id" where "(.*)"."deleted_at" is null and "is_secondary" = \? group by "sellers"."id" order by "(.*)"."id" desc/';
+        $queryTest = '/select "sellers".* from "sellers" left join "locations" on "(.*)"."seller_id" = "sellers"."id" where "(.*)"."deleted_at" is null and "locations"."is_secondary" = \? group by "sellers"."id" order by "(.*)"."id" desc/';
         $this->assertRegExp($queryTest, $this->fetchQuery());
 
         //locationPrimary have one where ['is_primary => 1'] and one orWhere ['is_secondary => 1']
         \DB::enableQueryLog();
         $items = Seller::orderByJoin('locationPrimaryOrSecondary.id', 'desc')->get();
-        $queryTest = '/select "sellers".* from "sellers" left join "locations" as "(.*)" on "(.*)"."seller_id" = "sellers"."id" where \("(.*)"."deleted_at" is null and "is_primary" = \? or "is_secondary" = \?\) group by "sellers"."id" order by "(.*)"."id" desc/';
+        $queryTest = '/select "sellers".* from "sellers" left join "locations" on "(.*)"."seller_id" = "sellers"."id" where \("(.*)"."deleted_at" is null and "locations"."is_primary" = \? or "locations"."is_secondary" = \?\) group by "sellers"."id" order by "(.*)"."id" desc/';
         $this->assertRegExp($queryTest, $this->fetchQuery());
     }
 
