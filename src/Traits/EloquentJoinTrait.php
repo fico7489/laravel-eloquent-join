@@ -91,7 +91,11 @@ trait EloquentJoinTrait
                 if ($relatedRelation instanceof BelongsToJoin) {
                     $keyRelated = $relatedRelation->getForeignKey();
 
-                    $builder->leftJoin($joinQuery, $relatedTableAlias . '.' . $relatedPrimaryKey, '=', $currentTable . '.' . $keyRelated);
+                    $builder->leftJoin($joinQuery, function ($join) use ($relatedTableAlias, $keyRelated, $currentTable, $relatedPrimaryKey, $relatedModel) {
+                        $join->on($relatedTableAlias . '.' . $relatedPrimaryKey, '=', $currentTable . '.' . $keyRelated);
+
+                        $this->leftJoinQuery($join, $relatedModel, $relatedTableAlias, $keyRelated, $currentTable, $relatedPrimaryKey);
+                    });
                 } elseif ($relatedRelation instanceof HasOneJoin) {
                     $keyRelated = $relatedRelation->getQualifiedForeignKeyName();
                     $keyRelated = last(explode('.', $keyRelated));
@@ -99,19 +103,7 @@ trait EloquentJoinTrait
                     $builder->leftJoin($joinQuery, function ($join) use ($relatedTableAlias, $keyRelated, $currentTable, $relatedPrimaryKey, $relatedModel) {
                         $join->on($relatedTableAlias . '.' . $keyRelated, '=', $currentTable . '.' . $relatedPrimaryKey);
 
-                        foreach ($relatedModel->relationWhereClauses as $relationClause) {
-                            $join->where($relatedTableAlias . '.' . $relationClause['column'], $relationClause['operator'], $relationClause['value'], $relationClause['boolean']);
-                        }
-
-                        if (method_exists($relatedModel, 'getQualifiedDeletedAtColumn')) {
-                            if ($this->softDelete == 'withTrashed') {
-                                //do nothing
-                            } elseif ($this->softDelete == 'withoutTrashed') {
-                                $join->where($relatedTableAlias . '.deleted_at', '=', null);
-                            } elseif ($this->softDelete == 'onlyTrashed') {
-                                $join->where($relatedTableAlias . '.deleted_at', '<>', null);
-                            }
-                        }
+                        $this->leftJoinQuery($join, $relatedModel, $relatedTableAlias, $keyRelated, $currentTable, $relatedPrimaryKey);
                     });
                 } else {
                     throw new \Exception('Only allowed relations for join queries: BelongsToJoin, HasOneJoin');
@@ -130,6 +122,23 @@ trait EloquentJoinTrait
         }
 
         return $currentTable . '.' . $column;
+    }
+
+    private function leftJoinQuery($join, $relatedModel, $relatedTableAlias, $keyRelated, $currentTable, $relatedPrimaryKey)
+    {
+        foreach ($relatedModel->relationWhereClauses as $relationClause) {
+            $join->where($relatedTableAlias . '.' . $relationClause['column'], $relationClause['operator'], $relationClause['value'], $relationClause['boolean']);
+        }
+
+        if (method_exists($relatedModel, 'getQualifiedDeletedAtColumn')) {
+            if ($this->softDelete == 'withTrashed') {
+                //do nothing
+            } elseif ($this->softDelete == 'withoutTrashed') {
+                $join->where($relatedTableAlias . '.deleted_at', '=', null);
+            } elseif ($this->softDelete == 'onlyTrashed') {
+                $join->where($relatedTableAlias . '.deleted_at', '<>', null);
+            }
+        }
     }
 
     private function validateJoinQuery($relatedModel)
