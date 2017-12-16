@@ -10,7 +10,7 @@ trait EloquentJoinTrait
 {
     use ExtendRelationsTrait;
 
-    private $useTableAlias = true;
+    private $useTableAlias = false;
     private $selected = false;
     private $joinedTables = [];
 
@@ -79,15 +79,16 @@ trait EloquentJoinTrait
             } else {
                 $relatedTableAlias = $this->useTableAlias ? uniqid() : $relatedTable;
 
+                $joinQuery = $relatedTable . ($this->useTableAlias ? ' as ' . $relatedTableAlias : '');
                 if ($relatedRelation instanceof BelongsToJoin) {
                     $keyRelated = $relatedRelation->getForeignKey();
 
-                    $builder->leftJoin($relatedTable . ' as ' . $relatedTableAlias, $relatedTableAlias . '.' . $relatedPrimaryKey, '=', $currentTable . '.' . $keyRelated);
+                    $builder->leftJoin($joinQuery, $relatedTableAlias . '.' . $relatedPrimaryKey, '=', $currentTable . '.' . $keyRelated);
                 } elseif ($relatedRelation instanceof HasOneJoin) {
                     $keyRelated = $relatedRelation->getQualifiedForeignKeyName();
-
                     $keyRelated = last(explode('.', $keyRelated));
-                    $builder->leftJoin($relatedTable . ' as ' . $relatedTableAlias, $relatedTableAlias . '.' . $keyRelated, '=', $currentTable . '.' . $relatedPrimaryKey);
+
+                    $builder->leftJoin($joinQuery, $relatedTableAlias . '.' . $keyRelated, '=', $currentTable . '.' . $relatedPrimaryKey);
                 } else {
                     throw new \Exception('Only allowed relations for join queries: BelongsToJoin, HasOneJoin');
                 }
@@ -113,7 +114,7 @@ trait EloquentJoinTrait
             $this->joinedTables[$relation] = $relatedTableAlias;
         }
 
-        if (! $this->selected) {
+        if (! $this->selected  &&  count($relations) > 1) {
             $this->selected = true;
             $builder->select($baseTable . '.*')->groupBy($baseTable . '.' . $baseModel->primaryKey);
         }

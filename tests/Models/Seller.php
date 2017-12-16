@@ -38,4 +38,9 @@ class Seller extends BaseModel
             ->where('is_primary', '=', 1)
             ->orWhere('is_secondary', '=', 1);
     }
+
+    public function city()
+    {
+        return $this->belongsToJoin(City::class);
+    }
 }

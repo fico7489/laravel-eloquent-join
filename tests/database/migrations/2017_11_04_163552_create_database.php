@@ -43,6 +43,11 @@ class CreateDatabase extends Migration
             $table->increments('id');
             $table->string('title')->nullable();
 
+            $table->integer('city_id')->unsigned()->index()->nullable();
+
+            $table->foreign('city_id')->references('id')->on('cities')
+                ->onUpdate('cascade')->onDelete('cascade');
+
             $table->timestamps();
             $table->softDeletes();
         });
@@ -60,6 +65,14 @@ class CreateDatabase extends Migration
             $table->timestamps();
             $table->softDeletes();
         });
+
+        Schema::create('cities', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name')->nullable();
+
+            $table->timestamps();
+            $table->softDeletes();
+        });
     }
 
     /**
@@ -73,5 +86,6 @@ class CreateDatabase extends Migration
         Schema::drop('sellers');
         Schema::drop('order_items');
         Schema::drop('locations');
+        Schema::drop('cities');
     }
 }
