@@ -79,4 +79,12 @@ class JoinTest extends TestCase
         $queryTest = '/select "sellers".* from "sellers" left join "cities" on "cities"."id" = "sellers"."city_id" left join "states" on "states"."id" = "cities"."state_id" where "cities"."deleted_at" is null and "states"."deleted_at" is null and "states"."name" = \? group by "sellers"."id"/';
         $this->assertRegExp($queryTest, $this->fetchQuery());
     }
+
+    public function testWhereJoinBelongsToHasOne()
+    {
+        Seller::whereJoin('city.zipCodePrimary.name', '=', 'test')->get();
+
+        $queryTest = '/select "sellers".* from "sellers" left join "cities" on "cities"."id" = "sellers"."city_id" left join "zip_codes" on "zip_codes"."city_id" = "cities"."id" where "cities"."deleted_at" is null and "zip_codes"."deleted_at" is null and "is_primary" = \? and "zip_codes"."name" = \? group by "sellers"."id"/';
+        $this->assertRegExp($queryTest, $this->fetchQuery());
+    }
 }

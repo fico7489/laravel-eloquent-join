@@ -82,9 +82,9 @@ class CreateDatabase extends Migration
             $table->increments('id');
             $table->string('name')->nullable();
             $table->boolean('is_primary')->default(0);
-            $table->integer('location_id')->unsigned()->index()->nullable();
+            $table->integer('city_id')->unsigned()->index()->nullable();
 
-            $table->foreign('location_id')->references('id')->on('locations')
+            $table->foreign('city_id')->references('id')->on('cities')
                 ->onUpdate('cascade')->onDelete('cascade');
 
             $table->timestamps();
