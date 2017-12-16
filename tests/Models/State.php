@@ -4,11 +4,11 @@ namespace Fico7489\Laravel\EloquentJoin\Tests\Models;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class ZipCode extends BaseModel
+class State extends BaseModel
 {
     use SoftDeletes;
 
-    protected $table = 'zip_codes';
+    protected $table = 'states';
 
-    protected $fillable = ['name', 'is_primary'];
+    protected $fillable = ['name'];
 }

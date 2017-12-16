@@ -48,7 +48,7 @@ class JoinTest extends TestCase
         return end($log)['query'];
     }
 
-    public function testwhereJoinNoRelation()
+    public function testWhereJoinNoRelation()
     {
         Seller::whereJoin('title', '=', 'test')->get();
 
@@ -56,7 +56,7 @@ class JoinTest extends TestCase
         $this->assertRegExp($queryTest, $this->fetchQuery());
     }
 
-    public function testwhereJoinBelongsTo()
+    public function testWhereJoinBelongsTo()
     {
         Seller::whereJoin('city.name', '=', 'test')->get();
 
@@ -64,11 +64,19 @@ class JoinTest extends TestCase
         $this->assertRegExp($queryTest, $this->fetchQuery());
     }
 
-    public function testwhereJoinHasOne()
+    public function testWhereJoinHasOne()
     {
         Seller::whereJoin('locationPrimary.address', '=', 'test')->get();
 
         $queryTest = '/select "sellers".* from "sellers" left join "locations" on "locations"."seller_id" = "sellers"."id" where "locations"."deleted_at" is null and "is_primary" = \? and "locations"."address" = \? group by "sellers"."id"/';
+        $this->assertRegExp($queryTest, $this->fetchQuery());
+    }
+
+    public function testWhereJoinBelongsToBelongsTo()
+    {
+        Seller::whereJoin('city.state.name', '=', 'test')->get();
+
+        $queryTest = '/select "sellers".* from "sellers" left join "cities" on "cities"."id" = "sellers"."city_id" left join "states" on "states"."id" = "cities"."state_id" where "cities"."deleted_at" is null and "states"."deleted_at" is null and "states"."name" = \? group by "sellers"."id"/';
         $this->assertRegExp($queryTest, $this->fetchQuery());
     }
 }

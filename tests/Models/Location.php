@@ -16,4 +16,10 @@ class Location extends BaseModel
     {
         return $this->belongsToJoin(Seller::class);
     }
+
+    public function zipCodePrimary()
+    {
+        return $this->belongsToJoin(ZipCode::class)
+            ->where('is_primary', '=', 1);
+    }
 }

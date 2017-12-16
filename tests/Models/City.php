@@ -11,4 +11,9 @@ class City extends BaseModel
     protected $table = 'cities';
 
     protected $fillable = ['name'];
+
+    public function state()
+    {
+        return $this->belongsToJoin(State::class);
+    }
 }
