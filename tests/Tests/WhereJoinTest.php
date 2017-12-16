@@ -29,7 +29,7 @@ class WhereJoinTest extends TestCase
     {
         Seller::whereJoin('locationPrimary.address', '=', 'test')->get();
 
-        $queryTest = '/select "sellers".* from "sellers" left join "locations" on "locations"."seller_id" = "sellers"."id" where "locations"."deleted_at" is null and "locations"."is_primary" = \? and "locations"."address" = \? group by "sellers"."id"/';
+        $queryTest = '/select "sellers".* from "sellers" left join "locations" on "locations"."seller_id" = "sellers"."id" and "locations"."is_primary" = \? where "locations"."deleted_at" is null and "locations"."address" = \? group by "sellers"."id"/';
         $this->assertRegExp($queryTest, $this->fetchQuery());
     }
 
@@ -45,7 +45,7 @@ class WhereJoinTest extends TestCase
     {
         Seller::whereJoin('city.zipCodePrimary.name', '=', 'test')->get();
 
-        $queryTest = '/select "sellers".* from "sellers" left join "cities" on "cities"."id" = "sellers"."city_id" left join "zip_codes" on "zip_codes"."city_id" = "cities"."id" where "cities"."deleted_at" is null and "zip_codes"."deleted_at" is null and "zip_codes"."is_primary" = \? and "zip_codes"."name" = \? group by "sellers"."id"/';
+        $queryTest = '/select "sellers".* from "sellers" left join "cities" on "cities"."id" = "sellers"."city_id" left join "zip_codes" on "zip_codes"."city_id" = "cities"."id" and "zip_codes"."is_primary" = \? where "cities"."deleted_at" is null and "zip_codes"."deleted_at" is null and "zip_codes"."name" = \? group by "sellers"."id"/';
         $this->assertRegExp($queryTest, $this->fetchQuery());
     }
 
@@ -53,7 +53,7 @@ class WhereJoinTest extends TestCase
     {
         Seller::whereJoin('locationPrimary.locationAddressPrimary.name', '=', 'test')->get();
 
-        $queryTest = '/select "sellers".* from "sellers" left join "locations" on "locations"."seller_id" = "sellers"."id" left join "location_addresses" on "location_addresses"."location_id" = "locations"."id" where "locations"."deleted_at" is null and "locations"."is_primary" = \? and "location_addresses"."deleted_at" is null and "location_addresses"."is_primary" = \? and "location_addresses"."name" = \? group by "sellers"."id"/';
+        $queryTest = '/select "sellers".* from "sellers" left join "locations" on "locations"."seller_id" = "sellers"."id" and "locations"."is_primary" = ? left join "location_addresses" on "location_addresses"."location_id" = "locations"."id" and "location_addresses"."is_primary" = ? where "locations"."deleted_at" is null and "location_addresses"."deleted_at" is null and "location_addresses"."name" = ? group by "sellers"."id"/';
         $this->assertRegExp($queryTest, $this->fetchQuery());
     }
 

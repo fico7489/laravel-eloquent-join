@@ -96,23 +96,25 @@ trait EloquentJoinTrait
                     $keyRelated = $relatedRelation->getQualifiedForeignKeyName();
                     $keyRelated = last(explode('.', $keyRelated));
 
-                    $builder->leftJoin($joinQuery, $relatedTableAlias . '.' . $keyRelated, '=', $currentTable . '.' . $relatedPrimaryKey);
+                    $builder->leftJoin($joinQuery, function ($join) use ($relatedTableAlias, $keyRelated, $currentTable, $relatedPrimaryKey, $relatedModel) {
+                        $join->on($relatedTableAlias . '.' . $keyRelated, '=', $currentTable . '.' . $relatedPrimaryKey);
+
+                        foreach ($relatedModel->relationWhereClauses as $relationClause) {
+                            $join->where($relatedTableAlias . '.' . $relationClause['column'], $relationClause['operator'], $relationClause['value'], $relationClause['boolean']);
+                        }
+
+                        if (method_exists($relatedModel, 'getQualifiedDeletedAtColumn')) {
+                            if ($this->softDelete == 'withTrashed') {
+                                //do nothing
+                            } elseif ($this->softDelete == 'withoutTrashed') {
+                                $join->where($relatedTableAlias . '.deleted_at', '=', null);
+                            } elseif ($this->softDelete == 'onlyTrashed') {
+                                $join->where($relatedTableAlias . '.deleted_at', '<>', null);
+                            }
+                        }
+                    });
                 } else {
                     throw new \Exception('Only allowed relations for join queries: BelongsToJoin, HasOneJoin');
-                }
-
-                if (method_exists($relatedModel, 'getQualifiedDeletedAtColumn')) {
-                    if ($this->softDelete == 'withTrashed') {
-                        //do nothing
-                    } elseif ($this->softDelete == 'withoutTrashed') {
-                        $builder->where($relatedTableAlias . '.deleted_at', '=', null);
-                    } elseif ($this->softDelete == 'onlyTrashed') {
-                        $builder->where($relatedTableAlias . '.deleted_at', '<>', null);
-                    }
-                }
-
-                foreach ($relatedModel->relationWhereClauses as $relationClause) {
-                    $builder->where($relatedTableAlias . '.' . $relationClause['column'], $relationClause['operator'], $relationClause['value'], $relationClause['boolean']);
                 }
             }
 
