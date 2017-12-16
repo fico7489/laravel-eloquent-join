@@ -8,7 +8,7 @@ use Fico7489\Laravel\EloquentJoin\Tests\TestCase;
 
 class HasOneLeftJoinTest extends TestCase
 {
-    public function testHasOneLeftJoinMore()
+    public function testLeftJoinMore()
     {
         Seller::where('id', '>', 0)->forceDelete();
         Location::where('id', '>', 0)->forceDelete();
@@ -25,7 +25,7 @@ class HasOneLeftJoinTest extends TestCase
         $this->assertEquals(1, Seller::count());
     }
 
-    /*public function testHasOneLeftJoinEmpty()
+    public function testLeftJoinEmpty()
     {
         Seller::where('id', '>', 0)->forceDelete();
         Location::where('id', '>', 0)->forceDelete();
@@ -38,5 +38,5 @@ class HasOneLeftJoinTest extends TestCase
         $items = Seller::orderByJoin('locationPrimary.address')->get();
         $this->assertEquals(1, $items->count());
         $this->assertEquals(1, Seller::count());
-    }*/
+    }
 }
