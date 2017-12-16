@@ -26,6 +26,19 @@ class Seller extends BaseModel
             ->where('is_primary', '=', 1);
     }
 
+    public function locationPrimaryInvalid()
+    {
+        return $this->hasOneJoin(Location::class)
+            ->where('is_primary', '=', 1)
+            ->orderBy('is_primary');
+    }
+
+    public function locationPrimaryInvalid2()
+    {
+        return $this->hasOneJoin(Location::class)
+            ->where(['is_primary' => 1]);
+    }
+
     public function locationSecondary()
     {
         return $this->hasOneJoin(Location::class)
