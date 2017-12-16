@@ -95,4 +95,12 @@ class JoinTest extends TestCase
         $queryTest = '/select "sellers".* from "sellers" left join "locations" on "locations"."seller_id" = "sellers"."id" left join "location_addresses" on "location_addresses"."location_id" = "locations"."id" where "locations"."deleted_at" is null and "locations"."is_primary" = \? and "location_addresses"."deleted_at" is null and "location_addresses"."is_primary" = \? and "location_addresses"."name" = \? group by "sellers"."id"/';
         $this->assertRegExp($queryTest, $this->fetchQuery());
     }
+
+    public function testWhereJoinHasBelongsTo()
+    {
+        Seller::whereJoin('locationPrimary.city.name', '=', 'test')->get();
+
+        $queryTest = '/select "sellers".* from "sellers" left join "locations" on "locations"."seller_id" = "sellers"."id" left join "cities" on "cities"."id" = "locations"."city_id" where "locations"."deleted_at" is null and "locations"."is_primary" = \? and "cities"."deleted_at" is null and "cities"."name" = \? group by "sellers"."id"/';
+        $this->assertRegExp($queryTest, $this->fetchQuery());
+    }
 }

@@ -17,6 +17,11 @@ class Location extends BaseModel
         return $this->belongsToJoin(Seller::class);
     }
 
+    public function city()
+    {
+        return $this->belongsToJoin(City::class);
+    }
+
     public function locationAddressPrimary()
     {
         return $this->hasOneJoin(LocationAddress::class)

@@ -58,8 +58,12 @@ class CreateDatabase extends Migration
             $table->boolean('is_primary')->default(0);
             $table->boolean('is_secondary')->default(0);
             $table->integer('seller_id')->unsigned()->index()->nullable();
+            $table->integer('city_id')->unsigned()->index()->nullable();
 
             $table->foreign('seller_id')->references('id')->on('sellers')
+                ->onUpdate('cascade')->onDelete('cascade');
+
+            $table->foreign('city_id')->references('id')->on('cities')
                 ->onUpdate('cascade')->onDelete('cascade');
 
             $table->timestamps();
