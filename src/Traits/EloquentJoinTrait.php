@@ -32,7 +32,6 @@ trait EloquentJoinTrait
         $this->softDelete = $param;
     }
 
-
     public function scopeWhereJoin(Builder $builder, $column, $operator = null, $value = null, $boolean = 'and')
     {
         $column = $this->performJoin($builder, $column);
