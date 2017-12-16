@@ -19,8 +19,10 @@ trait JoinRelationTrait
             parent::__call('setWhereForJoin', $parameters);
         } elseif ($method == 'orWhere') {
             parent::__call('setOrWhereForJoin', $parameters);
-        }elseif (in_array($method, $softDeleteOptions)) {
+        } elseif (in_array($method, $softDeleteOptions)) {
             parent::__call('setSoftDelete', $parameters);
+        } else {
+            parent::__call('scopeSetInvalidJoin', $method, $parameters);
         }
 
         return parent::__call($method, $parameters);

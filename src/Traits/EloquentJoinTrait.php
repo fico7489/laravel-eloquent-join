@@ -14,8 +14,14 @@ trait EloquentJoinTrait
     private $selected = false;
     private $joinedTables = [];
 
+    private $relationClausesNotAllowed = [];
     private $relationClauses = [];
     private $softDelete = 'withoutTrashed';
+
+    public function scopeSetInvalidJoin(Builder $builder, $method, $parameters)
+    {
+        $this->relationClausesNotAllowed[] = ['method' => $method, 'parameters' => $parameters];
+    }
 
     public function scopeSetWhereForJoin(Builder $builder, $column, $operator = null, $value = null, $boolean = 'and')
     {
