@@ -1,6 +1,6 @@
 <?php
 
-namespace Fico7489\Laravel\SortJoin\Tests\Models;
+namespace Fico7489\Laravel\EloquentJoin\Tests\Models;
 
 class Seller extends BaseModel
 {

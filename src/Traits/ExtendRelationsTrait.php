@@ -1,9 +1,9 @@
 <?php
 
-namespace Fico7489\Laravel\SortJoin\Traits;
+namespace Fico7489\Laravel\EloquentJoin\Traits;
 
-use Fico7489\Laravel\SortJoin\Relations\BelongsToJoin;
-use Fico7489\Laravel\SortJoin\Relations\HasOneJoin;
+use Fico7489\Laravel\EloquentJoin\Relations\BelongsToJoin;
+use Fico7489\Laravel\EloquentJoin\Relations\HasOneJoin;
 use Illuminate\Support\Str;
 
 trait ExtendRelationsTrait

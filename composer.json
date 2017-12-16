@@ -1,17 +1,19 @@
 {
-    "name": "fico7489/laravel-sort-join",
+    "name": "fico7489/laravel-eloquent-join",
     "description": "Sorting by related model attributes can be awkward, but this package can help you.",
     "keywords": [
-        "laravel sort",
-        "laravel sort related",
-        "laravel sort models",
-        "laravel sort related models",
+        "laravel eloquent join",
+        "laravel eloquent join",
+        "laravel sort join",
+        "laravel where join",
+        "laravel join relation",
+        "laravel join relations",
         "laravel"
     ],
-    "homepage": "https://github.com/fico7489/laravel-sort-join",
+    "homepage": "https://github.com/fico7489/laravel-eloquent-join",
     "support": {
-        "issues": "https://github.com/fico7489/laravel-sort-join/issues",
-        "source": "https://github.com/fico7489/laravel-sort-join"
+        "issues": "https://github.com/fico7489/laravel-eloquent-join/issues",
+        "source": "https://github.com/fico7489/laravel-eloquent-join"
     },
     "license": "MIT",
     "authors": [
@@ -30,12 +32,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Fico7489\\Laravel\\SortJoin\\": "src"
+            "Fico7489\\Laravel\\EloquentJoin\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Fico7489\\Laravel\\SortJoin\\Tests\\": "tests/"
+            "Fico7489\\Laravel\\EloquentJoin\\Tests\\": "tests/"
         }
     },
     "minimum-stability": "dev",

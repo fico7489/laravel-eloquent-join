@@ -1,13 +1,13 @@
 <?php
 
-namespace Fico7489\Laravel\SortJoin\Tests;
+namespace Fico7489\Laravel\EloquentJoin\Tests;
 
-use Fico7489\Laravel\SortJoin\Tests\Models\Seller;
-use Fico7489\Laravel\SortJoin\Tests\Models\Order;
-use Fico7489\Laravel\SortJoin\Tests\Models\OrderItem;
-use Fico7489\Laravel\SortJoin\Tests\Models\Location;
+use Fico7489\Laravel\EloquentJoin\Tests\Models\Seller;
+use Fico7489\Laravel\EloquentJoin\Tests\Models\Order;
+use Fico7489\Laravel\EloquentJoin\Tests\Models\OrderItem;
+use Fico7489\Laravel\EloquentJoin\Tests\Models\Location;
 
-class SortJoinTraitTest extends TestCase
+class EloquentJoinTraitTest extends TestCase
 {
     public function setUp()
     {

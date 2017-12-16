@@ -1,6 +1,6 @@
 <?php
 
-namespace Fico7489\Laravel\SortJoin\Tests;
+namespace Fico7489\Laravel\EloquentJoin\Tests;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
