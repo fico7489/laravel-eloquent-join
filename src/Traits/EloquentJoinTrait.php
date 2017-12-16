@@ -3,6 +3,7 @@
 namespace Fico7489\Laravel\EloquentJoin\Traits;
 
 use Fico7489\Laravel\EloquentJoin\Relations\BelongsToJoin;
+use Fico7489\Laravel\EloquentJoin\Exceptions\EloquentJoinException;
 use Fico7489\Laravel\EloquentJoin\Relations\HasOneJoin;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -14,23 +15,23 @@ trait EloquentJoinTrait
     private $selected = false;
     private $joinedTables = [];
 
-    private $relationClausesNotAllowed = [];
-    private $relationClauses = [];
+    private $relationNotAllowedClauses = [];
+    private $relationWhereClauses = [];
     private $softDelete = 'withoutTrashed';
 
     public function scopeSetInvalidJoin(Builder $builder, $method, $parameters)
     {
-        $this->relationClausesNotAllowed[] = ['method' => $method, 'parameters' => $parameters];
+        $this->relationNotAllowedClauses[$method] = $parameters;
     }
 
     public function scopeSetWhereForJoin(Builder $builder, $column, $operator = null, $value = null, $boolean = 'and')
     {
-        $this->relationClauses[] = ['column' => $column, 'operator' => $operator, 'value' => $value, 'boolean' => $boolean];
+        $this->relationWhereClauses[] = ['column' => $column, 'operator' => $operator, 'value' => $value, 'boolean' => $boolean];
     }
 
     public function scopeSetOrWhereForJoin(Builder $builder, $column, $operator = null, $value)
     {
-        $this->relationClauses[] = ['column' => $column, 'operator' => $operator, 'value' => $value, 'boolean' => 'or'];
+        $this->relationWhereClauses[] = ['column' => $column, 'operator' => $operator, 'value' => $value, 'boolean' => 'or'];
     }
 
     public function scopeSetSoftDelete(Builder $builder, $param)
@@ -79,6 +80,8 @@ trait EloquentJoinTrait
             $relatedPrimaryKey = $relatedModel->primaryKey;
             $relatedTable = $relatedModel->getTable();
 
+            $this->validateJoinQuery($relatedModel);
+
             if (array_key_exists($relation, $this->joinedTables)) {
                 $relatedTableAlias = $this->joinedTables[$relation];
             } else {
@@ -108,7 +111,7 @@ trait EloquentJoinTrait
                     }
                 }
 
-                foreach ($relatedModel->relationClauses as $relationClause) {
+                foreach ($relatedModel->relationWhereClauses as $relationClause) {
                     $builder->where($relatedTableAlias . '.' . $relationClause['column'], $relationClause['operator'], $relationClause['value'], $relationClause['boolean']);
                 }
             }
@@ -125,5 +128,18 @@ trait EloquentJoinTrait
         }
 
         return $currentTable . '.' . $column;
+    }
+
+    private function validateJoinQuery($relatedModel)
+    {
+        foreach ($relatedModel->relationNotAllowedClauses as $method => $relationNotAllowedClause) {
+            throw new EloquentJoinException($method . ' is not allowed on HasOneJoin and BelongsToJoin relations.');
+        }
+
+        foreach ($relatedModel->relationWhereClauses as $relationWhereClause) {
+            if (empty($relationWhereClause['column'])  ||  ! is_string($relationWhereClause['column'])) {
+                throw new EloquentJoinException("Only this where type ->where('column', 'operator', 'value') is allowed on HasOneJoin and BelongsToJoin relations.");
+            }
+        }
     }
 }
