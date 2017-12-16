@@ -104,7 +104,7 @@ trait EloquentJoinTrait
                 }
 
                 foreach ($relatedModel->relationClauses as $relationClause) {
-                    $builder->where($relationClause['column'], $relationClause['operator'], $relationClause['value'], $relationClause['boolean']);
+                    $builder->where($relatedTableAlias . '.' . $relationClause['column'], $relationClause['operator'], $relationClause['value'], $relationClause['boolean']);
                 }
             }
 
