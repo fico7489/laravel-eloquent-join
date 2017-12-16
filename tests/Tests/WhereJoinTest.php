@@ -5,7 +5,7 @@ namespace Fico7489\Laravel\EloquentJoin\Tests\Tests;
 use Fico7489\Laravel\EloquentJoin\Tests\Models\Seller;
 use Fico7489\Laravel\EloquentJoin\Tests\TestCase;
 
-class JoinWhereTest extends TestCase
+class WhereJoinTest extends TestCase
 {
     public function testWhereJoinNoRelation()
     {

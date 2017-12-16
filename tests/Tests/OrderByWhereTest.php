@@ -8,7 +8,7 @@ use Fico7489\Laravel\EloquentJoin\Tests\Models\OrderItem;
 use Fico7489\Laravel\EloquentJoin\Tests\Models\Seller;
 use Fico7489\Laravel\EloquentJoin\Tests\TestCase;
 
-class OrderByTest extends TestCase
+class OrderByWhereTest extends TestCase
 {
     private function checkOrder($items, $order, $count)
     {

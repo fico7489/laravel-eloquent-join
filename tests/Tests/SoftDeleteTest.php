@@ -5,7 +5,7 @@ namespace Fico7489\Laravel\EloquentJoin\Tests\Tests;
 use Fico7489\Laravel\EloquentJoin\Tests\Models\OrderItem;
 use Fico7489\Laravel\EloquentJoin\Tests\TestCase;
 
-class TrashedTest extends TestCase
+class SoftDeleteTest extends TestCase
 {
     public function testNotRelatedWithoutTrashedDefault()
     {
