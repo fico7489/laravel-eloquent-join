@@ -71,5 +71,7 @@ class CreateDatabase extends Migration
     {
         Schema::drop('users');
         Schema::drop('sellers');
+        Schema::drop('order_items');
+        Schema::drop('locations');
     }
 }
