@@ -153,9 +153,9 @@ trait EloquentJoinTrait
             if ($this->softDelete == 'withTrashed') {
                 //do nothing
             } elseif ($this->softDelete == 'withoutTrashed') {
-                $join->where($relatedTableAlias . '.deleted_at', 'is', null);
+                $join->whereNull($relatedTableAlias . '.deleted_at');
             } elseif ($this->softDelete == 'onlyTrashed') {
-                $join->where($relatedTableAlias . '.deleted_at', 'is not', null);
+                $join->whereNotNull($relatedTableAlias . '.deleted_at');
             }
         }
     }
