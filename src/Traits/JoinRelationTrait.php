@@ -22,8 +22,8 @@ trait JoinRelationTrait
         } elseif (in_array($method, $softDeleteOptions)) {
             parent::__call('setSoftDelete', $parameters);
         } else {
-            $parameters = array_merge([$method], $parameters);
-            parent::__call('setInvalidJoin', $parameters);
+            $parametersInvalid = array_merge([$method], $parameters);
+            parent::__call('setInvalidJoin', $parametersInvalid);
         }
 
         return parent::__call($method, $parameters);
