@@ -114,7 +114,7 @@ trait EloquentJoinTrait
                         $this->leftJoinQuery($join, $relatedModel, $relatedTableAlias, $keyRelated, $currentTable, $relatedPrimaryKey);
                     });
                 } elseif ($relatedRelation instanceof HasOneJoin) {
-                    $keyRelated = $relatedRelation->getQualifiedForeignKeyName();
+                    $keyRelated = $relatedRelation->getForeignKey();
                     $keyRelated = last(explode('.', $keyRelated));
 
                     $builder->leftJoin($joinQuery, function ($join) use ($relatedTableAlias, $keyRelated, $currentTable, $relatedPrimaryKey, $relatedModel) {

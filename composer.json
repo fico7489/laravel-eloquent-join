@@ -25,11 +25,11 @@
         }
     ],
     "require": {
-        "illuminate/database": "5.4.*",
+        "illuminate/database": "5.3.*",
         "phpunit/phpunit": "~5.0"
     },
     "require-dev": {
-        "orchestra/testbench": "~3.4.0"
+        "orchestra/testbench": "~3.3.0"
     },
     "autoload": {
         "psr-4": {
