@@ -25,7 +25,7 @@
         }
     ],
     "require": {
-        "illuminate/database": "5.*"
+        "illuminate/database": "5.5.*"
     },
     "require-dev": {
         "orchestra/testbench": "~3.5.0"
