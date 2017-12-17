@@ -23,11 +23,6 @@ class WhereOnRelationTest extends TestCase
         $items = Seller::orderByJoin('locationSecondary.id', 'desc')->get();
         $queryTest = '/select "sellers".* from "sellers" left join "locations" on "locations"."seller_id" = "sellers"."id" and "locations"."is_secondary" = \? and "locations"."deleted_at" is null group by "sellers"."id" order by "locations"."id" desc/';
         $this->assertRegExp($queryTest, $this->fetchQuery());
-
-        //locationPrimary have one where ['is_primary => 1'] and one orWhere ['is_secondary => 1']
-        $items = Seller::orderByJoin('locationPrimaryOrSecondary.id', 'desc')->get();
-        $queryTest = '/select "sellers".* from "sellers" left join "locations" on "locations"."seller_id" = "sellers"."id" and "locations"."is_primary" = \? or "locations"."is_secondary" = \? and "locations"."deleted_at" is null group by "sellers"."id" order by "locations"."id" desc/';
-        $this->assertRegExp($queryTest, $this->fetchQuery());
     }
 
     public function testWhereOnRelationWithoutOrderByJoin()

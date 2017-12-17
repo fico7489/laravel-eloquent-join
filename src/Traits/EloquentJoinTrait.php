@@ -47,7 +47,8 @@ trait EloquentJoinTrait
     //set orWhere clause for join relations
     public function scopeSetOrWhereForJoin(Builder $builder, $column, $operator = null, $value)
     {
-        $this->relationWhereClauses[] = ['column' => $column, 'operator' => $operator, 'value' => $value, 'boolean' => 'or'];
+        $method = 'orWhere';
+        $this->relationNotAllowedClauses[$method] = $method;
     }
 
     //set soft delete clauses for join relations
@@ -162,7 +163,9 @@ trait EloquentJoinTrait
     private function validateJoinQuery($relatedModel)
     {
         foreach ($relatedModel->relationNotAllowedClauses as $method => $relationNotAllowedClause) {
-            throw new EloquentJoinException($method . ' is not allowed on HasOneJoin and BelongsToJoin relations.');
+            $text = $method . ' is not allowed on HasOneJoin and BelongsToJoin relations.';
+            $text = ($method == 'orWhere') ? $text . ' (for laravel <=5.2.*)' : $text;
+            throw new EloquentJoinException($text);
         }
 
         foreach ($relatedModel->relationWhereClauses as $relationWhereClause) {

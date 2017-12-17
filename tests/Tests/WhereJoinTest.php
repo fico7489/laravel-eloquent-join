@@ -86,13 +86,5 @@ class WhereJoinTest extends TestCase
         //test more where does not exists
         $items = OrderItem::orderByJoin('order.number')->whereJoin('order.number', '=', 'bbbb')->whereJoin('order.number', '=', 'cccc')->get();
         $this->assertEquals(0, $items->count());
-
-        //test more where with orWhere exists
-        $items = OrderItem::orderByJoin('order.number')->whereJoin('order.number', '=', 'bbbb')->orWhereJoin('order.number', '=', 'cccc')->get();
-        $this->assertEquals(2, $items->count());
-
-        //test more where with orWhere does not exists
-        $items = OrderItem::orderByJoin('order.number')->whereJoin('order.number', '=', 'dddd')->orWhereJoin('order.number', '=', 'eeee')->get();
-        $this->assertEquals(0, $items->count());
     }
 }

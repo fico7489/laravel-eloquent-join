@@ -26,6 +26,15 @@ class ExceptionTest extends TestCase
         }
     }
 
+    public function testInvalidOrWhere()
+    {
+        try {
+            Seller::whereJoin('locationPrimaryOrSecondary.name', '=', 'test')->get();
+        } catch (EloquentJoinException $e) {
+            $this->assertEquals("orWhere is not allowed on HasOneJoin and BelongsToJoin relations. (for laravel <=5.2.*)", $e->getMessage());
+        }
+    }
+
     public function testInvalidRelation()
     {
         try {
