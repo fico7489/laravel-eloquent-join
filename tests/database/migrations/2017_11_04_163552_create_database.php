@@ -18,7 +18,7 @@ class CreateDatabase extends Migration
         Schema::create('order_items', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
-            $table->integer('order_id')->unsigned()->index()->nullable();
+            $table->unsignedInteger('order_id')->unsigned()->nullable();
 
             $table->foreign('order_id')->references('id')->on('orders')
                 ->onUpdate('cascade')->onDelete('cascade');
@@ -30,7 +30,7 @@ class CreateDatabase extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->increments('id');
             $table->string('number')->nullable();
-            $table->integer('seller_id')->unsigned()->index()->nullable();
+            $table->unsignedInteger('seller_id')->unsigned()->nullable();
 
             $table->foreign('seller_id')->references('id')->on('sellers')
                 ->onUpdate('cascade')->onDelete('cascade');
@@ -42,8 +42,7 @@ class CreateDatabase extends Migration
         Schema::create('sellers', function (Blueprint $table) {
             $table->increments('id');
             $table->string('title')->nullable();
-
-            $table->integer('city_id')->unsigned()->index()->nullable();
+            $table->unsignedInteger('city_id')->unsigned()->nullable();
 
             $table->foreign('city_id')->references('id')->on('cities')
                 ->onUpdate('cascade')->onDelete('cascade');
@@ -57,8 +56,8 @@ class CreateDatabase extends Migration
             $table->string('address')->nullable();
             $table->boolean('is_primary')->default(0);
             $table->boolean('is_secondary')->default(0);
-            $table->integer('seller_id')->unsigned()->index()->nullable();
-            $table->integer('city_id')->unsigned()->index()->nullable();
+            $table->unsignedInteger('seller_id')->unsigned()->nullable();
+            $table->unsignedInteger('city_id')->unsigned()->nullable();
 
             $table->foreign('seller_id')->references('id')->on('sellers')
                 ->onUpdate('cascade')->onDelete('cascade');
@@ -73,7 +72,7 @@ class CreateDatabase extends Migration
         Schema::create('cities', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name')->nullable();
-            $table->integer('state_id')->unsigned()->index()->nullable();
+            $table->unsignedInteger('state_id')->unsigned()->nullable();
 
             $table->foreign('state_id')->references('id')->on('states')
                 ->onUpdate('cascade')->onDelete('cascade');
@@ -86,7 +85,7 @@ class CreateDatabase extends Migration
             $table->increments('id');
             $table->string('name')->nullable();
             $table->boolean('is_primary')->default(0);
-            $table->integer('city_id')->unsigned()->index()->nullable();
+            $table->unsignedInteger('city_id')->unsigned()->nullable();
 
             $table->foreign('city_id')->references('id')->on('cities')
                 ->onUpdate('cascade')->onDelete('cascade');
@@ -107,7 +106,7 @@ class CreateDatabase extends Migration
             $table->increments('id');
             $table->string('name')->nullable();
             $table->boolean('is_primary')->default(0);
-            $table->integer('location_id')->unsigned()->index()->nullable();
+            $table->unsignedInteger('location_id')->unsigned()->nullable();
 
             $table->foreign('location_id')->references('id')->on('locations')
                 ->onUpdate('cascade')->onDelete('cascade');
