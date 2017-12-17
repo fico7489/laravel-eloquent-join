@@ -1,6 +1,6 @@
 {
     "name": "fico7489/laravel-eloquent-join",
-    "description": "Sorting by related model attributes can be awkward, but this package can help you.",
+    "description": "This package introduces the join capability for sorting and filtering on eloquent relations.",
     "keywords": [
         "laravel eloquent join",
         "laravel eloquent join",
