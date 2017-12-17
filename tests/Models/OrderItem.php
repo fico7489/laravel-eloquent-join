@@ -14,6 +14,6 @@ class OrderItem extends BaseModel
 
     public function order()
     {
-        return $this->belongsToJoin(Order::class);
+        return $this->belongsTo(Order::class);
     }
 }

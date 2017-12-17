@@ -14,6 +14,6 @@ class Order extends BaseModel
     
     public function seller()
     {
-        return $this->belongsToJoin(Seller::class);
+        return $this->belongsTo(Seller::class);
     }
 }

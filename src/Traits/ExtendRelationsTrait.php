@@ -6,6 +6,9 @@ use Fico7489\Laravel\EloquentJoin\Relations\BelongsToJoin;
 use Fico7489\Laravel\EloquentJoin\Relations\HasOneJoin;
 use Illuminate\Support\Str;
 
+/**
+ * Add new realations BelongsTo and HasOne
+ */
 trait ExtendRelationsTrait
 {
     /**
@@ -17,7 +20,7 @@ trait ExtendRelationsTrait
      * @param  string  $relation
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function belongsToJoin($related, $foreignKey = null, $ownerKey = null, $relation = null)
+    public function belongsTo($related, $foreignKey = null, $ownerKey = null, $relation = null)
     {
         // If no relation name was given, we will use this debug backtrace to extract
         // the calling method's name and use that as the relationship name as most
@@ -53,7 +56,7 @@ trait ExtendRelationsTrait
      * @param  string  $localKey
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function hasOneJoin($related, $foreignKey = null, $localKey = null)
+    public function hasOne($related, $foreignKey = null, $localKey = null)
     {
         $instance = $this->newRelatedInstance($related);
 

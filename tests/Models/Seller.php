@@ -10,7 +10,7 @@ class Seller extends BaseModel
 
     public function location()
     {
-        return $this->hasOneJoin(Location::class)
+        return $this->hasOne(Location::class)
             ->where('is_primary', '=', 0)
             ->where('is_secondary', '=', 0);
     }
@@ -22,38 +22,38 @@ class Seller extends BaseModel
 
     public function locationPrimary()
     {
-        return $this->hasOneJoin(Location::class)
+        return $this->hasOne(Location::class)
             ->where('is_primary', '=', 1);
     }
 
     public function locationPrimaryInvalid()
     {
-        return $this->hasOneJoin(Location::class)
+        return $this->hasOne(Location::class)
             ->where('is_primary', '=', 1)
             ->orderBy('is_primary');
     }
 
     public function locationPrimaryInvalid2()
     {
-        return $this->hasOneJoin(Location::class)
+        return $this->hasOne(Location::class)
             ->where(['is_primary' => 1]);
     }
 
     public function locationSecondary()
     {
-        return $this->hasOneJoin(Location::class)
+        return $this->hasOne(Location::class)
             ->where('is_secondary', '=', 1);
     }
 
     public function locationPrimaryOrSecondary()
     {
-        return $this->hasOneJoin(Location::class)
+        return $this->hasOne(Location::class)
             ->where('is_primary', '=', 1)
             ->orWhere('is_secondary', '=', 1);
     }
 
     public function city()
     {
-        return $this->belongsToJoin(City::class);
+        return $this->belongsTo(City::class);
     }
 }

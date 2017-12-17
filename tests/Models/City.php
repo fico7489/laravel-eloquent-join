@@ -14,12 +14,12 @@ class City extends BaseModel
 
     public function state()
     {
-        return $this->belongsToJoin(State::class);
+        return $this->belongsTo(State::class);
     }
 
     public function zipCodePrimary()
     {
-        return $this->hasOneJoin(ZipCode::class)
+        return $this->hasOne(ZipCode::class)
             ->where('is_primary', '=', 1);
     }
 }
