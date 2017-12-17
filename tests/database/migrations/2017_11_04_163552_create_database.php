@@ -15,55 +15,9 @@ class CreateDatabase extends Migration
      */
     public function up()
     {
-        Schema::create('order_items', function (Blueprint $table) {
+        Schema::create('states', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name');
-            $table->unsignedInteger('order_id')->unsigned()->nullable();
-
-            $table->foreign('order_id')->references('id')->on('orders')
-                ->onUpdate('cascade')->onDelete('cascade');
-
-            $table->timestamps();
-            $table->softDeletes();
-        });
-
-        Schema::create('orders', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('number')->nullable();
-            $table->unsignedInteger('seller_id')->unsigned()->nullable();
-
-            $table->foreign('seller_id')->references('id')->on('sellers')
-                ->onUpdate('cascade')->onDelete('cascade');
-
-            $table->timestamps();
-            $table->softDeletes();
-        });
-        
-        Schema::create('sellers', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('title')->nullable();
-            $table->unsignedInteger('city_id')->unsigned()->nullable();
-
-            $table->foreign('city_id')->references('id')->on('cities')
-                ->onUpdate('cascade')->onDelete('cascade');
-
-            $table->timestamps();
-            $table->softDeletes();
-        });
-        
-        Schema::create('locations', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('address')->nullable();
-            $table->boolean('is_primary')->default(0);
-            $table->boolean('is_secondary')->default(0);
-            $table->unsignedInteger('seller_id')->unsigned()->nullable();
-            $table->unsignedInteger('city_id')->unsigned()->nullable();
-
-            $table->foreign('seller_id')->references('id')->on('sellers')
-                ->onUpdate('cascade')->onDelete('cascade');
-
-            $table->foreign('city_id')->references('id')->on('cities')
-                ->onUpdate('cascade')->onDelete('cascade');
+            $table->string('name')->nullable();
 
             $table->timestamps();
             $table->softDeletes();
@@ -72,10 +26,57 @@ class CreateDatabase extends Migration
         Schema::create('cities', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name')->nullable();
-            $table->unsignedInteger('state_id')->unsigned()->nullable();
+            $table->unsignedInteger('state_id')->nullable();
 
-            $table->foreign('state_id')->references('id')->on('states')
-                ->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('state_id')->references('id')->on('states');
+
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
+        Schema::create('sellers', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('title')->nullable();
+            $table->unsignedInteger('city_id')->nullable();
+
+            $table->foreign('city_id')->references('id')->on('cities');
+
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
+        Schema::create('orders', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('number')->nullable();
+            $table->unsignedInteger('seller_id')->nullable();
+
+            $table->foreign('seller_id')->references('id')->on('sellers');
+
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
+        Schema::create('order_items', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->unsignedInteger('order_id')->nullable();
+
+            $table->foreign('order_id')->references('id')->on('orders');
+
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
+        Schema::create('locations', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('address')->nullable();
+            $table->boolean('is_primary')->default(0);
+            $table->boolean('is_secondary')->default(0);
+            $table->unsignedInteger('seller_id')->nullable();
+            $table->unsignedInteger('city_id')->nullable();
+
+            $table->foreign('seller_id')->references('id')->on('sellers');
+            $table->foreign('city_id')->references('id')->on('cities');
 
             $table->timestamps();
             $table->softDeletes();
@@ -85,18 +86,9 @@ class CreateDatabase extends Migration
             $table->increments('id');
             $table->string('name')->nullable();
             $table->boolean('is_primary')->default(0);
-            $table->unsignedInteger('city_id')->unsigned()->nullable();
+            $table->unsignedInteger('city_id')->nullable();
 
-            $table->foreign('city_id')->references('id')->on('cities')
-                ->onUpdate('cascade')->onDelete('cascade');
-
-            $table->timestamps();
-            $table->softDeletes();
-        });
-
-        Schema::create('states', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('name')->nullable();
+            $table->foreign('city_id')->references('id')->on('cities');
 
             $table->timestamps();
             $table->softDeletes();
@@ -106,10 +98,9 @@ class CreateDatabase extends Migration
             $table->increments('id');
             $table->string('name')->nullable();
             $table->boolean('is_primary')->default(0);
-            $table->unsignedInteger('location_id')->unsigned()->nullable();
+            $table->unsignedInteger('location_id')->nullable();
 
-            $table->foreign('location_id')->references('id')->on('locations')
-                ->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('location_id')->references('id')->on('locations');
 
             $table->timestamps();
             $table->softDeletes();
