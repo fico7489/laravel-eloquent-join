@@ -6,6 +6,7 @@ use Fico7489\Laravel\EloquentJoin\Relations\BelongsToJoin;
 use Fico7489\Laravel\EloquentJoin\Exceptions\EloquentJoinException;
 use Fico7489\Laravel\EloquentJoin\Relations\HasOneJoin;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 
 trait EloquentJoinTrait
 {
@@ -151,9 +152,9 @@ trait EloquentJoinTrait
             if ($this->softDelete == 'withTrashed') {
                 //do nothing
             } elseif ($this->softDelete == 'withoutTrashed') {
-                $join->where($relatedTableAlias . '.deleted_at', '=', null);
+                $join->where($relatedTableAlias . '.deleted_at', 'is', null);
             } elseif ($this->softDelete == 'onlyTrashed') {
-                $join->where($relatedTableAlias . '.deleted_at', '<>', null);
+                $join->where($relatedTableAlias . '.deleted_at', 'is not', null);
             }
         }
     }

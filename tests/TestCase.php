@@ -45,7 +45,9 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     protected function fetchQuery()
     {
         $log = \DB::getQueryLog();
-        return end($log)['query'];
+        $query = end($log)['query'];
+        $query = str_replace('"deleted_at" is ?', '"deleted_at" is null', $query);
+        return $query;
     }
     
     protected function getEnvironmentSetUp($app)
