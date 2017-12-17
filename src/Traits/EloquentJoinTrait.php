@@ -32,9 +32,9 @@ trait EloquentJoinTrait
 
 
     //set invalid clauses on join relations
-    public function scopeSetInvalidJoin(Builder $builder, $method, $parameters)
+    public function scopeSetInvalidJoin(Builder $builder, $method, $parameters = [])
     {
-        $this->relationNotAllowedClauses[$method] = $parameters;
+        $this->relationNotAllowedClauses[$method] = $method;
     }
 
     //set where clause for join relations
