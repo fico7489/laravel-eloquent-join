@@ -153,6 +153,8 @@ Don't worry, if you anyway create the query that is not allowed **EloquentJoinEx
 
 Database schema : 
 
+![Database schema](https://raw.githubusercontent.com/fico7489/laravel-eloquent-join/master/readme/era.png)
+
 Models : 
 
 ```
