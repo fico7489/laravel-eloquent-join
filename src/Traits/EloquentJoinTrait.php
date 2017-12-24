@@ -113,7 +113,7 @@ trait EloquentJoinTrait
                     $builder->leftJoin($joinQuery, function ($join) use ($relatedTableAlias, $keyRelated, $currentTable, $relatedPrimaryKey, $relatedModel) {
                         $join->on($relatedTableAlias . '.' . $relatedPrimaryKey, '=', $currentTable . '.' . $keyRelated);
 
-                        $this->leftJoinQuery($join, $relatedModel, $relatedTableAlias, $keyRelated, $currentTable, $relatedPrimaryKey);
+                        $this->leftJoinQuery($join, $relatedModel, $relatedTableAlias);
                     });
                 } elseif ($relatedRelation instanceof HasOneJoin) {
                     $keyRelated = $relatedRelation->getForeignKey();
@@ -122,7 +122,7 @@ trait EloquentJoinTrait
                     $builder->leftJoin($joinQuery, function ($join) use ($relatedTableAlias, $keyRelated, $currentTable, $relatedPrimaryKey, $relatedModel) {
                         $join->on($relatedTableAlias . '.' . $keyRelated, '=', $currentTable . '.' . $relatedPrimaryKey);
 
-                        $this->leftJoinQuery($join, $relatedModel, $relatedTableAlias, $keyRelated, $currentTable, $relatedPrimaryKey);
+                        $this->leftJoinQuery($join, $relatedModel, $relatedTableAlias);
                     });
                 } else {
                     throw new EloquentJoinException('Only allowed relations for whereJoin, orWhereJoin and orderByJoin are BelongsToJoin, HasOneJoin');
