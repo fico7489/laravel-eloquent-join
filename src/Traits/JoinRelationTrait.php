@@ -20,7 +20,7 @@ trait JoinRelationTrait
         } elseif ($method == 'orWhere') {
             parent::__call('setOrWhereForJoin', $parameters);
         } elseif (in_array($method, $softDeleteOptions)) {
-            parent::__call('setSoftDelete', $parameters);
+            parent::__call('setSoftDelete', [$method]);
         } else {
             $parametersInvalid = array_merge([$method], $parameters);
             parent::__call('setInvalidJoin', $parametersInvalid);
