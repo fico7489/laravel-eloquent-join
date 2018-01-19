@@ -96,7 +96,7 @@ trait EloquentJoinTrait
 
             $relatedRelation = $currentModel->$relation();
             $relatedModel = $relatedRelation->getRelated();
-            $relatedPrimaryKey = $relatedModel->primaryKey;
+            $relatedPrimaryKey = $currentModel->getKeyName();
             $relatedTable = $relatedModel->getTable();
 
             $this->validateJoinQuery($relatedModel);
