@@ -22,10 +22,10 @@ trait EloquentJoinTrait
 
 
     //store not allowed clauses on join relations for throw exception (e.g. whereHas, orderBy etc.)
-    private $relationNotAllowedClauses = [];
+    public $relationNotAllowedClauses = [];
 
     //store where clauses which we will use for join
-    private $relationWhereClauses = [];
+    public $relationWhereClauses = [];
 
     //store soft delete clauses (withoutTrashed|onlyTrashed|WithTrashed)
     private $softDelete = 'withoutTrashed';
