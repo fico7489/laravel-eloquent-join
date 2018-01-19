@@ -28,7 +28,7 @@ trait EloquentJoinTrait
     public $relationWhereClauses = [];
 
     //store soft delete clauses (withoutTrashed|onlyTrashed|WithTrashed)
-    private $softDelete = 'withoutTrashed';
+    public $softDelete = 'withoutTrashed';
 
 
     //set invalid clauses on join relations
@@ -148,11 +148,11 @@ trait EloquentJoinTrait
         }
 
         if (method_exists($relatedModel, 'getQualifiedDeletedAtColumn')) {
-            if ($this->softDelete == 'withTrashed') {
+            if ($relatedModel->softDelete == 'withTrashed') {
                 //do nothing
-            } elseif ($this->softDelete == 'withoutTrashed') {
+            } elseif ($relatedModel->softDelete == 'withoutTrashed') {
                 $join->where($relatedTableAlias . '.deleted_at', '=', null);
-            } elseif ($this->softDelete == 'onlyTrashed') {
+            } elseif ($relatedModel->softDelete == 'onlyTrashed') {
                 $join->where($relatedTableAlias . '.deleted_at', '<>', null);
             }
         }
