@@ -53,6 +53,16 @@ reason : post and category can have "date" attribute and in that case without se
 This package will take care of all above problems for you out of the box.
 You can perform filtering on the relationship field without joining but this package will give you the ability to do this easier.
 
+## Version Compatibility
+
+| Laravel Version | Package Tag | Supported | Development Branch
+|-----------------|-------------|-----------| -----------|
+| 5.5.* | 2.1.* | yes | master
+| 5.4.* | 2.0.* | yes | 2.0
+| 5.3.* | 1.3.* | yes | 1.3
+| 5.2.* | 1.2.* | yes | 1.2
+| <5.2 | - | no |
+
 ## Install
 
 1.Install package with composer
