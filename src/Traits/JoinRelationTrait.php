@@ -2,6 +2,8 @@
 
 namespace Fico7489\Laravel\EloquentJoin\Traits;
 
+use Fico7489\Laravel\EloquentJoin\Services\QueryNormalizer;
+
 trait JoinRelationTrait
 {
     /**
@@ -16,9 +18,11 @@ trait JoinRelationTrait
         $softDeleteOptions = ['withTrashed', 'withoutTrashed', 'onlyTrashed'];
 
         if ($method == 'where') {
-            parent::__call('setWhereForJoin', $parameters);
+            $parametersNew = QueryNormalizer::normalize($parameters);
+            parent::__call('setWhereForJoin', $parametersNew);
         } elseif ($method == 'orWhere') {
-            parent::__call('setOrWhereForJoin', $parameters);
+            $parametersNew = QueryNormalizer::normalize($parameters);
+            parent::__call('setOrWhereForJoin', $parametersNew);
         } elseif (in_array($method, $softDeleteOptions)) {
             parent::__call('setSoftDelete', [$method]);
         } else {

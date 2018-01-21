@@ -5,6 +5,7 @@ namespace Fico7489\Laravel\EloquentJoin\Traits;
 use Fico7489\Laravel\EloquentJoin\Relations\BelongsToJoin;
 use Fico7489\Laravel\EloquentJoin\Exceptions\EloquentJoinException;
 use Fico7489\Laravel\EloquentJoin\Relations\HasOneJoin;
+use Fico7489\Laravel\EloquentJoin\Services\QueryNormalizer;
 use Illuminate\Database\Eloquent\Builder;
 
 trait EloquentJoinTrait
@@ -58,13 +59,17 @@ trait EloquentJoinTrait
 
     public function scopeWhereJoin(Builder $builder, $column, $operator = null, $value = null, $boolean = 'and')
     {
+        list($column, $operator, $value) = QueryNormalizer::normalizeScope(func_get_args());
         $column = $this->performJoin($builder, $column);
+
         return $builder->where($column, $operator, $value, $boolean);
     }
 
     public function scopeOrWhereJoin(Builder $builder, $column, $operator = null, $value)
     {
+        list($column, $operator, $value) = QueryNormalizer::normalizeScope(func_get_args());
         $column = $this->performJoin($builder, $column);
+
         return $builder->orWhere($column, $operator, $value);
     }
 
