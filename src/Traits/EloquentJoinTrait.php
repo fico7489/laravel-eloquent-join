@@ -175,7 +175,11 @@ trait EloquentJoinTrait
 
         foreach ($relatedModel->relationWhereClauses as $relationWhereClause) {
             if (empty($relationWhereClause['column'])  ||  ! is_string($relationWhereClause['column'])) {
-                throw new EloquentJoinException("Only this where type ->where('column', 'operator', 'value') is allowed on HasOneJoin and BelongsToJoin relations.");
+                throw new EloquentJoinException("Only this where types are allowed on HasOneJoin and BelongsToJoin relations : 
+                    ->where('column', 'operator', 'value') 
+                    ->where('column', 'value') 
+                    ->where(['column' => 'value']) 
+                ");
             }
         }
     }
