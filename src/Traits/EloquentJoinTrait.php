@@ -5,6 +5,7 @@ namespace Fico7489\Laravel\EloquentJoin\Traits;
 use Fico7489\Laravel\EloquentJoin\Relations\BelongsToJoin;
 use Fico7489\Laravel\EloquentJoin\Exceptions\EloquentJoinException;
 use Fico7489\Laravel\EloquentJoin\Relations\HasOneJoin;
+use Fico7489\Laravel\EloquentJoin\Services\QueryNormalizer;
 use Illuminate\Database\Eloquent\Builder;
 
 trait EloquentJoinTrait
@@ -58,13 +59,17 @@ trait EloquentJoinTrait
 
     public function scopeWhereJoin(Builder $builder, $column, $operator = null, $value = null, $boolean = 'and')
     {
+        list($column, $operator, $value) = QueryNormalizer::normalizeScope(func_get_args());
         $column = $this->performJoin($builder, $column);
+
         return $builder->where($column, $operator, $value, $boolean);
     }
 
     public function scopeOrWhereJoin(Builder $builder, $column, $operator = null, $value)
     {
+        list($column, $operator, $value) = QueryNormalizer::normalizeScope(func_get_args());
         $column = $this->performJoin($builder, $column);
+
         return $builder->orWhere($column, $operator, $value);
     }
 
@@ -166,7 +171,11 @@ trait EloquentJoinTrait
 
         foreach ($relatedModel->relationWhereClauses as $relationWhereClause) {
             if (empty($relationWhereClause['column'])  ||  ! is_string($relationWhereClause['column'])) {
-                throw new EloquentJoinException("Only this where type ->where('column', 'operator', 'value') is allowed on HasOneJoin and BelongsToJoin relations.");
+                throw new EloquentJoinException("Only this where types are allowed on HasOneJoin and BelongsToJoin relations : 
+                    ->where('column', 'operator', 'value') 
+                    ->where('column', 'value') 
+                    ->where(['column' => 'value']) 
+                ");
             }
         }
     }
