@@ -57,7 +57,8 @@ You can perform filtering on the relationship field without joining but this pac
 
 | Laravel Version | Package Tag | Supported | Development Branch
 |-----------------|-------------|-----------| -----------|
-| 5.5.* | 2.1.* | yes | master
+| 5.6.* | 2.2.* | yes | master
+| 5.5.* | 2.1.* | yes | 2.1
 | 5.4.* | 2.0.* | yes | 2.0
 | 5.3.* | 1.3.* | yes | 1.3
 | 5.2.* | 1.2.* | yes | 1.2
