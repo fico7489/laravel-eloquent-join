@@ -88,8 +88,9 @@ trait EloquentJoinTrait
         $baseTable = $this->getTable();
         $baseModel = $this;
 
-        $currentTable = $this->getTable();
         $currentModel = $this;
+        $currentPrimaryKey = $this->getKeyName();
+        $currentTable = $this->getTable();
 
         foreach ($relations as $relation) {
             if ($relation == $column) {
@@ -122,8 +123,8 @@ trait EloquentJoinTrait
                     $keyRelated = $relatedRelation->getQualifiedForeignKeyName();
                     $keyRelated = last(explode('.', $keyRelated));
 
-                    $builder->leftJoin($joinQuery, function ($join) use ($relatedTableAlias, $keyRelated, $currentTable, $relatedPrimaryKey, $relatedModel) {
-                        $join->on($relatedTableAlias . '.' . $keyRelated, '=', $currentTable . '.' . $relatedPrimaryKey);
+                    $builder->leftJoin($joinQuery, function ($join) use ($relatedTableAlias, $keyRelated, $currentTable, $relatedPrimaryKey, $relatedModel, $currentPrimaryKey) {
+                        $join->on($relatedTableAlias . '.' . $keyRelated, '=', $currentTable . '.' . $currentPrimaryKey);
 
                         $this->leftJoinQuery($join, $relatedModel, $relatedTableAlias);
                     });
@@ -132,8 +133,9 @@ trait EloquentJoinTrait
                 }
             }
 
-            $currentTable = $relatedTableAlias;
             $currentModel = $relatedModel;
+            $currentPrimaryKey = $relatedPrimaryKey;
+            $currentTable = $relatedTableAlias;
 
             $this->joinedTables[$relation] = $relatedTableAlias;
         }
