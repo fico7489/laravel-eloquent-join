@@ -2,6 +2,8 @@
 
 namespace Fico7489\Laravel\EloquentJoin;
 
+use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationClause;
+use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationScope;
 use Illuminate\Database\Eloquent\Builder;
 use Fico7489\Laravel\EloquentJoin\Relations\BelongsToJoin;
 use Fico7489\Laravel\EloquentJoin\Exceptions\EloquentJoinException;
@@ -134,26 +136,44 @@ class EloquentJoinBuilder extends Builder
         /** @var Builder $relationQuery */
         $relationBuilder = $relation->getQuery();
 
-        foreach ($relationBuilder->relationClauses as $clause) {
-            foreach ($clause as $method => $params) {
-                if(is_array($params[0])){
-                    foreach($params[0] as $k => $param){
-                        $params[0][$relatedTableAlias . '.' . $k] = $param;
-                        unset($params[0][$k]);
-                    }
-                }else{
-                    $params[0] = $relatedTableAlias . '.' . $params[0];
-                }
-
-                call_user_func_array([$join, $method], $params);
-            }
-        }
-
         foreach ($relationBuilder->getScopes() as $scope) {
             if($scope instanceof SoftDeletingScope){
                 call_user_func_array([$join, 'where'], [$relatedTableAlias . '.deleted_at', '=', null]);
+            }else{
+                throw new InvalidRelationScope('Package allows only SoftDeletingScope scope .');
             }
         }
+
+        foreach ($relationBuilder->relationClauses as $clause) {
+            foreach ($clause as $method => $params) {
+                if(in_array($method, ['where', 'orWhere'])){
+                    if(is_array($params[0])){
+                        foreach($params[0] as $k => $param){
+                            $params[0][$relatedTableAlias . '.' . $k] = $param;
+                            unset($params[0][$k]);
+                        }
+                    }else{
+                        $params[0] = $relatedTableAlias . '.' . $params[0];
+                    }
+
+                    call_user_func_array([$join, $method], $params);
+                }elseif(in_array($method, ['withoutTrashed', 'onlyTrashed', 'withTrashed'])){
+                    if ($method == 'withTrashed') {
+                        //do nothing
+                    } elseif ($method == 'withoutTrashed') {
+                        call_user_func_array([$join, 'where'], [$relatedTableAlias . '.deleted_at', '=', null]);
+                    } elseif ($method == 'onlyTrashed') {
+                        call_user_func_array([$join, 'where'], [$relatedTableAlias . '.deleted_at', '<>', null]);
+                    }
+                }else{
+                    throw new InvalidRelationClause('Package allows only following clauses on relation : where, orWhere, withTrashed, onlyTrashed and withoutTrashed.');
+                }
+            }
+        }
+    }
+
+    private function applyClauseOnRelation(){
+        
     }
 
     /**
