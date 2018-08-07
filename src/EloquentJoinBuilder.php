@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Fico7489\Laravel\EloquentJoin\Relations\BelongsToJoin;
 use Fico7489\Laravel\EloquentJoin\Exceptions\EloquentJoinException;
 use Fico7489\Laravel\EloquentJoin\Relations\HasOneJoin;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 class EloquentJoinBuilder extends Builder
 {
@@ -23,6 +24,9 @@ class EloquentJoinBuilder extends Builder
 
     //store where clauses which we will use for join
     public $relationWhereClauses = [];
+
+    //store where clauses which we will use for join
+    public $relationClauses = [];
 
     public function whereJoin($column, $operator = null, $value = null, $boolean = 'and')
     {
@@ -47,6 +51,7 @@ class EloquentJoinBuilder extends Builder
 
     private function performJoin($relations)
     {
+        //print_r($this->relationWhereClauses);exit;
         $relations = explode('.', $relations);
 
         $column    = end($relations);
@@ -66,12 +71,12 @@ class EloquentJoinBuilder extends Builder
                 break;
             }
 
+            /** @var Relation $relatedRelation */
             $relatedRelation   = $currentModel->$relation();
+
             $relatedModel      = $relatedRelation->getRelated();
             $relatedPrimaryKey = $relatedModel->getKeyName();
             $relatedTable      = $relatedModel->getTable();
-
-            $this->validateJoinQuery();
 
             if (array_key_exists($relation, $this->joinedTables)) {
                 $relatedTableAlias = $this->useTableAlias ? uniqid() : $relation;
@@ -90,7 +95,7 @@ class EloquentJoinBuilder extends Builder
                 if ($relatedRelation instanceof BelongsToJoin) {
                     $keyRelated = $relatedRelation->getForeignKey();
 
-                    $this->leftJoin($joinQuery, function ($join) use ($relatedTableAlias, $keyRelated, $currentTable, $relatedPrimaryKey, $relatedModel) {
+                    $this->leftJoin($joinQuery, function ($join) use ($relatedTableAlias, $keyRelated, $currentTable, $relatedPrimaryKey, $relatedModel, $relatedRelation) {
                         $join->on($relatedTableAlias . '.' . $relatedPrimaryKey, '=', $currentTable . '.' . $keyRelated);
 
                         $this->leftJoinQuery($join, $relatedModel, $relatedTableAlias);
@@ -99,10 +104,10 @@ class EloquentJoinBuilder extends Builder
                     $keyRelated = $relatedRelation->getQualifiedForeignKeyName();
                     $keyRelated = last(explode('.', $keyRelated));
 
-                    $this->leftJoin($joinQuery, function ($join) use ($relatedTableAlias, $keyRelated, $currentTable, $relatedPrimaryKey, $relatedModel, $currentPrimaryKey) {
+                    $this->leftJoin($joinQuery, function ($join) use ($relatedTableAlias, $keyRelated, $currentTable, $relatedPrimaryKey, $relatedModel, $currentPrimaryKey, $relatedRelation) {
                         $join->on($relatedTableAlias . '.' . $keyRelated, '=', $currentTable . '.' . $currentPrimaryKey);
 
-                        $this->leftJoinQuery($join, $relatedModel, $relatedTableAlias);
+                        $this->leftJoinQuery($join, $relatedRelation, $relatedTableAlias);
                     });
                 } else {
                     throw new EloquentJoinException('Only allowed relations for whereJoin, orWhereJoin and orderByJoin are BelongsToJoin, HasOneJoin');
@@ -126,29 +131,34 @@ class EloquentJoinBuilder extends Builder
         return $currentTable . '.' . $column;
     }
 
-    private function leftJoinQuery($join, $relatedModel, $relatedTableAlias)
+    private function leftJoinQuery($join, $relation, $relatedTableAlias)
     {
-        $relatedModel = $this;
+        $relationQuery = $relation->getQuery();
 
-        foreach ($relatedModel->relationWhereClauses as $relationClause) {
-            $join->where($relatedTableAlias . '.' . $relationClause['column'], $relationClause['operator'], $relationClause['value'], $relationClause['boolean']);
-        }
-    }
+        foreach ($relationQuery->relationClauses as $clause) {
+            foreach ($clause as $method => $params) {
+                if(is_array($params[0])){
+                    foreach($params[0] as $k => $param){
+                        $params[0][$relatedTableAlias . '.' . $k] = $param;
+                        unset($params[0][$k]);
+                    }
+                }else{
+                    $params[0] = $relatedTableAlias . '.' . $params[0];
+                }
 
-    private function validateJoinQuery()
-    {
-        foreach ($this->relationNotAllowedClauses as $method => $relationNotAllowedClause) {
-            throw new EloquentJoinException($method . ' is not allowed on HasOneJoin and BelongsToJoin relations.');
-        }
-
-        foreach ($this->relationWhereClauses as $relationWhereClause) {
-            if (empty($relationWhereClause['column'])  ||  ! is_string($relationWhereClause['column'])) {
-                throw new EloquentJoinException("Only this where types are allowed on HasOneJoin and BelongsToJoin relations : 
-                    ->where('column', 'operator', 'value') 
-                    ->where('column', 'value') 
-                    ->where(['column' => 'value']) 
-                ");
+                call_user_func_array([$join, $method], $params);
             }
+
         }
+
+        /*if (method_exists($relationQuery->getModel(), 'getQualifiedDeletedAtColumn')) {
+            if ($relation->softDelete == 'withTrashed') {
+                //do nothing
+            } elseif ($relation->softDelete == 'withoutTrashed') {
+                $join->where($relatedTableAlias . '.deleted_at', '=', null);
+            } elseif ($relation->softDelete == 'onlyTrashed') {
+                $join->where($relatedTableAlias . '.deleted_at', '<>', null);
+            }
+        }*/
     }
 }
