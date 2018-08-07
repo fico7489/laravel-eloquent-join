@@ -15,13 +15,13 @@ class EloquentJoinBuilder extends Builder
     //use table alias for join (real table name or uniqid())
     private $useTableAlias = false;
 
-    //store if ->select(...) is already called on builder (we want only one select)
+    //store if ->select(...) is already called on builder (we want only one groupBy())
     private $selected = false;
 
     //store joined tables, we want join table only once (e.g. when you call orderByJoin more time)
     private $joinedTables = [];
 
-    //store relation clauses for join
+    //store clauses on relation for join
     public $relationClauses = [];
 
     public function whereJoin($column, $operator = null, $value = null, $boolean = 'and')
