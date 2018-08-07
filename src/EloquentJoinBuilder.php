@@ -55,13 +55,13 @@ class EloquentJoinBuilder extends Builder
     {
         $relations = explode('.', $relations);
 
-        $column = end($relations);
+        $column    = end($relations);
         $baseModel = $this->getModel();
         $baseTable = $baseModel->getTable();
 
-        $currentModel = $baseModel;
+        $currentModel      = $baseModel;
         $currentPrimaryKey = $baseModel->getKeyName();
-        $currentTable = $baseModel->getTable();
+        $currentTable      = $baseModel->getTable();
 
         $relationAccumulated = [];
         $relationAccumulatedAlias = [];
@@ -75,9 +75,9 @@ class EloquentJoinBuilder extends Builder
             /** @var Relation $relatedRelation */
             $relatedRelation = $currentModel->$relation();
 
-            $relatedModel = $relatedRelation->getRelated();
+            $relatedModel      = $relatedRelation->getRelated();
             $relatedPrimaryKey = $relatedModel->getKeyName();
-            $relatedTable = $relatedModel->getTable();
+            $relatedTable      = $relatedModel->getTable();
 
             if (array_key_exists($relation, $this->joinedTables)) {
                 $relatedTableAlias = $this->useTableAlias ? uniqid() : $relation;
@@ -115,9 +115,9 @@ class EloquentJoinBuilder extends Builder
                 }
             }
 
-            $currentModel = $relatedModel;
+            $currentModel      = $relatedModel;
             $currentPrimaryKey = $relatedPrimaryKey;
-            $currentTable = $relatedTableAlias;
+            $currentTable      = $relatedTableAlias;
 
             $this->joinedTables[implode('.', $relationAccumulatedAlias)] = implode('.', $relationAccumulated);
         }

@@ -45,7 +45,11 @@ trait ExtendRelationsTrait
         $ownerKey = $ownerKey ?: $instance->getKeyName();
 
         return new BelongsToJoin(
-            $instance->newQuery(), $this, $foreignKey, $ownerKey, $relation
+            $instance->newQuery(),
+            $this,
+            $foreignKey,
+            $ownerKey,
+            $relation
         );
     }
 
