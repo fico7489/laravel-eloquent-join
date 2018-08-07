@@ -51,7 +51,6 @@ class EloquentJoinBuilder extends Builder
 
     private function performJoin($relations)
     {
-        //print_r($this->relationWhereClauses);exit;
         $relations = explode('.', $relations);
 
         $column    = end($relations);
@@ -123,9 +122,7 @@ class EloquentJoinBuilder extends Builder
 
         if (! $this->selected  &&  count($relations) > 1) {
             $this->selected = true;
-            $this->select($baseTable . '.*')
-                ->groupBy($baseTable . '.' . $baseModel->getKeyName())
-            ;
+            $this->select($baseTable . '.*')->groupBy($baseTable . '.' . $baseModel->getKeyName());
         }
 
         return $currentTable . '.' . $column;
@@ -133,9 +130,17 @@ class EloquentJoinBuilder extends Builder
 
     private function leftJoinQuery($join, $relation, $relatedTableAlias)
     {
-        $relationQuery = $relation->getQuery();
+        /** @var Builder $relationQuery */
+        $relationBuilder = $relation->getQuery();
 
-        foreach ($relationQuery->relationClauses as $clause) {
+
+
+        foreach ($relationBuilder->getScopes() as $scope) {
+
+        }
+
+
+        foreach ($relationBuilder->relationClauses as $clause) {
             foreach ($clause as $method => $params) {
                 if(is_array($params[0])){
                     foreach($params[0] as $k => $param){
@@ -150,15 +155,13 @@ class EloquentJoinBuilder extends Builder
             }
 
         }
+    }
 
-        /*if (method_exists($relationQuery->getModel(), 'getQualifiedDeletedAtColumn')) {
-            if ($relation->softDelete == 'withTrashed') {
-                //do nothing
-            } elseif ($relation->softDelete == 'withoutTrashed') {
-                $join->where($relatedTableAlias . '.deleted_at', '=', null);
-            } elseif ($relation->softDelete == 'onlyTrashed') {
-                $join->where($relatedTableAlias . '.deleted_at', '<>', null);
-            }
-        }*/
+    /**
+     * @return array
+     */
+    public function getScopes()
+    {
+        return $this->scopes;
     }
 }
