@@ -47,17 +47,15 @@ class EloquentJoinBuilder extends Builder
 
     private function performJoin($relations)
     {
-        $builder = $this;
-
         $relations = explode('.', $relations);
 
-        $column = end($relations);
-        $baseModel = $builder->getModel();
+        $column    = end($relations);
+        $baseModel = $this->getModel();
         $baseTable = $baseModel->getTable();
 
-        $currentModel = $baseModel;
+        $currentModel      = $baseModel;
         $currentPrimaryKey = $baseModel->getKeyName();
-        $currentTable = $baseModel->getTable();
+        $currentTable      = $baseModel->getTable();
 
         foreach ($relations as $relation) {
             if ($relation == $column) {
@@ -81,7 +79,7 @@ class EloquentJoinBuilder extends Builder
                 if ($relatedRelation instanceof BelongsToJoin) {
                     $keyRelated = $relatedRelation->getForeignKey();
 
-                    $builder->leftJoin($joinQuery, function ($join) use ($relatedTableAlias, $keyRelated, $currentTable, $relatedPrimaryKey, $relatedModel) {
+                    $this->leftJoin($joinQuery, function ($join) use ($relatedTableAlias, $keyRelated, $currentTable, $relatedPrimaryKey, $relatedModel) {
                         $join->on($relatedTableAlias . '.' . $relatedPrimaryKey, '=', $currentTable . '.' . $keyRelated);
 
                         $this->leftJoinQuery($join, $relatedModel, $relatedTableAlias);
@@ -90,7 +88,7 @@ class EloquentJoinBuilder extends Builder
                     $keyRelated = $relatedRelation->getQualifiedForeignKeyName();
                     $keyRelated = last(explode('.', $keyRelated));
 
-                    $builder->leftJoin($joinQuery, function ($join) use ($relatedTableAlias, $keyRelated, $currentTable, $relatedPrimaryKey, $relatedModel, $currentPrimaryKey) {
+                    $this->leftJoin($joinQuery, function ($join) use ($relatedTableAlias, $keyRelated, $currentTable, $relatedPrimaryKey, $relatedModel, $currentPrimaryKey) {
                         $join->on($relatedTableAlias . '.' . $keyRelated, '=', $currentTable . '.' . $currentPrimaryKey);
 
                         $this->leftJoinQuery($join, $relatedModel, $relatedTableAlias);
@@ -109,7 +107,7 @@ class EloquentJoinBuilder extends Builder
 
         if (! $this->selected  &&  count($relations) > 1) {
             $this->selected = true;
-            $builder->select($baseTable . '.*')
+            $this->select($baseTable . '.*')
                 //->groupBy($baseTable . '.' . $baseModel->primaryKey)
             ;
         }
