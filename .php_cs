@@ -17,7 +17,7 @@ $finder = Finder::create()
  * Do the magic
  */
 return Config::create()
-    ->setUsingCache(true)
+    ->setUsingCache(false)
     ->setRules([
         '@PSR2'              => true,
         '@Symfony'           => true,
