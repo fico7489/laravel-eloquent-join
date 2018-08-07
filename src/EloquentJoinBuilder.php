@@ -112,7 +112,7 @@ class EloquentJoinBuilder extends Builder
                         $this->leftJoinQuery($join, $relatedRelation, $relatedTableAlias);
                     });
                 } else {
-                    throw new EloquentJoinException('Only allowed relations for whereJoin, orWhereJoin and orderByJoin are BelongsToJoin, HasOneJoin');
+                    throw new InvalidRelation('Package allows only following relations : BelongsToJoin and HasOneJoin');
                 }
             }
 
