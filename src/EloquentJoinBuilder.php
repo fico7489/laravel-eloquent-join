@@ -60,7 +60,7 @@ class EloquentJoinBuilder extends Builder
         foreach ($relations as $relation) {
             if ($relation == $column) {
                 //last item in $relations argument is sort|where column
-                continue;
+                break;
             }
 
             $relatedRelation   = $currentModel->$relation();
