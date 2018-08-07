@@ -7,6 +7,7 @@ use Fico7489\Laravel\EloquentJoin\Relations\BelongsToJoin;
 use Fico7489\Laravel\EloquentJoin\Exceptions\EloquentJoinException;
 use Fico7489\Laravel\EloquentJoin\Relations\HasOneJoin;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class EloquentJoinBuilder extends Builder
 {
@@ -133,13 +134,6 @@ class EloquentJoinBuilder extends Builder
         /** @var Builder $relationQuery */
         $relationBuilder = $relation->getQuery();
 
-
-
-        foreach ($relationBuilder->getScopes() as $scope) {
-
-        }
-
-
         foreach ($relationBuilder->relationClauses as $clause) {
             foreach ($clause as $method => $params) {
                 if(is_array($params[0])){
@@ -153,7 +147,12 @@ class EloquentJoinBuilder extends Builder
 
                 call_user_func_array([$join, $method], $params);
             }
+        }
 
+        foreach ($relationBuilder->getScopes() as $scope) {
+            if($scope instanceof SoftDeletingScope){
+                call_user_func_array([$join, 'where'], [$relatedTableAlias . '.deleted_at', '=', null]);
+            }
         }
     }
 
