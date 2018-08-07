@@ -57,8 +57,7 @@ class EloquentJoinBuilder extends Builder
         $currentTable      = $baseTable;
         $currentPrimaryKey = $baseModel->getKeyName();
 
-        $relationAccumulated      = [];
-        $relationAccumulatedAlias = [];
+        $relationsAccumulated = [];
 
         foreach ($relations as $relation) {
             if ($relation == $column) {
@@ -69,16 +68,11 @@ class EloquentJoinBuilder extends Builder
             /** @var Relation $relatedRelation */
             $relatedRelation   = $currentModel->$relation();
             $relatedModel      = $relatedRelation->getRelated();
-            $relatedPrimaryKey = $relatedModel->getKeyName();
             $relatedTable      = $relatedModel->getTable();
+            $relatedPrimaryKey = $relatedModel->getKeyName();
+            $relatedTableAlias = $this->useTableAlias ? uniqid() : $relatedTable;
 
-            if (array_key_exists($relation, $this->joinedTables)) {
-                $relatedTableAlias = $this->useTableAlias ? uniqid() : $relation;
-            } else {
-                $relatedTableAlias = $this->useTableAlias ? uniqid() : $relatedTable;
-            }
-
-            $relationAccumulated[] = $relatedTable;
+            $relationAccumulated[]      = $relatedTableAlias;
             $relationAccumulatedAlias[] = $relatedTableAlias;
 
             $relationAccumulatedAliasString = implode('.', $relationAccumulatedAlias);
