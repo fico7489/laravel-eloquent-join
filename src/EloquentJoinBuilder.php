@@ -54,10 +54,10 @@ class EloquentJoinBuilder extends Builder
         $baseTable = $baseModel->getTable();
 
         $currentModel      = $baseModel;
+        $currentTable      = $baseTable;
         $currentPrimaryKey = $baseModel->getKeyName();
-        $currentTable      = $baseModel->getTable();
 
-        $relationAccumulated = [];
+        $relationAccumulated      = [];
         $relationAccumulatedAlias = [];
 
         foreach ($relations as $relation) {
@@ -110,8 +110,8 @@ class EloquentJoinBuilder extends Builder
             }
 
             $currentModel      = $relatedModel;
-            $currentPrimaryKey = $relatedPrimaryKey;
             $currentTable      = $relatedTableAlias;
+            $currentPrimaryKey = $relatedPrimaryKey;
 
             $this->joinedTables[implode('.', $relationAccumulatedAlias)] = implode('.', $relationAccumulated);
         }
