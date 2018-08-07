@@ -73,10 +73,9 @@ class EloquentJoinBuilder extends Builder
             $relatedTableAlias = $this->useTableAlias ? uniqid() : $relatedTable;
 
             $relationAccumulated[]      = $relatedTableAlias;
-            $relationAccumulatedAlias[] = $relatedTableAlias;
 
-            $relationAccumulatedAliasString = implode('.', $relationAccumulatedAlias);
-            if (!array_key_exists($relationAccumulatedAliasString, $this->joinedTables)) {
+            $relationAccumulatedString = implode('.', $relationAccumulated);
+            if (!in_array($relationAccumulatedString, $this->joinedTables)) {
                 $relatedTableAlias = $this->useTableAlias ? uniqid() : $relatedTable;
 
                 $joinQuery = $relatedTable.($this->useTableAlias ? ' as '.$relatedTableAlias : '');
@@ -106,7 +105,7 @@ class EloquentJoinBuilder extends Builder
             $currentTable      = $relatedTableAlias;
             $currentPrimaryKey = $relatedPrimaryKey;
 
-            $this->joinedTables[implode('.', $relationAccumulatedAlias)] = implode('.', $relationAccumulated);
+            $this->joinedTables[] = implode('.', $relationAccumulated);
         }
 
         if (!$this->selected && count($relations) > 1) {
