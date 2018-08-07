@@ -67,8 +67,7 @@ class EloquentJoinBuilder extends Builder
             }
 
             /** @var Relation $relatedRelation */
-            $relatedRelation = $currentModel->$relation();
-
+            $relatedRelation   = $currentModel->$relation();
             $relatedModel      = $relatedRelation->getRelated();
             $relatedPrimaryKey = $relatedModel->getKeyName();
             $relatedTable      = $relatedModel->getTable();
