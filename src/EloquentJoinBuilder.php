@@ -57,6 +57,9 @@ class EloquentJoinBuilder extends Builder
         $currentPrimaryKey = $baseModel->getKeyName();
         $currentTable      = $baseModel->getTable();
 
+        $relationAccumulated      = [];
+        $relationAccumulatedAlias = [];
+
         foreach ($relations as $relation) {
             if ($relation == $column) {
                 //last item in $relations argument is sort|where column
@@ -71,8 +74,16 @@ class EloquentJoinBuilder extends Builder
             $this->validateJoinQuery();
 
             if (array_key_exists($relation, $this->joinedTables)) {
-                $relatedTableAlias = $this->joinedTables[$relation];
+                $relatedTableAlias = $this->useTableAlias ? uniqid() : $relation;
             } else {
+                $relatedTableAlias = $this->useTableAlias ? uniqid() : $relatedTable;
+            }
+
+            $relationAccumulated[]      = $relatedTable;
+            $relationAccumulatedAlias[] = $relatedTableAlias;
+
+            $relationAccumulatedAliasString = implode('.', $relationAccumulatedAlias);
+            if ( ! array_key_exists($relationAccumulatedAliasString, $this->joinedTables)) {
                 $relatedTableAlias = $this->useTableAlias ? uniqid() : $relatedTable;
 
                 $joinQuery = $relatedTable . ($this->useTableAlias ? ' as ' . $relatedTableAlias : '');
@@ -102,13 +113,13 @@ class EloquentJoinBuilder extends Builder
             $currentPrimaryKey = $relatedPrimaryKey;
             $currentTable      = $relatedTableAlias;
 
-            $this->joinedTables[$relation] = $relatedTableAlias;
+            $this->joinedTables[implode('.', $relationAccumulatedAlias)] = implode('.', $relationAccumulated);
         }
 
         if (! $this->selected  &&  count($relations) > 1) {
             $this->selected = true;
             $this->select($baseTable . '.*')
-                //->groupBy($baseTable . '.' . $baseModel->primaryKey)
+                ->groupBy($baseTable . '.' . $baseModel->getKeyName())
             ;
         }
 
