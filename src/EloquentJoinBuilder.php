@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Fico7489\Laravel\EloquentJoin\Relations\BelongsToJoin;
 use Fico7489\Laravel\EloquentJoin\Exceptions\EloquentJoinException;
 use Fico7489\Laravel\EloquentJoin\Relations\HasOneJoin;
-use Fico7489\Laravel\EloquentJoin\Services\QueryNormalizer;
 
 class EloquentJoinBuilder extends Builder
 {
@@ -19,19 +18,14 @@ class EloquentJoinBuilder extends Builder
     //store joined tables, we want join table only once (e.g. when you call orderByJoin more time)
     private $joinedTables = [];
 
-
     //store not allowed clauses on join relations for throw exception (e.g. whereHas, orderBy etc.)
     public $relationNotAllowedClauses = [];
 
     //store where clauses which we will use for join
     public $relationWhereClauses = [];
 
-    //store soft delete clauses (withoutTrashed|onlyTrashed|WithTrashed)
-    public $softDelete = 'withoutTrashed';
-
     public function whereJoin($column, $operator = null, $value = null, $boolean = 'and')
     {
-        //list($column, $operator, $value) = QueryNormalizer::normalizeScope(func_get_args());
         $column = $this->performJoin($column);
 
         return $this->where($column, $operator, $value, $boolean);
@@ -39,7 +33,6 @@ class EloquentJoinBuilder extends Builder
 
     public function orWhereJoin($column, $operator = null, $value)
     {
-        //list($column, $operator, $value) = QueryNormalizer::normalizeScope(func_get_args());
         $column = $this->performJoin($column);
 
         return $this->orWhere($column, $operator, $value);
@@ -48,9 +41,9 @@ class EloquentJoinBuilder extends Builder
     public function orderByJoin($column, $sortBy = 'asc')
     {
         $column = $this->performJoin($column);
+
         return $this->orderBy($column, $sortBy);
     }
-
 
     private function performJoin($relations)
     {
@@ -130,16 +123,6 @@ class EloquentJoinBuilder extends Builder
 
         foreach ($relatedModel->relationWhereClauses as $relationClause) {
             $join->where($relatedTableAlias . '.' . $relationClause['column'], $relationClause['operator'], $relationClause['value'], $relationClause['boolean']);
-        }
-
-        if (method_exists($relatedModel, 'getQualifiedDeletedAtColumn')) {
-            if ($relatedModel->softDelete == 'withTrashed') {
-                //do nothing
-            } elseif ($relatedModel->softDelete == 'withoutTrashed') {
-                $join->where($relatedTableAlias . '.deleted_at', '=', null);
-            } elseif ($relatedModel->softDelete == 'onlyTrashed') {
-                $join->where($relatedTableAlias . '.deleted_at', '<>', null);
-            }
         }
     }
 
