@@ -74,10 +74,10 @@ class OrderByJoinTest extends TestCase
         $this->checkOrder($items, [1, 2, 3], 3);
 
         $items = OrderItem::orderByJoin('order.seller.location.address', 'desc')->get();
-        $this->checkOrder($items, [3, 2 , 1], 3);
+        $this->checkOrder($items, [3, 2, 1], 3);
 
         Location::find(2)->update(['address' => 9]);
         $items = OrderItem::orderByJoin('order.seller.location.address', 'desc')->get();
-        $this->checkOrder($items, [2, 3 , 1], 3);
+        $this->checkOrder($items, [2, 3, 1], 3);
     }
 }

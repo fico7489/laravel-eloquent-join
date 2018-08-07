@@ -13,7 +13,7 @@ class QueryNormalizer
             foreach ($firstParam as $k => $v) {
                 $parametersNew = [$k, '=', $v];
             }
-        } elseif (count($parameters) == 2) {
+        } elseif (2 == count($parameters)) {
             $secondParam = array_values($parameters)[1];
             $parametersNew = [$firstParam, '=', $secondParam];
         } else {

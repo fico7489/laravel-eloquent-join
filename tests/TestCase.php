@@ -45,20 +45,21 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     protected function fetchQuery()
     {
         $log = \DB::getQueryLog();
+
         return end($log)['query'];
     }
-    
+
     protected function getEnvironmentSetUp($app)
     {
         // Setup default database to use sqlite :memory:
         $app['config']->set('database.default', 'testbench');
         $app['config']->set('database.connections.testbench', [
-            'driver'   => 'sqlite',
+            'driver' => 'sqlite',
             'database' => ':memory:',
-            'prefix'   => '',
+            'prefix' => '',
         ]);
     }
-    
+
     protected function getPackageProviders($app)
     {
         return [ServiceProvider::class];

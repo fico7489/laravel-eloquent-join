@@ -6,7 +6,6 @@ use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationClause;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationScope;
 use Illuminate\Database\Eloquent\Builder;
 use Fico7489\Laravel\EloquentJoin\Relations\BelongsToJoin;
-use Fico7489\Laravel\EloquentJoin\Exceptions\EloquentJoinException;
 use Fico7489\Laravel\EloquentJoin\Relations\HasOneJoin;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -56,15 +55,15 @@ class EloquentJoinBuilder extends Builder
     {
         $relations = explode('.', $relations);
 
-        $column    = end($relations);
+        $column = end($relations);
         $baseModel = $this->getModel();
         $baseTable = $baseModel->getTable();
 
-        $currentModel      = $baseModel;
+        $currentModel = $baseModel;
         $currentPrimaryKey = $baseModel->getKeyName();
-        $currentTable      = $baseModel->getTable();
+        $currentTable = $baseModel->getTable();
 
-        $relationAccumulated      = [];
+        $relationAccumulated = [];
         $relationAccumulatedAlias = [];
 
         foreach ($relations as $relation) {
@@ -74,11 +73,11 @@ class EloquentJoinBuilder extends Builder
             }
 
             /** @var Relation $relatedRelation */
-            $relatedRelation   = $currentModel->$relation();
+            $relatedRelation = $currentModel->$relation();
 
-            $relatedModel      = $relatedRelation->getRelated();
+            $relatedModel = $relatedRelation->getRelated();
             $relatedPrimaryKey = $relatedModel->getKeyName();
-            $relatedTable      = $relatedModel->getTable();
+            $relatedTable = $relatedModel->getTable();
 
             if (array_key_exists($relation, $this->joinedTables)) {
                 $relatedTableAlias = $this->useTableAlias ? uniqid() : $relation;
@@ -86,19 +85,19 @@ class EloquentJoinBuilder extends Builder
                 $relatedTableAlias = $this->useTableAlias ? uniqid() : $relatedTable;
             }
 
-            $relationAccumulated[]      = $relatedTable;
+            $relationAccumulated[] = $relatedTable;
             $relationAccumulatedAlias[] = $relatedTableAlias;
 
             $relationAccumulatedAliasString = implode('.', $relationAccumulatedAlias);
-            if ( ! array_key_exists($relationAccumulatedAliasString, $this->joinedTables)) {
+            if (!array_key_exists($relationAccumulatedAliasString, $this->joinedTables)) {
                 $relatedTableAlias = $this->useTableAlias ? uniqid() : $relatedTable;
 
-                $joinQuery = $relatedTable . ($this->useTableAlias ? ' as ' . $relatedTableAlias : '');
+                $joinQuery = $relatedTable.($this->useTableAlias ? ' as '.$relatedTableAlias : '');
                 if ($relatedRelation instanceof BelongsToJoin) {
                     $keyRelated = $relatedRelation->getForeignKey();
 
                     $this->leftJoin($joinQuery, function ($join) use ($relatedTableAlias, $keyRelated, $currentTable, $relatedPrimaryKey, $relatedModel, $relatedRelation) {
-                        $join->on($relatedTableAlias . '.' . $relatedPrimaryKey, '=', $currentTable . '.' . $keyRelated);
+                        $join->on($relatedTableAlias.'.'.$relatedPrimaryKey, '=', $currentTable.'.'.$keyRelated);
 
                         $this->leftJoinQuery($join, $relatedRelation, $relatedTableAlias);
                     });
@@ -107,7 +106,7 @@ class EloquentJoinBuilder extends Builder
                     $keyRelated = last(explode('.', $keyRelated));
 
                     $this->leftJoin($joinQuery, function ($join) use ($relatedTableAlias, $keyRelated, $currentTable, $relatedPrimaryKey, $relatedModel, $currentPrimaryKey, $relatedRelation) {
-                        $join->on($relatedTableAlias . '.' . $keyRelated, '=', $currentTable . '.' . $currentPrimaryKey);
+                        $join->on($relatedTableAlias.'.'.$keyRelated, '=', $currentTable.'.'.$currentPrimaryKey);
 
                         $this->leftJoinQuery($join, $relatedRelation, $relatedTableAlias);
                     });
@@ -116,19 +115,19 @@ class EloquentJoinBuilder extends Builder
                 }
             }
 
-            $currentModel      = $relatedModel;
+            $currentModel = $relatedModel;
             $currentPrimaryKey = $relatedPrimaryKey;
-            $currentTable      = $relatedTableAlias;
+            $currentTable = $relatedTableAlias;
 
             $this->joinedTables[implode('.', $relationAccumulatedAlias)] = implode('.', $relationAccumulated);
         }
 
-        if (! $this->selected  &&  count($relations) > 1) {
+        if (!$this->selected && count($relations) > 1) {
             $this->selected = true;
-            $this->select($baseTable . '.*')->groupBy($baseTable . '.' . $baseModel->getKeyName());
+            $this->select($baseTable.'.*')->groupBy($baseTable.'.'.$baseModel->getKeyName());
         }
 
-        return $currentTable . '.' . $column;
+        return $currentTable.'.'.$column;
     }
 
     private function leftJoinQuery($join, $relation, $relatedTableAlias)
@@ -143,35 +142,36 @@ class EloquentJoinBuilder extends Builder
         }
 
         foreach ($relationBuilder->getScopes() as $scope) {
-            if($scope instanceof SoftDeletingScope){
+            if ($scope instanceof SoftDeletingScope) {
                 $this->applyClauseOnRelation($join, 'withoutTrashed', [], $relatedTableAlias);
-            }else{
+            } else {
                 throw new InvalidRelationScope('Package allows only SoftDeletingScope scope .');
             }
         }
     }
 
-    private function applyClauseOnRelation($join, $method, $params, $relatedTableAlias){
-        if(in_array($method, ['where', 'orWhere'])){
-            if(is_array($params[0])){
-                foreach($params[0] as $k => $param){
-                    $params[0][$relatedTableAlias . '.' . $k] = $param;
+    private function applyClauseOnRelation($join, $method, $params, $relatedTableAlias)
+    {
+        if (in_array($method, ['where', 'orWhere'])) {
+            if (is_array($params[0])) {
+                foreach ($params[0] as $k => $param) {
+                    $params[0][$relatedTableAlias.'.'.$k] = $param;
                     unset($params[0][$k]);
                 }
-            }else{
-                $params[0] = $relatedTableAlias . '.' . $params[0];
+            } else {
+                $params[0] = $relatedTableAlias.'.'.$params[0];
             }
 
             call_user_func_array([$join, $method], $params);
-        }elseif(in_array($method, ['withoutTrashed', 'onlyTrashed', 'withTrashed'])){
-            if ($method == 'withTrashed') {
+        } elseif (in_array($method, ['withoutTrashed', 'onlyTrashed', 'withTrashed'])) {
+            if ('withTrashed' == $method) {
                 //do nothing
-            } elseif ($method == 'withoutTrashed') {
-                call_user_func_array([$join, 'where'], [$relatedTableAlias . '.deleted_at', '=', null]);
-            } elseif ($method == 'onlyTrashed') {
-                call_user_func_array([$join, 'where'], [$relatedTableAlias . '.deleted_at', '<>', null]);
+            } elseif ('withoutTrashed' == $method) {
+                call_user_func_array([$join, 'where'], [$relatedTableAlias.'.deleted_at', '=', null]);
+            } elseif ('onlyTrashed' == $method) {
+                call_user_func_array([$join, 'where'], [$relatedTableAlias.'.deleted_at', '<>', null]);
             }
-        }else{
+        } else {
             throw new InvalidRelationClause('Package allows only following clauses on relation : where, orWhere, withTrashed, onlyTrashed and withoutTrashed.');
         }
     }

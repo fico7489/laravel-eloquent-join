@@ -18,7 +18,7 @@ class HasOneLeftJoinTest extends TestCase
 
         $seller = Seller::create(['title' => 'test']);
         Location::create(['address' => 'test', 'seller_id' => $seller->id, 'is_primary' => 1]);
-        Location::create(['address' => 'test2','seller_id' => $seller->id, 'is_primary' => 1]);
+        Location::create(['address' => 'test2', 'seller_id' => $seller->id, 'is_primary' => 1]);
 
         $items = Seller::orderByJoin('locationPrimary.address')->get();
         $this->assertEquals(1, $items->count());
