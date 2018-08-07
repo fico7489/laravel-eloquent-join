@@ -4,6 +4,7 @@ namespace Fico7489\Laravel\EloquentJoin;
 
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationClause;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationScope;
+use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationWhere;
 use Illuminate\Database\Eloquent\Builder;
 use Fico7489\Laravel\EloquentJoin\Relations\BelongsToJoin;
 use Fico7489\Laravel\EloquentJoin\Relations\HasOneJoin;
@@ -119,12 +120,14 @@ class EloquentJoinBuilder extends Builder
         /** @var Builder $relationQuery */
         $relationBuilder = $relation->getQuery();
 
+        //apply clauses on relation
         foreach ($relationBuilder->relationClauses as $clause) {
             foreach ($clause as $method => $params) {
                 $this->applyClauseOnRelation($join, $method, $params, $relatedTableAlias);
             }
         }
 
+        //apply global SoftDeletingScope
         foreach ($relationBuilder->getScopes() as $scope) {
             if ($scope instanceof SoftDeletingScope) {
                 $this->applyClauseOnRelation($join, 'withoutTrashed', [], $relatedTableAlias);
@@ -137,16 +140,20 @@ class EloquentJoinBuilder extends Builder
     private function applyClauseOnRelation($join, $method, $params, $relatedTableAlias)
     {
         if (in_array($method, ['where', 'orWhere'])) {
-            if (is_array($params[0])) {
-                foreach ($params[0] as $k => $param) {
-                    $params[0][$relatedTableAlias.'.'.$k] = $param;
-                    unset($params[0][$k]);
+            try {
+                if (is_array($params[0])) {
+                    foreach ($params[0] as $k => $param) {
+                        $params[0][$relatedTableAlias.'.'.$k] = $param;
+                        unset($params[0][$k]);
+                    }
+                } else {
+                    $params[0] = $relatedTableAlias.'.'.$params[0];
                 }
-            } else {
-                $params[0] = $relatedTableAlias.'.'.$params[0];
-            }
 
-            call_user_func_array([$join, $method], $params);
+                call_user_func_array([$join, $method], $params);
+            } catch (\Exception $e) {
+                throw new InvalidRelationWhere('Package allows only following where(orWhere) clauses type on relation : ->where($column, $operator, $value) and ->where([$column => $value]).');
+            }
         } elseif (in_array($method, ['withoutTrashed', 'onlyTrashed', 'withTrashed'])) {
             if ('withTrashed' == $method) {
                 //do nothing
