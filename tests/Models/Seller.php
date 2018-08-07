@@ -12,9 +12,7 @@ class Seller extends BaseModel
     {
         return $this->hasOne(Location::class)
             ->where('is_primary', '=', 0)
-            ->where('is_secondary', '=', 0)
-            //->onlyTrashed()
-            ;
+            ->where('is_secondary', '=', 0);
     }
 
     public function locations()

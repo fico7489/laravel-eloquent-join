@@ -36,7 +36,7 @@ class EloquentJoinBuilder extends Builder
         return $this->where($column, $operator, $value, $boolean);
     }
 
-    public function orWhereJoin($column, $operator = null, $value)
+    public function orWhereJoin($column, $operator = null, $value = null)
     {
         $column = $this->performJoin($column);
 
@@ -98,7 +98,7 @@ class EloquentJoinBuilder extends Builder
                     $this->leftJoin($joinQuery, function ($join) use ($relatedTableAlias, $keyRelated, $currentTable, $relatedPrimaryKey, $relatedModel, $relatedRelation) {
                         $join->on($relatedTableAlias . '.' . $relatedPrimaryKey, '=', $currentTable . '.' . $keyRelated);
 
-                        $this->leftJoinQuery($join, $relatedModel, $relatedTableAlias);
+                        $this->leftJoinQuery($join, $relatedRelation, $relatedTableAlias);
                     });
                 } elseif ($relatedRelation instanceof HasOneJoin) {
                     $keyRelated = $relatedRelation->getQualifiedForeignKeyName();
