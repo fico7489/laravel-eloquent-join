@@ -21,13 +21,7 @@ class EloquentJoinBuilder extends Builder
     //store joined tables, we want join table only once (e.g. when you call orderByJoin more time)
     private $joinedTables = [];
 
-    //store not allowed clauses on join relations for throw exception (e.g. whereHas, orderBy etc.)
-    public $relationNotAllowedClauses = [];
-
-    //store where clauses which we will use for join
-    public $relationWhereClauses = [];
-
-    //store where clauses which we will use for join
+    //store relation clauses for join
     public $relationClauses = [];
 
     public function whereJoin($column, $operator = null, $value = null, $boolean = 'and')
