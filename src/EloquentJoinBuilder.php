@@ -63,10 +63,10 @@ class EloquentJoinBuilder extends Builder
                 continue;
             }
 
-            $relatedRelation = $currentModel->$relation();
-            $relatedModel = $relatedRelation->getRelated();
+            $relatedRelation   = $currentModel->$relation();
+            $relatedModel      = $relatedRelation->getRelated();
             $relatedPrimaryKey = $relatedModel->getKeyName();
-            $relatedTable = $relatedModel->getTable();
+            $relatedTable      = $relatedModel->getTable();
 
             $this->validateJoinQuery();
 
@@ -98,9 +98,9 @@ class EloquentJoinBuilder extends Builder
                 }
             }
 
-            $currentModel = $relatedModel;
+            $currentModel      = $relatedModel;
             $currentPrimaryKey = $relatedPrimaryKey;
-            $currentTable = $relatedTableAlias;
+            $currentTable      = $relatedTableAlias;
 
             $this->joinedTables[$relation] = $relatedTableAlias;
         }
