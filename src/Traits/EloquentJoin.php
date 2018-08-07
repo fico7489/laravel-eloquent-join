@@ -8,7 +8,7 @@ use Fico7489\Laravel\EloquentJoin\Relations\HasOneJoin;
 use Fico7489\Laravel\EloquentJoin\Services\QueryNormalizer;
 use Illuminate\Database\Eloquent\Builder;
 
-trait EloquentJoinTrait
+trait EloquentJoin
 {
     use ExtendRelationsTrait;
 
