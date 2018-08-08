@@ -128,7 +128,7 @@ class EloquentJoinBuilder extends Builder
         }
 
         //apply global SoftDeletingScope
-        foreach ($relationBuilder->getScopes() as $scope) {
+        foreach ($relationBuilder->scopes as $scope) {
             if ($scope instanceof SoftDeletingScope) {
                 $this->applyClauseOnRelation($join, 'withoutTrashed', [], $relatedTableAlias);
             } else {
@@ -165,10 +165,5 @@ class EloquentJoinBuilder extends Builder
         } else {
             throw new InvalidRelationClause('Package allows only following clauses on relation : where, orWhere, withTrashed, onlyTrashed and withoutTrashed.');
         }
-    }
-
-    public function getScopes()
-    {
-        return $this->scopes;
     }
 }
