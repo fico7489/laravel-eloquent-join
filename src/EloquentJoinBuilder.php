@@ -167,9 +167,6 @@ class EloquentJoinBuilder extends Builder
         }
     }
 
-    /**
-     * @return array
-     */
     public function getScopes()
     {
         return $this->scopes;
