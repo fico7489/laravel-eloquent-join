@@ -83,21 +83,14 @@ trait EloquentJoinTrait
     private function performJoin($builder, $relations)
     {
         $relations = explode('.', $relations);
-
-        $column = end($relations);
+        $column = array_pop($relations);
         $baseTable = $this->getTable();
-        $baseModel = $this;
 
         $currentModel = $this;
         $currentPrimaryKey = $this->getKeyName();
         $currentTable = $this->getTable();
 
         foreach ($relations as $relation) {
-            if ($relation == $column) {
-                //last item in $relations argument is sort|where column
-                continue;
-            }
-
             $relatedRelation = $currentModel->$relation();
             $relatedModel = $relatedRelation->getRelated();
             $relatedPrimaryKey = $relatedModel->getKeyName();
@@ -140,7 +133,7 @@ trait EloquentJoinTrait
             $this->joinedTables[$relation] = $relatedTableAlias;
         }
 
-        if (! $this->selected  &&  count($relations) > 1) {
+        if (!$this->selected && !empty($relations)) {
             $this->selected = true;
             $builder->select($baseTable . '.*');
         }
