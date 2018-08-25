@@ -41,6 +41,12 @@ class WhereJoinTest extends TestCase
             on "locations"."seller_id" = "sellers"."id"
             and "locations"."is_primary" = \? 
             and "locations"."deleted_at" is null 
+            and locations.id = \(
+                SELECT min\(id\)
+                FROM locations
+                WHERE locations.seller_id = sellers.id
+                LIMIT 1
+           \)
             where "locations"."address" = \?/';
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());

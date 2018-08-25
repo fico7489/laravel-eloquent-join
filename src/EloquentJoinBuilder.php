@@ -93,16 +93,17 @@ class EloquentJoinBuilder extends Builder
 
                     $this->leftJoin($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $relatedPrimaryKey, $currentTableAlias, $relatedKey, $currentPrimaryKey) {
                         $join->on($relatedTableAlias.'.'.$relatedKey, '=', $currentTableAlias.'.'.$currentPrimaryKey);
-                        $join->whereRaw('
-                            '.$relatedTableAlias.'.'.$relatedPrimaryKey.' =  (
-                                SELECT min('.$relatedPrimaryKey.')
-                                FROM '.$relatedTableAlias.'
-                                WHERE '.$relatedTableAlias.'.'.$relatedKey.' = '.$currentTableAlias.'.'.$currentPrimaryKey.'
-                                LIMIT 1
-                              )
-                        ');
 
                         $this->leftJoinQuery($join, $relatedRelation, $relatedTableAlias);
+
+                        $join->whereRaw(
+                            $relatedTableAlias.'.'.$relatedPrimaryKey.' =  (
+                                SELECT min('.$relatedPrimaryKey.')
+                                    FROM '.$relatedTableAlias.'
+                                    WHERE '.$relatedTableAlias.'.'.$relatedKey.' = '.$currentTableAlias.'.'.$currentPrimaryKey.'
+                                    LIMIT 1
+                                )
+                            ');
                     });
                 } else {
                     throw new InvalidRelation('Package allows only following relations : BelongsToJoin and HasOneJoin');
