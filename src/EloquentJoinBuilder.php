@@ -56,7 +56,7 @@ class EloquentJoinBuilder extends Builder
         $baseTable = $baseModel->getTable();
 
         $currentModel      = $baseModel;
-        $currentTable      = $baseTable;
+        $currentTableAlias = $baseTable;
         $currentPrimaryKey = $baseModel->getKeyName();
 
         $relationsAccumulated = [];
@@ -80,19 +80,19 @@ class EloquentJoinBuilder extends Builder
             if (!in_array($relationAccumulatedString, $this->joinedTables)) {
                 $joinQuery = $relatedTable.($this->useTableAlias ? ' as '.$relatedTableAlias : '');
                 if ($relatedRelation instanceof BelongsToJoin) {
-                    $keyRelated = $relatedRelation->getForeignKey();
+                    $relatedKey = $relatedRelation->getForeignKey();
 
-                    $this->leftJoin($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $relatedPrimaryKey, $currentTable, $keyRelated) {
-                        $join->on($relatedTableAlias.'.'.$relatedPrimaryKey, '=', $currentTable.'.'.$keyRelated);
+                    $this->leftJoin($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $relatedPrimaryKey, $currentTableAlias, $relatedKey) {
+                        $join->on($relatedTableAlias.'.'.$relatedPrimaryKey, '=', $currentTableAlias.'.'.$relatedKey);
 
                         $this->leftJoinQuery($join, $relatedRelation, $relatedTableAlias);
                     });
                 } elseif ($relatedRelation instanceof HasOneJoin) {
-                    $keyRelated = $relatedRelation->getQualifiedForeignKeyName();
-                    $keyRelated = last(explode('.', $keyRelated));
+                    $relatedKey = $relatedRelation->getQualifiedForeignKeyName();
+                    $relatedKey = last(explode('.', $relatedKey));
 
-                    $this->leftJoin($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $relatedPrimaryKey, $currentTable, $keyRelated, $currentPrimaryKey) {
-                        $join->on($relatedTableAlias.'.'.$keyRelated, '=', $currentTable.'.'.$currentPrimaryKey);
+                    $this->leftJoin($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $relatedPrimaryKey, $currentTableAlias, $relatedKey, $currentPrimaryKey) {
+                        $join->on($relatedTableAlias.'.'.$relatedKey, '=', $currentTableAlias.'.'.$currentPrimaryKey);
 
                         $this->leftJoinQuery($join, $relatedRelation, $relatedTableAlias);
                     });
@@ -102,7 +102,7 @@ class EloquentJoinBuilder extends Builder
             }
 
             $currentModel      = $relatedModel;
-            $currentTable      = $relatedTableAlias;
+            $currentTableAlias = $relatedTableAlias;
             $currentPrimaryKey = $relatedPrimaryKey;
 
             $this->joinedTables[] = implode('.', $relationsAccumulated);
@@ -113,7 +113,7 @@ class EloquentJoinBuilder extends Builder
             $this->select($baseTable.'.*')->groupBy($baseTable.'.'.$baseModel->getKeyName());
         }
 
-        return $currentTable.'.'.$column;
+        return $currentTableAlias.'.'.$column;
     }
 
     private function leftJoinQuery($join, $relation, $relatedTableAlias)
