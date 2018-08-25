@@ -22,6 +22,7 @@ class OrderItem extends BaseModel
         return $this->belongsTo(Order::class, 'order_id')
             ->withTrashed();
     }
+
     public function orderOnlyTrashed()
     {
         return $this->belongsTo(Order::class, 'order_id')

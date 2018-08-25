@@ -9,18 +9,19 @@ trait JoinRelationTrait
     /**
      * Handle dynamic method calls to the relationship.
      *
-     * @param  string  $method
-     * @param  array   $parameters
+     * @param string $method
+     * @param array  $parameters
+     *
      * @return mixed
      */
     public function __call($method, $parameters)
     {
         $softDeleteOptions = ['withTrashed', 'withoutTrashed', 'onlyTrashed'];
 
-        if ($method == 'where') {
+        if ('where' == $method) {
             $parametersNew = QueryNormalizer::normalize($parameters);
             parent::__call('setWhereForJoin', $parametersNew);
-        } elseif ($method == 'orWhere') {
+        } elseif ('orWhere' == $method) {
             $parametersNew = QueryNormalizer::normalize($parameters);
             parent::__call('setOrWhereForJoin', $parametersNew);
         } elseif (in_array($method, $softDeleteOptions)) {

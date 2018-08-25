@@ -63,7 +63,6 @@ class SoftDeleteTest extends TestCase
         $this->assertRegExp($queryTest, $this->fetchQuery());
     }
 
-
     public function testRelatedWithTrashedOnRelation()
     {
         OrderItem::orderByJoin('orderWithTrashed.number')->get();

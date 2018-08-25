@@ -45,9 +45,10 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     protected function fetchQuery()
     {
         $log = \DB::getQueryLog();
+
         return end($log)['query'];
     }
-    
+
     protected function getEnvironmentSetUp($app)
     {
         // Setup default database to use sqlite :memory:
@@ -58,7 +59,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             'prefix'   => '',
         ]);
     }
-    
+
     protected function getPackageProviders($app)
     {
         return [ServiceProvider::class];

@@ -7,17 +7,18 @@ use Fico7489\Laravel\EloquentJoin\Relations\HasOneJoin;
 use Illuminate\Support\Str;
 
 /**
- * Add new realations BelongsTo and HasOne
+ * Add new realations BelongsTo and HasOne.
  */
 trait ExtendRelationsTrait
 {
     /**
      * Define an inverse one-to-one or many relationship.
      *
-     * @param  string  $related
-     * @param  string  $foreignKey
-     * @param  string  $ownerKey
-     * @param  string  $relation
+     * @param string $related
+     * @param string $foreignKey
+     * @param string $ownerKey
+     * @param string $relation
+     *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function belongsTo($related, $foreignKey = null, $ownerKey = null, $relation = null)
@@ -51,9 +52,10 @@ trait ExtendRelationsTrait
     /**
      * Define a one-to-one relationship.
      *
-     * @param  string  $related
-     * @param  string  $foreignKey
-     * @param  string  $localKey
+     * @param string $related
+     * @param string $foreignKey
+     * @param string $localKey
+     *
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function hasOne($related, $foreignKey = null, $localKey = null)

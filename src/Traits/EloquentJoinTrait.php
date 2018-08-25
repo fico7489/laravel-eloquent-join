@@ -21,7 +21,6 @@ trait EloquentJoinTrait
     //store joined tables, we want join table only once (e.g. when you call orderByJoin more time)
     private $joinedTables = [];
 
-
     //store not allowed clauses on join relations for throw exception (e.g. whereHas, orderBy etc.)
     public $relationNotAllowedClauses = [];
 
@@ -30,7 +29,6 @@ trait EloquentJoinTrait
 
     //store soft delete clauses (withoutTrashed|onlyTrashed|WithTrashed)
     public $softDelete = 'withoutTrashed';
-
 
     //set invalid clauses on join relations
     public function scopeSetInvalidJoin(Builder $builder, $method, $parameters = [])
@@ -56,7 +54,6 @@ trait EloquentJoinTrait
         $this->softDelete = $param;
     }
 
-
     public function scopeWhereJoin(Builder $builder, $column, $operator = null, $value = null, $boolean = 'and')
     {
         list($column, $operator, $value) = QueryNormalizer::normalizeScope(func_get_args());
@@ -76,9 +73,9 @@ trait EloquentJoinTrait
     public function scopeOrderByJoin(Builder $builder, $column, $sortBy = 'asc')
     {
         $column = $this->performJoin($builder, $column);
+
         return $builder->orderBy($column, $sortBy);
     }
-
 
     private function performJoin($builder, $relations)
     {
@@ -110,12 +107,12 @@ trait EloquentJoinTrait
             } else {
                 $relatedTableAlias = $this->useTableAlias ? uniqid() : $relatedTable;
 
-                $joinQuery = $relatedTable . ($this->useTableAlias ? ' as ' . $relatedTableAlias : '');
+                $joinQuery = $relatedTable.($this->useTableAlias ? ' as '.$relatedTableAlias : '');
                 if ($relatedRelation instanceof BelongsToJoin) {
                     $keyRelated = $relatedRelation->getForeignKey();
 
                     $builder->leftJoin($joinQuery, function ($join) use ($relatedTableAlias, $keyRelated, $currentTable, $relatedPrimaryKey, $relatedModel) {
-                        $join->on($relatedTableAlias . '.' . $relatedPrimaryKey, '=', $currentTable . '.' . $keyRelated);
+                        $join->on($relatedTableAlias.'.'.$relatedPrimaryKey, '=', $currentTable.'.'.$keyRelated);
 
                         $this->leftJoinQuery($join, $relatedModel, $relatedTableAlias);
                     });
@@ -124,7 +121,7 @@ trait EloquentJoinTrait
                     $keyRelated = last(explode('.', $keyRelated));
 
                     $builder->leftJoin($joinQuery, function ($join) use ($relatedTableAlias, $keyRelated, $currentTable, $relatedPrimaryKey, $relatedModel, $currentPrimaryKey) {
-                        $join->on($relatedTableAlias . '.' . $keyRelated, '=', $currentTable . '.' . $currentPrimaryKey);
+                        $join->on($relatedTableAlias.'.'.$keyRelated, '=', $currentTable.'.'.$currentPrimaryKey);
 
                         $this->leftJoinQuery($join, $relatedModel, $relatedTableAlias);
                     });
@@ -140,27 +137,27 @@ trait EloquentJoinTrait
             $this->joinedTables[$relation] = $relatedTableAlias;
         }
 
-        if (! $this->selected  &&  count($relations) > 1) {
+        if (!$this->selected  &&  count($relations) > 1) {
             $this->selected = true;
-            $builder->select($baseTable . '.*')->groupBy($baseTable . '.' . $baseModel->primaryKey);
+            $builder->select($baseTable.'.*')->groupBy($baseTable.'.'.$baseModel->primaryKey);
         }
 
-        return $currentTable . '.' . $column;
+        return $currentTable.'.'.$column;
     }
 
     private function leftJoinQuery($join, $relatedModel, $relatedTableAlias)
     {
         foreach ($relatedModel->relationWhereClauses as $relationClause) {
-            $join->where($relatedTableAlias . '.' . $relationClause['column'], $relationClause['operator'], $relationClause['value'], $relationClause['boolean']);
+            $join->where($relatedTableAlias.'.'.$relationClause['column'], $relationClause['operator'], $relationClause['value'], $relationClause['boolean']);
         }
 
         if (method_exists($relatedModel, 'getQualifiedDeletedAtColumn')) {
-            if ($relatedModel->softDelete == 'withTrashed') {
+            if ('withTrashed' == $relatedModel->softDelete) {
                 //do nothing
-            } elseif ($relatedModel->softDelete == 'withoutTrashed') {
-                $join->where($relatedTableAlias . '.deleted_at', '=', null);
-            } elseif ($relatedModel->softDelete == 'onlyTrashed') {
-                $join->where($relatedTableAlias . '.deleted_at', '<>', null);
+            } elseif ('withoutTrashed' == $relatedModel->softDelete) {
+                $join->where($relatedTableAlias.'.deleted_at', '=', null);
+            } elseif ('onlyTrashed' == $relatedModel->softDelete) {
+                $join->where($relatedTableAlias.'.deleted_at', '<>', null);
             }
         }
     }
@@ -168,11 +165,11 @@ trait EloquentJoinTrait
     private function validateJoinQuery($relatedModel)
     {
         foreach ($relatedModel->relationNotAllowedClauses as $method => $relationNotAllowedClause) {
-            throw new EloquentJoinException($method . ' is not allowed on HasOneJoin and BelongsToJoin relations.');
+            throw new EloquentJoinException($method.' is not allowed on HasOneJoin and BelongsToJoin relations.');
         }
 
         foreach ($relatedModel->relationWhereClauses as $relationWhereClause) {
-            if (empty($relationWhereClause['column'])  ||  ! is_string($relationWhereClause['column'])) {
+            if (empty($relationWhereClause['column'])  ||  !is_string($relationWhereClause['column'])) {
                 throw new EloquentJoinException("Only this where types are allowed on HasOneJoin and BelongsToJoin relations : 
                     ->where('column', 'operator', 'value') 
                     ->where('column', 'value') 
