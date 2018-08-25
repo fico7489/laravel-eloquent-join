@@ -13,56 +13,100 @@ class WhereJoinTest extends TestCase
     {
         Seller::whereJoin('title', '=', 'test')->get();
 
-        $queryTest = '/select \* from "sellers" where "sellers"."title" = \?/';
-        $this->assertRegExp($queryTest, $this->fetchQuery());
+        $queryTest = '/select \* from "sellers" 
+            where "sellers"."title" = \?/';
+
+        $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }
 
     public function testWhereJoinBelongsTo()
     {
         Seller::whereJoin('city.name', '=', 'test')->get();
 
-        $queryTest = '/select "sellers".* from "sellers" left join "cities" on "cities"."id" = "sellers"."city_id" and "cities"."deleted_at" is null where "cities"."name" = \?/';
-        $this->assertRegExp($queryTest, $this->fetchQuery());
+        $queryTest = '/select "sellers".* from "sellers" 
+            left join "cities" 
+            on "cities"."id" = "sellers"."city_id" 
+            and "cities"."deleted_at" is null 
+            where "cities"."name" = \?/';
+
+        $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }
 
     public function testWhereJoinHasOne()
     {
         Seller::whereJoin('locationPrimary.address', '=', 'test')->get();
 
-        $queryTest = '/select "sellers".* from "sellers" left join "locations" on "locations"."seller_id" = "sellers"."id" and "locations"."is_primary" = \? and "locations"."deleted_at" is null where "locations"."address" = \?/';
-        $this->assertRegExp($queryTest, $this->fetchQuery());
+        $queryTest = '/select "sellers".* from "sellers" 
+            left join "locations" 
+            on "locations"."seller_id" = "sellers"."id"
+            and "locations"."is_primary" = \? 
+            and "locations"."deleted_at" is null 
+            where "locations"."address" = \?/';
+
+        $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }
 
     public function testWhereJoinBelongsToBelongsTo()
     {
         Seller::whereJoin('city.state.name', '=', 'test')->get();
 
-        $queryTest = '/select "sellers".* from "sellers" left join "cities" on "cities"."id" = "sellers"."city_id" and "cities"."deleted_at" is null left join "states" on "states"."id" = "cities"."state_id" and "states"."deleted_at" is null where "states"."name" = \?/';
-        $this->assertRegExp($queryTest, $this->fetchQuery());
+        $queryTest = '/select "sellers".* from "sellers" 
+            left join "cities" 
+            on "cities"."id" = "sellers"."city_id" 
+            and "cities"."deleted_at" is null 
+            left join "states" on "states"."id" = "cities"."state_id" 
+            and "states"."deleted_at" is null 
+            where "states"."name" = \?/';
+
+        $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }
 
     public function testWhereJoinBelongsToHasOne()
     {
         Seller::whereJoin('city.zipCodePrimary.name', '=', 'test')->get();
 
-        $queryTest = '/select "sellers".* from "sellers" left join "cities" on "cities"."id" = "sellers"."city_id" and "cities"."deleted_at" is null left join "zip_codes" on "zip_codes"."city_id" = "cities"."id" and "zip_codes"."is_primary" = \? and "zip_codes"."deleted_at" is null where "zip_codes"."name" = \?/';
-        $this->assertRegExp($queryTest, $this->fetchQuery());
+        $queryTest = '/select "sellers".* from "sellers" left join "cities" 
+            on "cities"."id" = "sellers"."city_id" 
+            and "cities"."deleted_at" is null 
+            left join "zip_codes" 
+            on "zip_codes"."city_id" = "cities"."id" 
+            and "zip_codes"."is_primary" = \? 
+            and "zip_codes"."deleted_at" is null 
+            where "zip_codes"."name" = \?/';
+
+        $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }
 
     public function testWhereJoinHasOneHasOne()
     {
         Seller::whereJoin('locationPrimary.locationAddressPrimary.name', '=', 'test')->get();
 
-        $queryTest = '/select "sellers".* from "sellers" left join "locations" on "locations"."seller_id" = "sellers"."id" and "locations"."is_primary" = \? and "locations"."deleted_at" is null left join "location_addresses" on "location_addresses"."location_id" = "locations"."id" and "location_addresses"."is_primary" = \? and "location_addresses"."deleted_at" is null where "location_addresses"."name" = \?/';
-        $this->assertRegExp($queryTest, $this->fetchQuery());
+        $queryTest = '/select "sellers".* from "sellers" 
+            left join "locations" 
+            on "locations"."seller_id" = "sellers"."id" 
+            and "locations"."is_primary" = \? 
+            and "locations"."deleted_at" is null 
+            left join "location_addresses" on "location_addresses"."location_id" = "locations"."id" 
+            and "location_addresses"."is_primary" = \? 
+            and "location_addresses"."deleted_at" is null 
+            where "location_addresses"."name" = \?/';
+
+        $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }
 
     public function testWhereJoinHasBelongsTo()
     {
         Seller::whereJoin('locationPrimary.city.name', '=', 'test')->get();
 
-        $queryTest = '/select "sellers".* from "sellers" left join "locations" on "locations"."seller_id" = "sellers"."id" and "locations"."is_primary" = \? and "locations"."deleted_at" is null left join "cities" on "cities"."id" = "locations"."city_id" and "cities"."deleted_at" is null where "cities"."name" = \?/';
-        $this->assertRegExp($queryTest, $this->fetchQuery());
+        $queryTest = '/select "sellers".* from "sellers" 
+            left join "locations" on "locations"."seller_id" = "sellers"."id" 
+            and "locations"."is_primary" = \? 
+            and "locations"."deleted_at" is null left join "cities" 
+            on "cities"."id" = "locations"."city_id" 
+            and "cities"."deleted_at" is null 
+            where "cities"."name" = \?/';
+
+        $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }
 
     public function testWhereJoinGeneral()
@@ -94,5 +138,17 @@ class WhereJoinTest extends TestCase
         //test more where with orWhere does not exists
         $items = OrderItem::orderByJoin('order.number')->whereJoin('order.number', '=', 'dddd')->orWhereJoin('order.number', '=', 'eeee')->get();
         $this->assertEquals(0, $items->count());
+    }
+
+    private function assertQueryMatches($expected, $actual)
+    {
+        $actual   = '/'.$actual.'/';
+        $actual   = preg_replace('/\s\s+/', ' ', $actual);
+        $actual   = str_replace(['\n', '\r'], '', $actual);
+
+        $expected = preg_replace('/\s\s+/', ' ', $expected);
+        $expected   = str_replace(['\n', '\r'], '', $expected);
+
+        $this->assertRegExp($expected, $actual);
     }
 }
