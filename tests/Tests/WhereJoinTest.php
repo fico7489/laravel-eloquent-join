@@ -78,6 +78,12 @@ class WhereJoinTest extends TestCase
             on "zip_codes"."city_id" = "cities"."id" 
             and "zip_codes"."is_primary" = \? 
             and "zip_codes"."deleted_at" is null 
+            and zip_codes.id = \(
+                SELECT min\(id\)
+                FROM zip_codes
+                WHERE zip_codes.city_id = cities.id
+                LIMIT 1
+           \)
             where "zip_codes"."name" = \?/';
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
@@ -92,9 +98,21 @@ class WhereJoinTest extends TestCase
             on "locations"."seller_id" = "sellers"."id" 
             and "locations"."is_primary" = \? 
             and "locations"."deleted_at" is null 
+            and locations.id = \(
+                SELECT min\(id\)
+                FROM locations
+                WHERE locations.seller_id = sellers.id
+                LIMIT 1
+           \)
             left join "location_addresses" on "location_addresses"."location_id" = "locations"."id" 
             and "location_addresses"."is_primary" = \? 
             and "location_addresses"."deleted_at" is null 
+            and location_addresses.id = \(
+                SELECT min\(id\)
+                FROM location_addresses
+                WHERE location_addresses.location_id = locations.id
+                LIMIT 1
+           \)
             where "location_addresses"."name" = \?/';
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
@@ -105,9 +123,17 @@ class WhereJoinTest extends TestCase
         Seller::whereJoin('locationPrimary.city.name', '=', 'test')->get();
 
         $queryTest = '/select "sellers".* from "sellers" 
-            left join "locations" on "locations"."seller_id" = "sellers"."id" 
+            left join "locations" 
+            on "locations"."seller_id" = "sellers"."id" 
             and "locations"."is_primary" = \? 
-            and "locations"."deleted_at" is null left join "cities" 
+            and "locations"."deleted_at" is null 
+            and locations.id = \(
+                SELECT min\(id\)
+                FROM locations
+                WHERE locations.seller_id = sellers.id
+                LIMIT 1
+           \)
+            left join "cities" 
             on "cities"."id" = "locations"."city_id" 
             and "cities"."deleted_at" is null 
             where "cities"."name" = \?/';
