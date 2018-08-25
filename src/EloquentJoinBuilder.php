@@ -2,6 +2,7 @@
 
 namespace Fico7489\Laravel\EloquentJoin;
 
+use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelation;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationClause;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationScope;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationWhere;
