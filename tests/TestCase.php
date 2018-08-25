@@ -64,4 +64,16 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     {
         return [ServiceProvider::class];
     }
+
+    protected function assertQueryMatches($expected, $actual)
+    {
+        $actual   = '/'.$actual.'/';
+        $actual   = preg_replace('/\s\s+/', ' ', $actual);
+        $actual   = str_replace(['\n', '\r'], '', $actual);
+
+        $expected = preg_replace('/\s\s+/', ' ', $expected);
+        $expected   = str_replace(['\n', '\r'], '', $expected);
+
+        $this->assertRegExp($expected, $actual);
+    }
 }

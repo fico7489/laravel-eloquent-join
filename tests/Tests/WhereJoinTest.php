@@ -171,16 +171,4 @@ class WhereJoinTest extends TestCase
         $items = OrderItem::orderByJoin('order.number')->whereJoin('order.number', '=', 'dddd')->orWhereJoin('order.number', '=', 'eeee')->get();
         $this->assertEquals(0, $items->count());
     }
-
-    private function assertQueryMatches($expected, $actual)
-    {
-        $actual   = '/'.$actual.'/';
-        $actual   = preg_replace('/\s\s+/', ' ', $actual);
-        $actual   = str_replace(['\n', '\r'], '', $actual);
-
-        $expected = preg_replace('/\s\s+/', ' ', $expected);
-        $expected   = str_replace(['\n', '\r'], '', $expected);
-
-        $this->assertRegExp($expected, $actual);
-    }
 }
