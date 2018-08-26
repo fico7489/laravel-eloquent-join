@@ -111,14 +111,14 @@ and that's it, you are ready to go.
 ##### Use table alias
 Should we use alias for joined tables (default = false)
 
-With true query will look like this : 
+With **true** query will look like this : 
 ```
 select "sellers".* from "sellers" 
     left join "locations" as "5b5c093d2e00f" 
 	...
 ```
 
-With false query will look like this : 
+With **false** query will look like this : 
 ```
 select "sellers".* from "sellers" 
 	left join "locations"                    
