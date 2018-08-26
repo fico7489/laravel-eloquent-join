@@ -61,7 +61,7 @@ Unlike **sorting**, you can perform **filtering** on the relationship fields wit
 
 NEW 3.* PACKAGE VERSION WITH MANY NEW FEATURES RELEASED
 
-New version
+#### New version
 
 | Laravel Version | Package Tag | Supported | Development Branch
 |-----------------|-------------|-----------| -----------|
@@ -72,7 +72,7 @@ New version
  * 3.* version is not backward compatible with any 2.* version
  * 3.* version is tested for laravel 5.5 and 5.6.
 
-Old deprecated versions
+#### Old deprecated versions
 
 | Laravel Version | Package Tag | Supported | Development Branch
 |-----------------|-------------|-----------| -----------|
@@ -111,14 +111,14 @@ and that's it, you are ready to go.
 ##### Use table alias
 Should we use alias for joined tables (default = false)
 
-With true query will look like this : 
+With **true** query will look like this : 
 ```
 select "sellers".* from "sellers" 
     left join "locations" as "5b5c093d2e00f" 
 	...
 ```
 
-With false query will look like this : 
+With **false** query will look like this : 
 ```
 select "sellers".* from "sellers" 
 	left join "locations"                    
@@ -137,24 +137,30 @@ Set option in your base model :
 
 ## Instructions for use
 
-##### Currently available relations for join queries
+### Currently available relations for join queries
+
 * **BelongsTo**
 * **HasOne**.
 
-##### New clauses for eloquent builder on BelongsTo and HasOne relations
+### New clauses for eloquent builder on BelongsTo and HasOne relations
 
 * **orderByJoin($column, $sortBy = 'asc', $leftJoin = true)**
+
     ***$column*** argument is same as in default eloquent orderBy()
+    
     ***$direction*** argument is same as in default eloquent orderBy()
-    ***$leftJoin*** argument defines if eloquent should perform left join or inner join
+    
+    ***$leftJoin*** argument defines if eloquent should perform left join or inner join, can be true or false
     
 * **whereJoin($column, $operator = null, $value = null, $boolean = 'and')**
+
     ***$column***, ***$operator***, ***$value*** and ***$boolean*** arguments are the same as in default eloquent where()
     
 * **orWhereJoin($column, $operator = null, $value)**
-    ***$column***, ***$operator*** and ***$value*** arguments are the same as in default eloquent where()
 
-##### Rules for column parameter in whereJoin, orWhereJoin and orderByJoin   
+    ***$column***, ***$operator*** and ***$value*** arguments are the same as in default eloquent orWhere()
+
+### Rules for column parameter in whereJoin, orWhereJoin and orderByJoin   
 
 *  current table attributes
 ```
@@ -169,7 +175,7 @@ Set option in your base model :
 ->where('relationName.relationNameSecond.title', '=', 'test')
 ```
 
-##### Allowed clauses on BelongsTo and HasOne relations on which you can use join clauses on the query
+### Allowed clauses on BelongsTo and HasOne relations on which you can use join clauses on the query
 
 * Relations that you want to use for join queries can only have this clauses : **where**, **orWhere**, **withTrashed**, **onlyTrashed**, **withoutTrashed**. 
 * Clauses **where** and **orWhere** can only have this variations **->where($column, $operator, $value)** and **->where([$column => $value])**, closures are not allowed.
@@ -200,9 +206,10 @@ public function locationPrimary()
 }
 ```
 
-The reason why the second relation is not allowed is that this package should apply all those clauses on the join clause,  eloquent use all those clauses isolated with subqueries NOT on join clause and that is more simpler.
+The reason why the second relation is not allowed is that this package should apply all those clauses on the join clause,  eloquent use all those clauses isolated with subqueries NOT on join clause and that is more simpler to do.
 
-##### Other 
+### Other 
+
 * You can combine new clauses unlimited times
 * If you combine clauses more times on same relation package will join related table only once
 * You can combine join clauses e.g. whereJoin() with elouent clauses e.g. orderBy()
@@ -332,7 +339,7 @@ if(request()->get('date')){
 $posts = $posts->get();
 ```
 
-Both snippets generates the same MySql query.
+Both snippets do the same thing.
 
 ## Tests
 
