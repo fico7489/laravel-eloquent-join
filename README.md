@@ -158,7 +158,7 @@ Set option in your base model :
     
 * **orWhereJoin($column, $operator = null, $value)**
 
-    ***$column***, ***$operator*** and ***$value*** arguments are the same as in default eloquent where()
+    ***$column***, ***$operator*** and ***$value*** arguments are the same as in default eloquent orWhere()
 
 ### Rules for column parameter in whereJoin, orWhereJoin and orderByJoin   
 
