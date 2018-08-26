@@ -144,12 +144,15 @@ Set option in your base model :
 ##### Rules for column parameter in whereJoin, orWhereJoin and orderByJoin   
 
 *  current table attributes
-* related table attributes (relationship names with dots)
-* related tables can be nested unlimited with any combination of HasOne and BelongsTo relations, they only need to meet **relation rules** for join queries.
-
 ```
 ->where('title', '=', 'test')
+```
+* related table attributes (relationship names with dots)
+```
 ->where('relationName.title', '=', 'test')
+```
+* related tables can be nested unlimited with any combination of HasOne and BelongsTo relations, they only need to meet **relation rules** for join queries.
+```
 ->where('relationName.relationNameSecond.title', '=', 'test')
 ```
 
