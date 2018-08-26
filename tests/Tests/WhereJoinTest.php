@@ -60,7 +60,8 @@ class WhereJoinTest extends TestCase
             left join "cities" 
             on "cities"."id" = "sellers"."city_id" 
             and "cities"."deleted_at" is null 
-            left join "states" on "states"."id" = "cities"."state_id" 
+            left join "states" 
+            on "states"."id" = "cities"."state_id" 
             and "states"."deleted_at" is null 
             where "states"."name" = \?/';
 
@@ -71,7 +72,8 @@ class WhereJoinTest extends TestCase
     {
         Seller::whereJoin('city.zipCodePrimary.name', '=', 'test')->get();
 
-        $queryTest = '/select "sellers".* from "sellers" left join "cities" 
+        $queryTest = '/select "sellers".* from "sellers" 
+            left join "cities" 
             on "cities"."id" = "sellers"."city_id" 
             and "cities"."deleted_at" is null 
             left join "zip_codes" 
@@ -104,7 +106,8 @@ class WhereJoinTest extends TestCase
                 WHERE locations.seller_id = sellers.id
                 LIMIT 1
            \)
-            left join "location_addresses" on "location_addresses"."location_id" = "locations"."id" 
+            left join "location_addresses" 
+            on "location_addresses"."location_id" = "locations"."id" 
             and "location_addresses"."is_primary" = \? 
             and "location_addresses"."deleted_at" is null 
             and location_addresses.id = \(

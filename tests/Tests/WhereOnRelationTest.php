@@ -63,12 +63,13 @@ class WhereOnRelationTest extends TestCase
 
         //locationPrimary have one where ['is_primary => 1'] and one orWhere ['is_secondary => 1']
         $items = Seller::orderByJoin('locationPrimaryOrSecondary.id', 'desc')->get();
-        $queryTest = '/select "sellers".* from "sellers" left join "locations" 
+        $queryTest = '/select "sellers".* from "sellers" 
+            left join "locations" 
             on "locations"."seller_id" = "sellers"."id" 
             and "locations"."is_primary" = \? 
             or "locations"."is_secondary" = \? 
             and "locations"."deleted_at" is null 
-             and locations.id = \(
+            and locations.id = \(
                 SELECT min\(id\)
                 FROM locations
                 WHERE locations.seller_id = sellers.id
@@ -88,7 +89,8 @@ class WhereOnRelationTest extends TestCase
             where "locations"."seller_id" = \? 
             and "locations"."seller_id" is not null 
             and "is_primary" = \? 
-            and "locations"."deleted_at" is null limit \d/';
+            and "locations"."deleted_at" is null 
+            limit \d/';
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
 
@@ -96,7 +98,8 @@ class WhereOnRelationTest extends TestCase
         $queryTest = '/select \* from "locations" 
             where "locations"."seller_id" = \? 
             and "locations"."seller_id" is not null 
-            and "is_primary" = \? and \("is_secondary" = \?\) 
+            and "is_primary" = \? 
+            and \("is_secondary" = \?\) 
             and "locations"."deleted_at" is null/';
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
