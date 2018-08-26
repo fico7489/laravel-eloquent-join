@@ -144,14 +144,19 @@ Set option in your base model :
 ##### New clauses for eloquent builder on BelongsTo and HasOne relations
 
 * **orderByJoin($column, $sortBy = 'asc', $leftJoin = true)**
+
     ***$column*** argument is same as in default eloquent orderBy()
+    
     ***$direction*** argument is same as in default eloquent orderBy()
+    
     ***$leftJoin*** argument defines if eloquent should perform left join or inner join
     
 * **whereJoin($column, $operator = null, $value = null, $boolean = 'and')**
+
     ***$column***, ***$operator***, ***$value*** and ***$boolean*** arguments are the same as in default eloquent where()
     
 * **orWhereJoin($column, $operator = null, $value)**
+
     ***$column***, ***$operator*** and ***$value*** arguments are the same as in default eloquent where()
 
 ##### Rules for column parameter in whereJoin, orWhereJoin and orderByJoin   
