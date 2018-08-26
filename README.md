@@ -112,20 +112,14 @@ With true query will look like this :
 ```
 select "sellers".* from "sellers" 
     left join "locations" as "5b5c093d2e00f" 
-    on "5b5c093d2e00f"."seller_id" = "sellers"."id" and "5b5c093d2e00f"."is_primary" = ? 
-    and "5b5c093d2e00f"."is_secondary" = ? 
-    and "5b5c093d2e00f"."deleted_at" is null 
-    group by "sellers"."id" order by "5b5c093d2e00f"."id" desc
+	...
 ```
 
 With false query will look like this : 
 ```
-select "sellers".* from "sellers" left join "locations"                    
-    on "locations"."seller_id"     = "sellers"."id" 
-    and "locations"."is_primary"     = ? 
-    and "locations"."is_secondary"     = ?   
-    and "locations"."deleted_at" is null
-    group by "sellers"."id" order by "locations"."id" desc
+select "sellers".* from "sellers" 
+	left join "locations"                    
+	...
 ```
 
 Set option in your base model : 
