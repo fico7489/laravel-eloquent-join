@@ -92,12 +92,12 @@ With this statement, a composer will install highest available package version f
 
 ```
 ...
-use Fico7489\Laravel\EloquentJoin\Traits\EloquentJoinTrait;
+use Fico7489\Laravel\EloquentJoin\Traits\EloquentJoin;
 use Illuminate\Database\Eloquent\Model;
 
 abstract class BaseModel extends Model
 {
-    use EloquentJoinTrait;
+    use EloquentJoin;
 ...
 ```
 
