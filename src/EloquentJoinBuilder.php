@@ -40,11 +40,11 @@ class EloquentJoinBuilder extends Builder
         return $this->orWhere($column, $operator, $value);
     }
 
-    public function orderByJoin($column, $sortBy = 'asc')
+    public function orderByJoin($column, $sortType = 'asc')
     {
         $column = $this->performJoin($column);
 
-        return $this->orderBy($column, $sortBy);
+        return $this->orderBy($column, $sortType);
     }
 
     private function performJoin($relations)
