@@ -4,7 +4,7 @@ namespace Fico7489\Laravel\EloquentJoin;
 
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelation;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationClause;
-use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationScope;
+use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationGlobalScope;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationWhere;
 use Illuminate\Database\Eloquent\Builder;
 use Fico7489\Laravel\EloquentJoin\Relations\BelongsToJoin;
@@ -106,7 +106,7 @@ class EloquentJoinBuilder extends Builder
                             ');
                     });
                 } else {
-                    throw new InvalidRelation('Package allows only following relations : BelongsToJoin and HasOneJoin');
+                    throw new InvalidRelation('Package allows only following relations : BelongsToJoin and HasOneJoin.');
                 }
             }
 
@@ -142,7 +142,7 @@ class EloquentJoinBuilder extends Builder
             if ($scope instanceof SoftDeletingScope) {
                 $this->applyClauseOnRelation($join, 'withoutTrashed', [], $relatedTableAlias);
             } else {
-                throw new InvalidRelationScope('Package allows only SoftDeletingScope scope .');
+                throw new InvalidRelationGlobalScope('Package allows only SoftDeletingScope scope.');
             }
         }
     }

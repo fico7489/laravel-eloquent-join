@@ -4,6 +4,7 @@ namespace Fico7489\Laravel\EloquentJoin\Tests\Tests;
 
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelation;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationClause;
+use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationGlobalScope;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationWhere;
 use Fico7489\Laravel\EloquentJoin\Tests\Models\Seller;
 use Fico7489\Laravel\EloquentJoin\Tests\TestCase;
@@ -15,7 +16,7 @@ class ExceptionTest extends TestCase
         try {
             Seller::whereJoin('locations.address', '=', 'test')->get();
         } catch (InvalidRelation $e) {
-            $this->assertEquals('Package allows only following relations : BelongsToJoin and HasOneJoin', $e->getMessage());
+            $this->assertEquals('Package allows only following relations : BelongsToJoin and HasOneJoin.', $e->getMessage());
 
             return;
         }
@@ -32,6 +33,7 @@ class ExceptionTest extends TestCase
 
             return;
         }
+
         $this->assertTrue(false);
     }
 
@@ -44,6 +46,20 @@ class ExceptionTest extends TestCase
 
             return;
         }
+
+        $this->assertTrue(false);
+    }
+
+    public function testInvalidRelationGlobalScope()
+    {
+        try {
+            Seller::whereJoin('locationPrimaryInvalid3.id', '=', 'test')->get();
+        } catch (InvalidRelationGlobalScope $e) {
+            $this->assertEquals('Package allows only SoftDeletingScope scope.', $e->getMessage());
+
+            return;
+        }
+
         $this->assertTrue(false);
     }
 }
