@@ -55,7 +55,7 @@ class ExceptionTest extends TestCase
         try {
             Seller::whereJoin('locationPrimaryInvalid3.id', '=', 'test')->get();
         } catch (InvalidRelationGlobalScope $e) {
-            $this->assertEquals('Package allows only SoftDeletingScope scope.', $e->getMessage());
+            $this->assertEquals('Package allows only SoftDeletingScope global scope.', $e->getMessage());
 
             return;
         }

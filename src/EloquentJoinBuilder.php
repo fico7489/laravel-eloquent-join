@@ -142,7 +142,7 @@ class EloquentJoinBuilder extends Builder
             if ($scope instanceof SoftDeletingScope) {
                 $this->applyClauseOnRelation($join, 'withoutTrashed', [], $relatedTableAlias);
             } else {
-                throw new InvalidRelationGlobalScope('Package allows only SoftDeletingScope scope.');
+                throw new InvalidRelationGlobalScope('Package allows only SoftDeletingScope global scope.');
             }
         }
     }
