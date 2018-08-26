@@ -17,6 +17,9 @@ class EloquentJoinBuilder extends Builder
     //use table alias for join (real table name or uniqid())
     private $useTableAlias = false;
 
+    //joinType
+    private $joinType = 'left';
+
     //store if ->select(...) is already called on builder (we want only one groupBy())
     private $selected = false;
 
@@ -77,12 +80,13 @@ class EloquentJoinBuilder extends Builder
             $relationsAccumulated[]    = $relatedTableAlias;
             $relationAccumulatedString = implode('.', $relationsAccumulated);
 
+            $joinMethod = $this->detectJoinMethod();
             if (!in_array($relationAccumulatedString, $this->joinedTables)) {
                 $joinQuery = $relatedTable.($this->useTableAlias ? ' as '.$relatedTableAlias : '');
                 if ($relatedRelation instanceof BelongsToJoin) {
                     $relatedKey = $relatedRelation->getForeignKey();
 
-                    $this->leftJoin($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $relatedPrimaryKey, $currentTableAlias, $relatedKey) {
+                    $this->$joinMethod($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $relatedPrimaryKey, $currentTableAlias, $relatedKey) {
                         $join->on($relatedTableAlias.'.'.$relatedPrimaryKey, '=', $currentTableAlias.'.'.$relatedKey);
 
                         $this->joinQuery($join, $relatedRelation, $relatedTableAlias);
@@ -91,7 +95,7 @@ class EloquentJoinBuilder extends Builder
                     $relatedKey = $relatedRelation->getQualifiedForeignKeyName();
                     $relatedKey = last(explode('.', $relatedKey));
 
-                    $this->leftJoin($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $relatedPrimaryKey, $currentTableAlias, $relatedKey, $currentPrimaryKey) {
+                    $this->$joinMethod($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $relatedPrimaryKey, $currentTableAlias, $relatedKey, $currentPrimaryKey) {
                         $join->on($relatedTableAlias.'.'.$relatedKey, '=', $currentTableAlias.'.'.$currentPrimaryKey);
 
                         $this->joinQuery($join, $relatedRelation, $relatedTableAlias);
@@ -175,5 +179,14 @@ class EloquentJoinBuilder extends Builder
         } else {
             throw new InvalidRelationClause('Package allows only following clauses on relation : where, orWhere, withTrashed, onlyTrashed and withoutTrashed.');
         }
+    }
+
+    private function detectJoinMethod()
+    {
+        if (!in_array($this->joinType, ['left', 'inner'])) {
+            throw new InvalidRelationClause('Only "left" and "inner" join is allowed.');
+        }
+
+        return ('left' == $this->joinType) ? 'leftJoin' : 'join';
     }
 }
