@@ -64,6 +64,7 @@ New version
 | Laravel Version | Package Tag | Supported | Development Branch
 |-----------------|-------------|-----------| -----------|
 | >= 5.5.0 | 3.* | yes | master
+| < 5.5.0 | - | no | -
 
  * new package version with many improvments and bug fixes is 3.*
  * 3.* version is not backward compatible with any 2.* version
