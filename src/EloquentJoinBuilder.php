@@ -110,7 +110,7 @@ class EloquentJoinBuilder extends Builder
                             ');
                     });
                 } else {
-                    throw new InvalidRelation('Package allows only following relations : BelongsToJoin and HasOneJoin.');
+                    throw new InvalidRelation();
                 }
             }
 
@@ -146,7 +146,7 @@ class EloquentJoinBuilder extends Builder
             if ($scope instanceof SoftDeletingScope) {
                 $this->applyClauseOnRelation($join, 'withoutTrashed', [], $relatedTableAlias);
             } else {
-                throw new InvalidRelationGlobalScope('Package allows only SoftDeletingScope global scope.');
+                throw new InvalidRelationGlobalScope();
             }
         }
     }
@@ -166,7 +166,7 @@ class EloquentJoinBuilder extends Builder
 
                 call_user_func_array([$join, $method], $params);
             } catch (\Exception $e) {
-                throw new InvalidRelationWhere('Package allows only following where(orWhere) clauses type on relation : ->where($column, $operator, $value) and ->where([$column => $value]).');
+                throw new InvalidRelationWhere();
             }
         } elseif (in_array($method, ['withoutTrashed', 'onlyTrashed', 'withTrashed'])) {
             if ('withTrashed' == $method) {
@@ -177,7 +177,7 @@ class EloquentJoinBuilder extends Builder
                 call_user_func_array([$join, 'where'], [$relatedTableAlias.'.deleted_at', '<>', null]);
             }
         } else {
-            throw new InvalidRelationClause('Package allows only following clauses on relation : where, orWhere, withTrashed, onlyTrashed and withoutTrashed.');
+            throw new InvalidRelationClause();
         }
     }
 }
