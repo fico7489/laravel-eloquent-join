@@ -18,7 +18,7 @@ class WhereOnRelationTest extends TestCase
             and "locations"."is_secondary" = ? 
             and "locations"."deleted_at" is null 
             and locations.id = (
-                SELECT min(id)
+                SELECT id
                 FROM locations
                 WHERE locations.seller_id = sellers.id
                 LIMIT 1
@@ -35,7 +35,7 @@ class WhereOnRelationTest extends TestCase
             and "locations"."is_primary" = ? 
             and "locations"."deleted_at" is null 
             and locations.id = (
-                SELECT min(id)
+                SELECT id
                 FROM locations
                 WHERE locations.seller_id = sellers.id
                 LIMIT 1
@@ -52,7 +52,7 @@ class WhereOnRelationTest extends TestCase
             and "locations"."is_secondary" = ? 
             and "locations"."deleted_at" is null 
             and locations.id = (
-                SELECT min(id)
+                SELECT id
                 FROM locations
                 WHERE locations.seller_id = sellers.id
                 LIMIT 1
@@ -70,7 +70,7 @@ class WhereOnRelationTest extends TestCase
             or "locations"."is_secondary" = ? 
             and "locations"."deleted_at" is null 
             and locations.id = (
-                SELECT min(id)
+                SELECT id
                 FROM locations
                 WHERE locations.seller_id = sellers.id
                 LIMIT 1

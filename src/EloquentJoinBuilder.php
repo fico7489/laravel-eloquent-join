@@ -98,7 +98,7 @@ class EloquentJoinBuilder extends Builder
 
                         $join->whereRaw(
                             $relatedTableAlias.'.'.$relatedPrimaryKey.' =  (
-                                SELECT min('.$relatedPrimaryKey.')
+                                SELECT '.$relatedPrimaryKey.'
                                     FROM '.$relatedTableAlias.'
                                     WHERE '.$relatedTableAlias.'.'.$relatedKey.' = '.$currentTableAlias.'.'.$currentPrimaryKey.'
                                     LIMIT 1

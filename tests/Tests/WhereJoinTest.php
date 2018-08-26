@@ -42,7 +42,7 @@ class WhereJoinTest extends TestCase
             and "locations"."is_primary" = ? 
             and "locations"."deleted_at" is null 
             and locations.id = (
-                SELECT min(id)
+                SELECT id
                 FROM locations
                 WHERE locations.seller_id = sellers.id
                 LIMIT 1
@@ -81,7 +81,7 @@ class WhereJoinTest extends TestCase
             and "zip_codes"."is_primary" = ? 
             and "zip_codes"."deleted_at" is null 
             and zip_codes.id = (
-                SELECT min(id)
+                SELECT id
                 FROM zip_codes
                 WHERE zip_codes.city_id = cities.id
                 LIMIT 1
@@ -101,7 +101,7 @@ class WhereJoinTest extends TestCase
             and "locations"."is_primary" = ? 
             and "locations"."deleted_at" is null 
             and locations.id = (
-                SELECT min(id)
+                SELECT id
                 FROM locations
                 WHERE locations.seller_id = sellers.id
                 LIMIT 1
@@ -111,7 +111,7 @@ class WhereJoinTest extends TestCase
             and "location_addresses"."is_primary" = ? 
             and "location_addresses"."deleted_at" is null 
             and location_addresses.id = (
-                SELECT min(id)
+                SELECT id
                 FROM location_addresses
                 WHERE location_addresses.location_id = locations.id
                 LIMIT 1
@@ -131,7 +131,7 @@ class WhereJoinTest extends TestCase
             and "locations"."is_primary" = ? 
             and "locations"."deleted_at" is null 
             and locations.id = (
-                SELECT min(id)
+                SELECT id
                 FROM locations
                 WHERE locations.seller_id = sellers.id
                 LIMIT 1
