@@ -41,6 +41,11 @@ class Seller extends BaseModel
             });
     }
 
+    public function locationPrimaryInvalid3()
+    {
+        return $this->hasOne(LocationWithGlobalScope::class);
+    }
+
     public function locationSecondary()
     {
         return $this->hasOne(Location::class)
