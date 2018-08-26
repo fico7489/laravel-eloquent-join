@@ -17,9 +17,6 @@ class EloquentJoinBuilder extends Builder
     //use table alias for join (real table name or uniqid())
     private $useTableAlias = false;
 
-    //joinType
-    private $joinType = 'left';
-
     //store if ->select(...) is already called on builder (we want only one groupBy())
     private $selected = false;
 
