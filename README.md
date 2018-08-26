@@ -2,6 +2,9 @@
 
 This package introduces the join capability for sorting and filtering on eloquent relations.
 
+NEW 3.* PACKAGE VERSION WITH MANY NEW FEATURES RELEASED  (26.8.2018)
+SUPPORT FOR HASMANY RELATION COMMIONG SOON !
+
 ## Eloquent Problems
 
 You can't perform sorting on the relationship field without manually joining related table which is very awkward. Let me give you a few reasons why. If you have a table with posts and related categories your code might look like this:
@@ -51,17 +54,30 @@ reason : post and category can have "date" attribute and in that case without se
     ->where('categories.deleted_at', '=', null)
     
 This package will take care of all above problems for you out of the box.
-You can perform filtering on the relationship field without joining but this package will give you the ability to do this easier.
+Unlike **sorting**, you can perform **filtering** on the relationship fields without joining related tables but this package will give you the ability to do this easier.
 
 ## Version Compatibility
 
+NEW 3.* PACKAGE VERSION WITH MANY NEW FEATURES RELEASED
+
+New version
 | Laravel Version | Package Tag | Supported | Development Branch
 |-----------------|-------------|-----------| -----------|
-| 5.6.* | 2.2.* | yes | master
-| 5.5.* | 2.1.* | yes | 2.1
-| 5.4.* | 2.0.* | yes | 2.0
-| 5.3.* | 1.3.* | yes | 1.3
-| 5.2.* | 1.2.* | yes | 1.2
+| >= 5.5.0 | 3.* | yes | master
+
+ * new package version with many improvments and bug fixes is 3.*
+ * 3.* version is not backward compatible with any 2.* version
+ * 3.* version is tested for laravel 5.5 and 5.6.
+
+Old deprecated versions
+
+| Laravel Version | Package Tag | Supported | Development Branch
+|-----------------|-------------|-----------| -----------|
+| 5.6.* | 2.2.* | no | master
+| 5.5.* | 2.1.* | no | 2.1
+| 5.4.* | 2.0.* | no | 2.0
+| 5.3.* | 1.3.* | no | 1.3
+| 5.2.* | 1.2.* | no | 1.2
 | <5.2 | - | no |
 
 ## Install
@@ -156,13 +172,12 @@ Set option in your base model :
 ->where('relationName.relationNameSecond.title', '=', 'test')
 ```
 
-##### Allowed clauses on BelongsTo and HasOne relations on which you want use join clauses on the query
+##### Allowed clauses on BelongsTo and HasOne relations on which you can use join clauses on the query
 
 * Relations that you want to use for join queries can only have this clauses : **where**, **orWhere**, **withTrashed**, **onlyTrashed**, **withoutTrashed**. 
-* Clauses **where** and **orWhere** can only have this variation **->where($columnn, $operator, $attribute)**, closures are not allowed.
-* Other clauses like whereHas, orderBy etc. are not allowed.
+* Clauses **where** and **orWhere** can only have this variations **->where($column, $operator, $value)** and **->where([$column => $value])**, closures are not allowed.
+* Other clauses like **whereHas**, **orderBy** etc. are not allowed.
 * You can add not allowed clauses on relations and use them in the normal eloquent way, but in that case, you can't use those relations for join queries.
-* If **withTrashed**, **onlyTrashed** or **withoutTrashed** is not applied for relation modes that use SoftDeletes, default behavior is **withoutTrashed**, this means that join query will by default only look for related tables that are not soft deleted.
 
 Allowed relation
 ```
@@ -188,19 +203,19 @@ public function locationPrimary()
 }
 ```
 
-The reason why the second relation is not allowed is that this package applies where, orWhere and other clauses on the left join (all eloquent clauses can't be performed on join). Eloquent can use all those clauses because eloquent use subqueries not join.
+The reason why the second relation is not allowed is that this package should apply all those clauses on the join clause,  eloquent use all those clauses isolated with subqueries NOT on join clause and that is more simpler.
 
 ##### Other 
 * You can combine new clauses unlimited times
 * If you combine clauses more times on same relation package will join related table only once
-* You can combine join clauses e.g. whereJoin() with elaquent clauses e.g. orderBy()
+* You can combine join clauses e.g. whereJoin() with elouent clauses e.g. orderBy()
 
 ```
 Seller::whereJoin('title', 'test')->whereJoin('city.title', 'test')->orderByJoin('city.title')->get();
 ```
 
-You might get a picture that there are many rules and restriction, but it is really not like that. 
-Don't worry, if you anyway create the query that is not allowed **EloquentJoinException** will be thrown with explaining what happened.
+You might get a picture that there are to many rules and restriction, but it is really not like that. 
+Don't worry, if you anyway create the query that is not allowed appropriate exception will be thrown and you will know what happened.
 
 ## See action on real example
 
