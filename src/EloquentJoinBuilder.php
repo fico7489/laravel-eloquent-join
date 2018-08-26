@@ -85,7 +85,7 @@ class EloquentJoinBuilder extends Builder
                     $this->leftJoin($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $relatedPrimaryKey, $currentTableAlias, $relatedKey) {
                         $join->on($relatedTableAlias.'.'.$relatedPrimaryKey, '=', $currentTableAlias.'.'.$relatedKey);
 
-                        $this->leftJoinQuery($join, $relatedRelation, $relatedTableAlias);
+                        $this->joinQuery($join, $relatedRelation, $relatedTableAlias);
                     });
                 } elseif ($relatedRelation instanceof HasOneJoin) {
                     $relatedKey = $relatedRelation->getQualifiedForeignKeyName();
@@ -94,7 +94,7 @@ class EloquentJoinBuilder extends Builder
                     $this->leftJoin($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $relatedPrimaryKey, $currentTableAlias, $relatedKey, $currentPrimaryKey) {
                         $join->on($relatedTableAlias.'.'.$relatedKey, '=', $currentTableAlias.'.'.$currentPrimaryKey);
 
-                        $this->leftJoinQuery($join, $relatedRelation, $relatedTableAlias);
+                        $this->joinQuery($join, $relatedRelation, $relatedTableAlias);
 
                         $join->whereRaw(
                             $relatedTableAlias.'.'.$relatedPrimaryKey.' =  (
@@ -125,7 +125,7 @@ class EloquentJoinBuilder extends Builder
         return $currentTableAlias.'.'.$column;
     }
 
-    private function leftJoinQuery($join, $relation, $relatedTableAlias)
+    private function joinQuery($join, $relation, $relatedTableAlias)
     {
         /** @var Builder $relationQuery */
         $relationBuilder = $relation->getQuery();
