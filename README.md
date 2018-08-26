@@ -150,7 +150,7 @@ Set option in your base model :
     
     ***$direction*** argument is same as in default eloquent orderBy()
     
-    ***$leftJoin*** argument defines if eloquent should perform left join or inner join
+    ***$leftJoin*** argument defines if eloquent should perform left join or inner join, can be true or false
     
 * **whereJoin($column, $operator = null, $value = null, $boolean = 'and')**
 
@@ -206,7 +206,7 @@ public function locationPrimary()
 }
 ```
 
-The reason why the second relation is not allowed is that this package should apply all those clauses on the join clause,  eloquent use all those clauses isolated with subqueries NOT on join clause and that is more simpler.
+The reason why the second relation is not allowed is that this package should apply all those clauses on the join clause,  eloquent use all those clauses isolated with subqueries NOT on join clause and that is more simpler to do.
 
 ### Other 
 
@@ -339,7 +339,7 @@ if(request()->get('date')){
 $posts = $posts->get();
 ```
 
-Both snippets generates the same MySql query.
+Both snippets do the same thing.
 
 ## Tests
 
