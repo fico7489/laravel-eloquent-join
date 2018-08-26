@@ -43,14 +43,14 @@ class EloquentJoinBuilder extends Builder
         return $this->orWhere($column, $operator, $value);
     }
 
-    public function orderByJoin($column, $sortType = 'asc')
+    public function orderByJoin($column, $sortType = 'asc', $leftJoin = true)
     {
-        $column = $this->performJoin($column);
+        $column = $this->performJoin($column, $leftJoin);
 
         return $this->orderBy($column, $sortType);
     }
 
-    private function performJoin($relations)
+    private function performJoin($relations, $leftJoin = true)
     {
         $relations = explode('.', $relations);
 
@@ -80,7 +80,7 @@ class EloquentJoinBuilder extends Builder
             $relationsAccumulated[]    = $relatedTableAlias;
             $relationAccumulatedString = implode('.', $relationsAccumulated);
 
-            $joinMethod = $this->detectJoinMethod();
+            $joinMethod = $leftJoin ? 'leftJoin' : 'join';
             if (!in_array($relationAccumulatedString, $this->joinedTables)) {
                 $joinQuery = $relatedTable.($this->useTableAlias ? ' as '.$relatedTableAlias : '');
                 if ($relatedRelation instanceof BelongsToJoin) {
@@ -179,14 +179,5 @@ class EloquentJoinBuilder extends Builder
         } else {
             throw new InvalidRelationClause('Package allows only following clauses on relation : where, orWhere, withTrashed, onlyTrashed and withoutTrashed.');
         }
-    }
-
-    private function detectJoinMethod()
-    {
-        if (!in_array($this->joinType, ['left', 'inner'])) {
-            throw new InvalidRelationClause('Only "left" and "inner" join is allowed.');
-        }
-
-        return ('left' == $this->joinType) ? 'leftJoin' : 'join';
     }
 }
