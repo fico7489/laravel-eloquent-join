@@ -141,7 +141,7 @@ Set option in your base model :
 * **BelongsTo**
 * **HasOne**.
 
-##### New clauses for eloquent builder on BelongsTo and HasOne relations
+#### New clauses for eloquent builder on BelongsTo and HasOne relations
 
 * **orderByJoin($column, $sortBy = 'asc', $leftJoin = true)**
 
@@ -159,7 +159,7 @@ Set option in your base model :
 
     ***$column***, ***$operator*** and ***$value*** arguments are the same as in default eloquent where()
 
-##### Rules for column parameter in whereJoin, orWhereJoin and orderByJoin   
+#### Rules for column parameter in whereJoin, orWhereJoin and orderByJoin   
 
 *  current table attributes
 ```
@@ -174,7 +174,7 @@ Set option in your base model :
 ->where('relationName.relationNameSecond.title', '=', 'test')
 ```
 
-##### Allowed clauses on BelongsTo and HasOne relations on which you can use join clauses on the query
+#### Allowed clauses on BelongsTo and HasOne relations on which you can use join clauses on the query
 
 * Relations that you want to use for join queries can only have this clauses : **where**, **orWhere**, **withTrashed**, **onlyTrashed**, **withoutTrashed**. 
 * Clauses **where** and **orWhere** can only have this variations **->where($column, $operator, $value)** and **->where([$column => $value])**, closures are not allowed.
@@ -207,7 +207,7 @@ public function locationPrimary()
 
 The reason why the second relation is not allowed is that this package should apply all those clauses on the join clause,  eloquent use all those clauses isolated with subqueries NOT on join clause and that is more simpler.
 
-##### Other 
+#### Other 
 * You can combine new clauses unlimited times
 * If you combine clauses more times on same relation package will join related table only once
 * You can combine join clauses e.g. whereJoin() with elouent clauses e.g. orderBy()
