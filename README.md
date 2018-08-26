@@ -3,6 +3,7 @@
 This package introduces the join capability for sorting and filtering on eloquent relations.
 
 NEW 3.* PACKAGE VERSION WITH MANY NEW FEATURES RELEASED  (26.8.2018)
+
 SUPPORT FOR HASMANY RELATION COMMIONG SOON !
 
 ## Eloquent Problems
