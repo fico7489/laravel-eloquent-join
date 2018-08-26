@@ -61,7 +61,7 @@ Unlike **sorting**, you can perform **filtering** on the relationship fields wit
 
 NEW 3.* PACKAGE VERSION WITH MANY NEW FEATURES RELEASED
 
-New version
+####New version
 
 | Laravel Version | Package Tag | Supported | Development Branch
 |-----------------|-------------|-----------| -----------|
@@ -72,7 +72,7 @@ New version
  * 3.* version is not backward compatible with any 2.* version
  * 3.* version is tested for laravel 5.5 and 5.6.
 
-Old deprecated versions
+####Old deprecated versions
 
 | Laravel Version | Package Tag | Supported | Development Branch
 |-----------------|-------------|-----------| -----------|
@@ -138,6 +138,7 @@ Set option in your base model :
 ## Instructions for use
 
 ##### Currently available relations for join queries
+
 * **BelongsTo**
 * **HasOne**.
 
@@ -208,6 +209,7 @@ public function locationPrimary()
 The reason why the second relation is not allowed is that this package should apply all those clauses on the join clause,  eloquent use all those clauses isolated with subqueries NOT on join clause and that is more simpler.
 
 #### Other 
+
 * You can combine new clauses unlimited times
 * If you combine clauses more times on same relation package will join related table only once
 * You can combine join clauses e.g. whereJoin() with elouent clauses e.g. orderBy()
