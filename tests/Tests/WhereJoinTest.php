@@ -46,7 +46,7 @@ class WhereJoinTest extends TestCase
                 FROM locations
                 WHERE locations.seller_id = sellers.id
                 LIMIT 1
-           )
+            )
             where "locations"."address" = ?';
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
@@ -85,7 +85,7 @@ class WhereJoinTest extends TestCase
                 FROM zip_codes
                 WHERE zip_codes.city_id = cities.id
                 LIMIT 1
-           )
+            )
             where "zip_codes"."name" = ?';
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
@@ -105,7 +105,7 @@ class WhereJoinTest extends TestCase
                 FROM locations
                 WHERE locations.seller_id = sellers.id
                 LIMIT 1
-           )
+            )
             left join "location_addresses" 
             on "location_addresses"."location_id" = "locations"."id" 
             and "location_addresses"."is_primary" = ? 
@@ -115,7 +115,7 @@ class WhereJoinTest extends TestCase
                 FROM location_addresses
                 WHERE location_addresses.location_id = locations.id
                 LIMIT 1
-           )
+            )
             where "location_addresses"."name" = ?';
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
@@ -135,7 +135,7 @@ class WhereJoinTest extends TestCase
                 FROM locations
                 WHERE locations.seller_id = sellers.id
                 LIMIT 1
-           )
+            )
             left join "cities" 
             on "cities"."id" = "locations"."city_id" 
             and "cities"."deleted_at" is null 
