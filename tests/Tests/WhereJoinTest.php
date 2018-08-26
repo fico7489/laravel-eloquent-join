@@ -13,8 +13,8 @@ class WhereJoinTest extends TestCase
     {
         Seller::whereJoin('title', '=', 'test')->get();
 
-        $queryTest = '/select \* from "sellers" 
-            where "sellers"."title" = \?/';
+        $queryTest = 'select * from "sellers" 
+            where "sellers"."title" = ?';
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }
@@ -23,11 +23,11 @@ class WhereJoinTest extends TestCase
     {
         Seller::whereJoin('city.name', '=', 'test')->get();
 
-        $queryTest = '/select "sellers".* from "sellers" 
+        $queryTest = 'select "sellers".* from "sellers" 
             left join "cities" 
             on "cities"."id" = "sellers"."city_id" 
             and "cities"."deleted_at" is null 
-            where "cities"."name" = \?/';
+            where "cities"."name" = ?';
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }
@@ -36,18 +36,18 @@ class WhereJoinTest extends TestCase
     {
         Seller::whereJoin('locationPrimary.address', '=', 'test')->get();
 
-        $queryTest = '/select "sellers".* from "sellers" 
+        $queryTest = 'select "sellers".* from "sellers" 
             left join "locations" 
             on "locations"."seller_id" = "sellers"."id"
-            and "locations"."is_primary" = \? 
+            and "locations"."is_primary" = ? 
             and "locations"."deleted_at" is null 
-            and locations.id = \(
-                SELECT min\(id\)
+            and locations.id = (
+                SELECT min(id)
                 FROM locations
                 WHERE locations.seller_id = sellers.id
                 LIMIT 1
-           \)
-            where "locations"."address" = \?/';
+           )
+            where "locations"."address" = ?';
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }
@@ -56,14 +56,14 @@ class WhereJoinTest extends TestCase
     {
         Seller::whereJoin('city.state.name', '=', 'test')->get();
 
-        $queryTest = '/select "sellers".* from "sellers" 
+        $queryTest = 'select "sellers".* from "sellers" 
             left join "cities" 
             on "cities"."id" = "sellers"."city_id" 
             and "cities"."deleted_at" is null 
             left join "states" 
             on "states"."id" = "cities"."state_id" 
             and "states"."deleted_at" is null 
-            where "states"."name" = \?/';
+            where "states"."name" = ?';
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }
@@ -72,21 +72,21 @@ class WhereJoinTest extends TestCase
     {
         Seller::whereJoin('city.zipCodePrimary.name', '=', 'test')->get();
 
-        $queryTest = '/select "sellers".* from "sellers" 
+        $queryTest = 'select "sellers".* from "sellers" 
             left join "cities" 
             on "cities"."id" = "sellers"."city_id" 
             and "cities"."deleted_at" is null 
             left join "zip_codes" 
             on "zip_codes"."city_id" = "cities"."id" 
-            and "zip_codes"."is_primary" = \? 
+            and "zip_codes"."is_primary" = ? 
             and "zip_codes"."deleted_at" is null 
-            and zip_codes.id = \(
-                SELECT min\(id\)
+            and zip_codes.id = (
+                SELECT min(id)
                 FROM zip_codes
                 WHERE zip_codes.city_id = cities.id
                 LIMIT 1
-           \)
-            where "zip_codes"."name" = \?/';
+           )
+            where "zip_codes"."name" = ?';
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }
@@ -95,28 +95,28 @@ class WhereJoinTest extends TestCase
     {
         Seller::whereJoin('locationPrimary.locationAddressPrimary.name', '=', 'test')->get();
 
-        $queryTest = '/select "sellers".* from "sellers" 
+        $queryTest = 'select "sellers".* from "sellers" 
             left join "locations" 
             on "locations"."seller_id" = "sellers"."id" 
-            and "locations"."is_primary" = \? 
+            and "locations"."is_primary" = ? 
             and "locations"."deleted_at" is null 
-            and locations.id = \(
-                SELECT min\(id\)
+            and locations.id = (
+                SELECT min(id)
                 FROM locations
                 WHERE locations.seller_id = sellers.id
                 LIMIT 1
-           \)
+           )
             left join "location_addresses" 
             on "location_addresses"."location_id" = "locations"."id" 
-            and "location_addresses"."is_primary" = \? 
+            and "location_addresses"."is_primary" = ? 
             and "location_addresses"."deleted_at" is null 
-            and location_addresses.id = \(
-                SELECT min\(id\)
+            and location_addresses.id = (
+                SELECT min(id)
                 FROM location_addresses
                 WHERE location_addresses.location_id = locations.id
                 LIMIT 1
-           \)
-            where "location_addresses"."name" = \?/';
+           )
+            where "location_addresses"."name" = ?';
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }
@@ -125,21 +125,21 @@ class WhereJoinTest extends TestCase
     {
         Seller::whereJoin('locationPrimary.city.name', '=', 'test')->get();
 
-        $queryTest = '/select "sellers".* from "sellers" 
+        $queryTest = 'select "sellers".* from "sellers" 
             left join "locations" 
             on "locations"."seller_id" = "sellers"."id" 
-            and "locations"."is_primary" = \? 
+            and "locations"."is_primary" = ? 
             and "locations"."deleted_at" is null 
-            and locations.id = \(
-                SELECT min\(id\)
+            and locations.id = (
+                SELECT min(id)
                 FROM locations
                 WHERE locations.seller_id = sellers.id
                 LIMIT 1
-           \)
+           )
             left join "cities" 
             on "cities"."id" = "locations"."city_id" 
             and "cities"."deleted_at" is null 
-            where "cities"."name" = \?/';
+            where "cities"."name" = ?';
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }
