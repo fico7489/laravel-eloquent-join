@@ -61,6 +61,7 @@ Unlike **sorting**, you can perform **filtering** on the relationship fields wit
 NEW 3.* PACKAGE VERSION WITH MANY NEW FEATURES RELEASED
 
 New version
+
 | Laravel Version | Package Tag | Supported | Development Branch
 |-----------------|-------------|-----------| -----------|
 | >= 5.5.0 | 3.* | yes | master
