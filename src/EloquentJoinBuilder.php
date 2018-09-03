@@ -98,15 +98,17 @@ class EloquentJoinBuilder extends Builder
 
                         $this->joinQuery($join, $relatedRelation, $relatedTableAlias);
 
-                        $join->whereRaw(
-                            $relatedTableAlias.'.'.$relatedPrimaryKey.' =  (
+                        if ($relatedRelation instanceof HasOneJoin) {
+
+                            $join->whereRaw(
+                                $relatedTableAlias.'.'.$relatedPrimaryKey.' =  (
                                 SELECT '.$relatedPrimaryKey.'
                                     FROM '.$relatedTableAlias.'
                                     WHERE '.$relatedTableAlias.'.'.$relatedKey.' = '.$currentTableAlias.'.'.$currentPrimaryKey.'
-                                    '. ($relatedRelation instanceof HasOneJoin ? 'LIMIT 1' : '') . '
-                                    
+                                    LIMIT 1
                                 )
                             ');
+                        }
                     });
                 } else {
                     throw new InvalidRelation();
