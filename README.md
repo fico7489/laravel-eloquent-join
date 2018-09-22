@@ -2,10 +2,6 @@
 
 This package introduces the join capability for sorting and filtering on eloquent relations.
 
-NEW 3.* PACKAGE VERSION WITH MANY NEW FEATURES RELEASED  (26.8.2018)
-
-SUPPORT FOR HASMANY RELATION COMMIONG SOON !
-
 ## Eloquent Problems
 
 You can't perform sorting on the relationship field without manually joining related table which is very awkward. Let me give you a few reasons why. If you have a table with posts and related categories your code might look like this:
@@ -59,35 +55,16 @@ Unlike **sorting**, you can perform **filtering** on the relationship fields wit
 
 ## Version Compatibility
 
-NEW 3.* PACKAGE VERSION WITH MANY NEW FEATURES RELEASED
-
-#### New version
-
 | Laravel Version | Package Tag | Supported | Development Branch
 |-----------------|-------------|-----------| -----------|
 | >= 5.5.0 | 3.* | yes | master
 | < 5.5.0 | - | no | -
 
- * new package version with many improvments and bug fixes is 3.*
- * 3.* version is not backward compatible with any 2.* version
- * 3.* version is tested for laravel 5.5 and 5.6.
-
-#### Old deprecated versions
-
-| Laravel Version | Package Tag | Supported | Development Branch
-|-----------------|-------------|-----------| -----------|
-| 5.6.* | 2.2.* | no | master
-| 5.5.* | 2.1.* | no | 2.1
-| 5.4.* | 2.0.* | no | 2.0
-| 5.3.* | 1.3.* | no | 1.3
-| 5.2.* | 1.2.* | no | 1.2
-| <5.2 | - | no |
-
 ## Install
 
 1.Install package with composer
 ```
-composer require fico7489/laravel-eloquent-join:"*"
+composer require fico7489/laravel-eloquent-join
 ```
 With this statement, a composer will install highest available package version for your current laravel version.
 
