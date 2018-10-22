@@ -15,6 +15,9 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class EloquentJoinBuilder extends Builder
 {
     //use table alias for join (real table name or uniqid())
+    public $baseQuery;
+
+    //use table alias for join (real table name or uniqid())
     private $useTableAlias = false;
 
     //store if ->select(...) is already called on builder (we want only one groupBy())
@@ -26,23 +29,42 @@ class EloquentJoinBuilder extends Builder
     //store clauses on relation for join
     public $relationClauses = [];
 
+    public function where($column, $operator = null, $value = null, $boolean = 'and')
+    {
+        if ($column instanceof \Closure) {
+            $query = $this->model->newModelQuery();
+            $query->baseQuery = $this;
+
+            $column($query);
+
+            $this->query->addNestedWhereQuery($query->getQuery(), $boolean);
+        } else {
+            $this->query->where(...func_get_args());
+        }
+
+        return $this;
+    }
+
     public function whereJoin($column, $operator = null, $value = null, $boolean = 'and')
     {
-        $column = $this->performJoin($column);
+        $query = $this->baseQuery ? $this->baseQuery : $this;
+        $column = $query->performJoin($column);
 
         return $this->where($column, $operator, $value, $boolean);
     }
 
     public function orWhereJoin($column, $operator = null, $value = null)
     {
-        $column = $this->performJoin($column);
+        $query = $this->baseQuery ? $this->baseQuery : $this;
+        $column = $query->performJoin($column);
 
         return $this->orWhere($column, $operator, $value);
     }
 
     public function orderByJoin($column, $direction = 'asc', $leftJoin = true)
     {
-        $column = $this->performJoin($column, $leftJoin);
+        $query = $this->baseQuery ? $this->baseQuery : $this;
+        $column = $query->performJoin($column, $leftJoin);
 
         return $this->orderBy($column, $direction);
     }
