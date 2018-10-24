@@ -154,9 +154,11 @@ class EloquentJoinBuilder extends Builder
         $relationBuilder = $relation->getQuery();
 
         //apply clauses on relation
-        foreach ($relationBuilder->relationClauses as $clause) {
-            foreach ($clause as $method => $params) {
-                $this->applyClauseOnRelation($join, $method, $params, $relatedTableAlias);
+        if (isset($relationBuilder->relationClauses)) {
+            foreach ($relationBuilder->relationClauses as $clause) {
+                foreach ($clause as $method => $params) {
+                    $this->applyClauseOnRelation($join, $method, $params, $relatedTableAlias);
+                }
             }
         }
 
