@@ -46,7 +46,7 @@ class EloquentJoinBuilder extends Builder
         return $this;
     }
 
-    public function whereJoin($column, $operator = null, $value = null, $boolean = 'and')
+    public function whereJoin($column, $operator, $value, $boolean = 'and')
     {
         $query = $this->baseBuilder ? $this->baseBuilder : $this;
         $column = $query->performJoin($column);
@@ -54,7 +54,7 @@ class EloquentJoinBuilder extends Builder
         return $this->where($column, $operator, $value, $boolean);
     }
 
-    public function orWhereJoin($column, $operator = null, $value = null)
+    public function orWhereJoin($column, $operator, $value)
     {
         $query = $this->baseBuilder ? $this->baseBuilder : $this;
         $column = $query->performJoin($column);
