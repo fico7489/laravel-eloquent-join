@@ -14,8 +14,8 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class EloquentJoinBuilder extends Builder
 {
-    //use table alias for join (real table name or uniqid())
-    public $baseQuery;
+    //base builder
+    public $baseBuilder;
 
     //use table alias for join (real table name or uniqid())
     private $useTableAlias = false;
@@ -33,7 +33,8 @@ class EloquentJoinBuilder extends Builder
     {
         if ($column instanceof \Closure) {
             $query = $this->model->newModelQuery();
-            $query->baseQuery = $this;
+            $baseBuilderCurrent = $this->baseBuilder ? $this->baseBuilder : $this;
+            $query->baseBuilder = $baseBuilderCurrent;
 
             $column($query);
 
@@ -47,7 +48,7 @@ class EloquentJoinBuilder extends Builder
 
     public function whereJoin($column, $operator = null, $value = null, $boolean = 'and')
     {
-        $query = $this->baseQuery ? $this->baseQuery : $this;
+        $query = $this->baseBuilder ? $this->baseBuilder : $this;
         $column = $query->performJoin($column);
 
         return $this->where($column, $operator, $value, $boolean);
@@ -55,7 +56,7 @@ class EloquentJoinBuilder extends Builder
 
     public function orWhereJoin($column, $operator = null, $value = null)
     {
-        $query = $this->baseQuery ? $this->baseQuery : $this;
+        $query = $this->baseBuilder ? $this->baseBuilder : $this;
         $column = $query->performJoin($column);
 
         return $this->orWhere($column, $operator, $value);
@@ -63,7 +64,7 @@ class EloquentJoinBuilder extends Builder
 
     public function orderByJoin($column, $direction = 'asc', $leftJoin = true)
     {
-        $query = $this->baseQuery ? $this->baseQuery : $this;
+        $query = $this->baseBuilder ? $this->baseBuilder : $this;
         $column = $query->performJoin($column, $leftJoin);
 
         return $this->orderBy($column, $direction);
