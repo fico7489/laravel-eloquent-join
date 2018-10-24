@@ -61,7 +61,7 @@ class EloquentJoinBuilder extends Builder
 
         $relationsAccumulated = [];
 
-        foreach ($relations as $relation) {
+        foreach ($relations ?? [] as $relation) {
             if ($relation == $column) {
                 //last item in $relations argument is sort|where column
                 break;
@@ -132,14 +132,14 @@ class EloquentJoinBuilder extends Builder
         $relationBuilder = $relation->getQuery();
 
         //apply clauses on relation
-        foreach ($relationBuilder->relationClauses as $clause) {
+        foreach ($relationBuilder->relationClauses ?? [] as $clause) {
             foreach ($clause as $method => $params) {
                 $this->applyClauseOnRelation($join, $method, $params, $relatedTableAlias);
             }
         }
 
         //apply global SoftDeletingScope
-        foreach ($relationBuilder->scopes as $scope) {
+        foreach ($relationBuilder->scopes ?? [] as $scope) {
             if ($scope instanceof SoftDeletingScope) {
                 $this->applyClauseOnRelation($join, 'withoutTrashed', [], $relatedTableAlias);
             } else {
