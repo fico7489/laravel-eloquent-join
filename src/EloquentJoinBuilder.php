@@ -14,6 +14,9 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class EloquentJoinBuilder extends Builder
 {
+    //base builder
+    public $baseBuilder;
+
     //use table alias for join (real table name or uniqid())
     private $useTableAlias = false;
 
@@ -26,23 +29,43 @@ class EloquentJoinBuilder extends Builder
     //store clauses on relation for join
     public $relationClauses = [];
 
+    public function where($column, $operator = null, $value = null, $boolean = 'and')
+    {
+        if ($column instanceof \Closure) {
+            $query = $this->model->newModelQuery();
+            $baseBuilderCurrent = $this->baseBuilder ? $this->baseBuilder : $this;
+            $query->baseBuilder = $baseBuilderCurrent;
+
+            $column($query);
+
+            $this->query->addNestedWhereQuery($query->getQuery(), $boolean);
+        } else {
+            $this->query->where(...func_get_args());
+        }
+
+        return $this;
+    }
+
     public function whereJoin($column, $operator = null, $value = null, $boolean = 'and')
     {
-        $column = $this->performJoin($column);
+        $query = $this->baseBuilder ? $this->baseBuilder : $this;
+        $column = $query->performJoin($column);
 
         return $this->where($column, $operator, $value, $boolean);
     }
 
     public function orWhereJoin($column, $operator = null, $value = null)
     {
-        $column = $this->performJoin($column);
+        $query = $this->baseBuilder ? $this->baseBuilder : $this;
+        $column = $query->performJoin($column);
 
         return $this->orWhere($column, $operator, $value);
     }
 
     public function orderByJoin($column, $direction = 'asc', $leftJoin = true)
     {
-        $column = $this->performJoin($column, $leftJoin);
+        $query = $this->baseBuilder ? $this->baseBuilder : $this;
+        $column = $query->performJoin($column, $leftJoin);
 
         return $this->orderBy($column, $direction);
     }
