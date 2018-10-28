@@ -132,6 +132,7 @@ class EloquentJoinBuilder extends Builder
                         $this->applyJoinOneClause($join, $currentTableAlias, $currentPrimaryKey, $relatedTableAlias, $relatedPrimaryKey, $relatedKey, $columnJoin, $directionJoin);
                     });
                 } elseif ($relatedRelation instanceof HasMany) {
+                    //
                 } else {
                     throw new InvalidRelation();
                 }
