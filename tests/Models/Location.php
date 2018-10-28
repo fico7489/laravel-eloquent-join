@@ -10,7 +10,7 @@ class Location extends BaseModel
 
     protected $table = 'locations';
 
-    protected $fillable = ['address', 'seller_id', 'is_primary', 'is_secondary'];
+    protected $fillable = ['address', 'seller_id', 'is_primary', 'is_secondary', 'city_id'];
 
     public function seller()
     {
