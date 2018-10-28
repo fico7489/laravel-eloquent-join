@@ -70,6 +70,14 @@ class EloquentJoinBuilder extends Builder
         return $this->orderBy($column, $direction);
     }
 
+    public function relationJoin($column, $leftJoin = true, $columnJoin = null, $directionJoin = null)
+    {
+        $query = $this->baseBuilder ? $this->baseBuilder : $this;
+        $column = $query->performJoin($column, $leftJoin, $columnJoin, $directionJoin);
+
+        return $this;
+    }
+
     private function performJoin($relations, $leftJoin = true, $columnJoin = null, $directionJoin = null)
     {
         $relations = explode('.', $relations);
