@@ -16,7 +16,7 @@ class ExceptionTest extends TestCase
         try {
             Seller::whereJoin('locations.address', '=', 'test')->get();
         } catch (InvalidRelation $e) {
-            $this->assertEquals('Package allows only following relations : BelongsToJoin and HasOneJoin.', $e->getMessage());
+            $this->assertEquals((new InvalidRelation())->message, $e->getMessage());
 
             return;
         }
@@ -29,7 +29,7 @@ class ExceptionTest extends TestCase
         try {
             Seller::whereJoin('locationPrimaryInvalid2.name', '=', 'test')->get();
         } catch (InvalidRelationWhere $e) {
-            $this->assertContains('Package allows only following where(orWhere) clauses type on relation : ->where($column, $operator, $value) and ->where([$column => $value]).', $e->getMessage());
+            $this->assertEquals((new InvalidRelationWhere())->message, $e->getMessage());
 
             return;
         }
@@ -42,7 +42,7 @@ class ExceptionTest extends TestCase
         try {
             Seller::whereJoin('locationPrimaryInvalid.name', '=', 'test')->get();
         } catch (InvalidRelationClause $e) {
-            $this->assertEquals('Package allows only following clauses on relation : where, orWhere, withTrashed, onlyTrashed and withoutTrashed.', $e->getMessage());
+            $this->assertEquals((new InvalidRelationClause())->message, $e->getMessage());
 
             return;
         }
@@ -55,7 +55,7 @@ class ExceptionTest extends TestCase
         try {
             Seller::whereJoin('locationPrimaryInvalid3.id', '=', 'test')->get();
         } catch (InvalidRelationGlobalScope $e) {
-            $this->assertEquals('Package allows only SoftDeletingScope global scope.', $e->getMessage());
+            $this->assertEquals((new InvalidRelationGlobalScope())->message, $e->getMessage());
 
             return;
         }
