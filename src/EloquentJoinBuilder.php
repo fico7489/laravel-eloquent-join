@@ -120,7 +120,7 @@ class EloquentJoinBuilder extends Builder
 
                         $this->joinQuery($join, $relatedRelation, $relatedTableAlias);
                     });
-                } elseif ($relatedRelation instanceof HasOneJoin) {
+                } elseif ($relatedRelation instanceof HasOneJoin  ||  $relatedRelation instanceof HasMany) {
                     $relatedKey = $relatedRelation->getQualifiedForeignKeyName();
                     $relatedKey = last(explode('.', $relatedKey));
 
@@ -131,8 +131,6 @@ class EloquentJoinBuilder extends Builder
 
                         $this->applyJoinOneClause($join, $currentTableAlias, $currentPrimaryKey, $relatedTableAlias, $relatedPrimaryKey, $relatedKey, $columnJoin, $directionJoin);
                     });
-                } elseif ($relatedRelation instanceof HasMany) {
-                    //
                 } else {
                     throw new InvalidRelation();
                 }
