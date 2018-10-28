@@ -129,7 +129,18 @@ class EloquentJoinBuilder extends Builder
 
                         $this->joinQuery($join, $relatedRelation, $relatedTableAlias);
 
-                        $this->applyJoinOneClause($join, $currentTableAlias, $currentPrimaryKey, $relatedTableAlias, $relatedPrimaryKey, $relatedKey, $columnJoin, $directionJoin);
+                        $columnJoin    = $columnJoin ? $columnJoin : $relatedPrimaryKey;
+                        $directionJoin = $directionJoin ? $directionJoin : 'DESC';
+
+                        $join->whereRaw(
+                            $relatedTableAlias.'.'.$relatedPrimaryKey.' =  (
+                            SELECT '.$relatedPrimaryKey.'
+                                FROM '.$relatedTableAlias.'
+                                WHERE '.$relatedTableAlias.'.'.$relatedKey.' = '.$currentTableAlias.'.'.$currentPrimaryKey.'
+                
+                                LIMIT 1
+                            )
+                        ');
                     });
                 } else {
                     throw new InvalidRelation();
@@ -203,21 +214,5 @@ class EloquentJoinBuilder extends Builder
         } else {
             throw new InvalidRelationClause();
         }
-    }
-
-    private function applyJoinOneClause($join, $currentTableAlias, $currentPrimaryKey, $relatedTableAlias, $relatedPrimaryKey, $relatedKey, $columnJoin, $directionJoin)
-    {
-        $columnJoin    = $columnJoin ? $columnJoin : $relatedPrimaryKey;
-        $directionJoin = $directionJoin ? $directionJoin : 'DESC';
-
-        $join->whereRaw(
-            $relatedTableAlias.'.'.$relatedPrimaryKey.' =  (
-            SELECT '.$relatedPrimaryKey.'
-                FROM '.$relatedTableAlias.'
-                WHERE '.$relatedTableAlias.'.'.$relatedKey.' = '.$currentTableAlias.'.'.$currentPrimaryKey.'
-
-                LIMIT 1
-            )
-        ');
     }
 }
