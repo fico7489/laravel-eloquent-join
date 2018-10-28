@@ -62,15 +62,15 @@ class EloquentJoinBuilder extends Builder
         return $this->orWhere($column, $operator, $value);
     }
 
-    public function orderByJoin($column, $direction = 'asc', $leftJoin = true)
+    public function orderByJoin($column, $direction = 'asc', $leftJoin = true, $columnJoin = null, $directionJoin = null)
     {
         $query = $this->baseBuilder ? $this->baseBuilder : $this;
-        $column = $query->performJoin($column, $leftJoin);
+        $column = $query->performJoin($column, $leftJoin, $columnJoin, $directionJoin);
 
         return $this->orderBy($column, $direction);
     }
 
-    private function performJoin($relations, $leftJoin = true)
+    private function performJoin($relations, $leftJoin = true, $columnJoin = null, $directionJoin = null)
     {
         $relations = explode('.', $relations);
 
@@ -115,16 +115,19 @@ class EloquentJoinBuilder extends Builder
                     $relatedKey = $relatedRelation->getQualifiedForeignKeyName();
                     $relatedKey = last(explode('.', $relatedKey));
 
-                    $this->$joinMethod($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $relatedPrimaryKey, $currentTableAlias, $relatedKey, $currentPrimaryKey) {
+                    $this->$joinMethod($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $relatedPrimaryKey, $currentTableAlias, $relatedKey, $currentPrimaryKey, $columnJoin, $directionJoin) {
                         $join->on($relatedTableAlias.'.'.$relatedKey, '=', $currentTableAlias.'.'.$currentPrimaryKey);
 
                         $this->joinQuery($join, $relatedRelation, $relatedTableAlias);
 
+                        $columnJoin    = $columnJoin ? $columnJoin : $relatedPrimaryKey;
+                        $directionJoin = $directionJoin ? $directionJoin : 'DESC';
                         $join->whereRaw(
                             $relatedTableAlias.'.'.$relatedPrimaryKey.' =  (
                                 SELECT '.$relatedPrimaryKey.'
                                     FROM '.$relatedTableAlias.'
                                     WHERE '.$relatedTableAlias.'.'.$relatedKey.' = '.$currentTableAlias.'.'.$currentPrimaryKey.'
+                                    ORDER BY '.$columnJoin.' '.$directionJoin.'
                                     LIMIT 1
                                 )
                             ');
