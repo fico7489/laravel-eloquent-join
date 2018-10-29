@@ -15,11 +15,14 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class EloquentJoinBuilder extends Builder
 {
-    //base builder
-    public $baseBuilder;
-
     //use table alias for join (real table name or uniqid())
     private $useTableAlias = false;
+
+    //use table alias for join (real table name or uniqid())
+    private $leftJoin = true;
+
+    //base builder
+    public $baseBuilder;
 
     //store if ->select(...) is already called on builder (we want only one groupBy())
     private $selected = false;
@@ -66,7 +69,8 @@ class EloquentJoinBuilder extends Builder
     public function orderByJoin($column, $direction = 'asc', $leftJoin = true, $columnJoin = null, $directionJoin = null)
     {
         $query = $this->baseBuilder ? $this->baseBuilder : $this;
-        $column = $query->performJoin($column, $leftJoin, $columnJoin, $directionJoin);
+        $query->setLeftJoin($leftJoin);
+        $column = $query->performJoin($column, $columnJoin, $directionJoin);
 
         return $this->orderBy($column, $direction);
     }
@@ -74,12 +78,13 @@ class EloquentJoinBuilder extends Builder
     public function relationJoin($column, $leftJoin = true, $columnJoin = null, $directionJoin = null)
     {
         $query = $this->baseBuilder ? $this->baseBuilder : $this;
-        $column = $query->performJoin($column, $leftJoin, $columnJoin, $directionJoin);
+        $query->setLeftJoin($leftJoin);
+        $column = $query->performJoin($column, $columnJoin, $directionJoin);
 
         return $this;
     }
 
-    private function performJoin($relations, $leftJoin = true, $columnJoin = null, $directionJoin = null)
+    private function performJoin($relations, $columnJoin = null, $directionJoin = null)
     {
         $relations = explode('.', $relations);
 
@@ -109,7 +114,7 @@ class EloquentJoinBuilder extends Builder
             $relationsAccumulated[]    = $relatedTableAlias;
             $relationAccumulatedString = implode('.', $relationsAccumulated);
 
-            $joinMethod = $leftJoin ? 'leftJoin' : 'join';
+            $joinMethod = $this->leftJoin ? 'leftJoin' : 'join';
             if (!in_array($relationAccumulatedString, $this->joinedTables)) {
                 $joinQuery = $relatedTable.($this->useTableAlias ? ' as '.$relatedTableAlias : '');
                 if ($relatedRelation instanceof BelongsToJoin) {
@@ -214,5 +219,37 @@ class EloquentJoinBuilder extends Builder
         } else {
             throw new InvalidRelationClause();
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public function isUseTableAlias()
+    {
+        return $this->useTableAlias;
+    }
+
+    /**
+     * @param bool $useTableAlias
+     */
+    public function setUseTableAlias($useTableAlias)
+    {
+        $this->useTableAlias = $useTableAlias;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isLeftJoin()
+    {
+        return $this->leftJoin;
+    }
+
+    /**
+     * @param bool $leftJoin
+     */
+    public function setLeftJoin($leftJoin)
+    {
+        $this->leftJoin = $leftJoin;
     }
 }
