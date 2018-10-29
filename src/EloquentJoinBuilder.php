@@ -135,12 +135,12 @@ class EloquentJoinBuilder extends Builder
                         $columnJoin    = $columnJoin ? $columnJoin : $relatedPrimaryKey;
                         $directionJoin = $directionJoin ? $directionJoin : 'DESC';
 
+                        //ORDER BY ' . $columnJoin . ' ' . $directionJoin . '
                         $join->whereRaw(
                             $relatedTableAlias.'.'.$relatedPrimaryKey.' =  (
                             SELECT '.$relatedPrimaryKey.'
                                 FROM '.$relatedTableAlias.'
                                 WHERE '.$relatedTableAlias.'.'.$relatedKey.' = '.$currentTableAlias.'.'.$currentPrimaryKey.'
-                
                                 LIMIT 1
                             )
                         ');
