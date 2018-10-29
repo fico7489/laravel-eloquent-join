@@ -68,8 +68,13 @@ class EloquentJoinBuilder extends Builder
 
     public function orderByJoin($column, $direction = 'asc', $columnJoin = null, $directionJoin = null)
     {
+        $sortByRelated = false !== strpos($column, '.');
+
         $query = $this->baseBuilder ? $this->baseBuilder : $this;
         $column = $query->performJoin($column, $columnJoin, $directionJoin);
+        if ($sortByRelated) {
+            $query->selectRaw($column.' as sort');
+        }
 
         return $this->orderBy($column, $direction);
     }
