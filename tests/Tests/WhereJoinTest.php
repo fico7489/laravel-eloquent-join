@@ -23,7 +23,7 @@ class WhereJoinTest extends TestCase
     {
         Seller::whereJoin('city.name', '=', 'test')->get();
 
-        $queryTest = 'select distinct "sellers".* from "sellers" 
+        $queryTest = 'select "sellers".* from "sellers" 
             left join "cities" 
             on "cities"."id" = "sellers"."city_id" 
             and "cities"."deleted_at" is null 
@@ -36,7 +36,7 @@ class WhereJoinTest extends TestCase
     {
         Seller::whereJoin('locationPrimary.address', '=', 'test')->get();
 
-        $queryTest = 'select distinct "sellers".* from "sellers" 
+        $queryTest = 'select "sellers".* from "sellers" 
             left join "locations" 
             on "locations"."seller_id" = "sellers"."id"
             and "locations"."is_primary" = ? 
@@ -57,7 +57,7 @@ class WhereJoinTest extends TestCase
     {
         Seller::whereJoin('city.state.name', '=', 'test')->get();
 
-        $queryTest = 'select distinct "sellers".* from "sellers" 
+        $queryTest = 'select "sellers".* from "sellers" 
             left join "cities" 
             on "cities"."id" = "sellers"."city_id" 
             and "cities"."deleted_at" is null 
@@ -73,7 +73,7 @@ class WhereJoinTest extends TestCase
     {
         Seller::whereJoin('city.zipCodePrimary.name', '=', 'test')->get();
 
-        $queryTest = 'select distinct "sellers".* from "sellers" 
+        $queryTest = 'select "sellers".* from "sellers" 
             left join "cities" 
             on "cities"."id" = "sellers"."city_id" 
             and "cities"."deleted_at" is null 
@@ -97,7 +97,7 @@ class WhereJoinTest extends TestCase
     {
         Seller::whereJoin('locationPrimary.locationAddressPrimary.name', '=', 'test')->get();
 
-        $queryTest = 'select distinct "sellers".* from "sellers" 
+        $queryTest = 'select "sellers".* from "sellers" 
             left join "locations" 
             on "locations"."seller_id" = "sellers"."id" 
             and "locations"."is_primary" = ? 
@@ -129,7 +129,7 @@ class WhereJoinTest extends TestCase
     {
         Seller::whereJoin('locationPrimary.city.name', '=', 'test')->get();
 
-        $queryTest = 'select distinct "sellers".* from "sellers" 
+        $queryTest = 'select "sellers".* from "sellers" 
             left join "locations" 
             on "locations"."seller_id" = "sellers"."id" 
             and "locations"."is_primary" = ? 

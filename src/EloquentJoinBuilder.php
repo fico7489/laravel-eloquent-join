@@ -22,8 +22,7 @@ class EloquentJoinBuilder extends Builder
     private $leftJoin = true;
 
     //aggregate method
-    private $aggregateMethod = 'MIN';
-
+    private $aggregateMethod = 'MAX';
 
     //base builder
     public $baseBuilder;
@@ -77,7 +76,7 @@ class EloquentJoinBuilder extends Builder
         $query = $this->baseBuilder ? $this->baseBuilder : $this;
         $column = $query->performJoin($column, $columnJoin, $directionJoin);
         if ($sortByRelated) {
-            $query->selectRaw($this->aggregateMethod . '('.$column.') as sort');
+            $query->selectRaw($this->aggregateMethod.'('.$column.') as sort');
         }
 
         return $this->orderBy($column, $direction);
@@ -144,7 +143,7 @@ class EloquentJoinBuilder extends Builder
                         $columnJoin    = $columnJoin ? $columnJoin : $relatedPrimaryKey;
                         $directionJoin = $directionJoin ? $directionJoin : 'ASC';
 
-                        $join->whereRaw(
+                        /*$join->whereRaw(
                             $relatedTableAlias.'.'.$relatedPrimaryKey.' =  (
                             SELECT '.$relatedPrimaryKey.'
                                 FROM '.$relatedTableAlias.'
@@ -152,7 +151,7 @@ class EloquentJoinBuilder extends Builder
                                 ORDER BY '.$columnJoin.' '.$directionJoin.'
                                 LIMIT 1
                             )
-                        ');
+                        ');*/
                     });
                 } else {
                     throw new InvalidRelation();
@@ -168,7 +167,7 @@ class EloquentJoinBuilder extends Builder
 
         if (!$this->selected && count($relations) > 1) {
             $this->selected = true;
-            $this->selectRaw('distinct "'.$baseTable.'".*');
+            $this->selectRaw('"'.$baseTable.'".*');
             $this->groupBy($baseTable.'.id');
         }
 
