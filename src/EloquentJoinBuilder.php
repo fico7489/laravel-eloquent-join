@@ -159,7 +159,7 @@ class EloquentJoinBuilder extends Builder
 
         if (!$this->selected && count($relations) > 1) {
             $this->selected = true;
-            $this->select($baseTable.'.*');
+            $this->selectRaw('"'.$baseTable.'".*');
         }
 
         return $currentTableAlias.'.'.$column;
