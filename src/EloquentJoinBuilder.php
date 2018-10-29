@@ -21,6 +21,10 @@ class EloquentJoinBuilder extends Builder
     //use table alias for join (real table name or uniqid())
     private $leftJoin = true;
 
+    //aggregate method
+    private $aggregateMethod = 'MIN';
+
+
     //base builder
     public $baseBuilder;
 
@@ -73,7 +77,7 @@ class EloquentJoinBuilder extends Builder
         $query = $this->baseBuilder ? $this->baseBuilder : $this;
         $column = $query->performJoin($column, $columnJoin, $directionJoin);
         if ($sortByRelated) {
-            $query->selectRaw($column.' as sort');
+            $query->selectRaw($this->aggregateMethod . '('.$column.') as sort');
         }
 
         return $this->orderBy($column, $direction);
@@ -165,6 +169,7 @@ class EloquentJoinBuilder extends Builder
         if (!$this->selected && count($relations) > 1) {
             $this->selected = true;
             $this->selectRaw('distinct "'.$baseTable.'".*');
+            $this->groupBy($baseTable.'.id');
         }
 
         return $currentTableAlias.'.'.$column;
