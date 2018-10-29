@@ -47,6 +47,7 @@ class ClosureTest extends TestCase
             SELECT id
                 FROM locations
                 WHERE locations.seller_id = sellers.id
+                ORDER BY id ASC
                 LIMIT 1
             ) where ("orders"."id" = ? or "orders"."id" = ? 
             and ("locations"."id" = ?)) 

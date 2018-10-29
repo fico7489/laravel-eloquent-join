@@ -21,6 +21,7 @@ class WhereOnRelationTest extends TestCase
                 SELECT id
                 FROM locations
                 WHERE locations.seller_id = sellers.id
+                ORDER BY id ASC
                 LIMIT 1
             )
             order by "locations"."id" desc';
@@ -38,6 +39,7 @@ class WhereOnRelationTest extends TestCase
                 SELECT id
                 FROM locations
                 WHERE locations.seller_id = sellers.id
+                ORDER BY id ASC
                 LIMIT 1
             )
             order by "locations"."id" desc';
@@ -55,6 +57,7 @@ class WhereOnRelationTest extends TestCase
                 SELECT id
                 FROM locations
                 WHERE locations.seller_id = sellers.id
+                ORDER BY id ASC
                 LIMIT 1
             )
             order by "locations"."id" desc';
@@ -73,6 +76,7 @@ class WhereOnRelationTest extends TestCase
                 SELECT id
                 FROM locations
                 WHERE locations.seller_id = sellers.id
+                ORDER BY id ASC
                 LIMIT 1
             )
             order by "locations"."id" desc';

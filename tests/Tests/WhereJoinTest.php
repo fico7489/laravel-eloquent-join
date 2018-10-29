@@ -45,6 +45,7 @@ class WhereJoinTest extends TestCase
                 SELECT id
                 FROM locations
                 WHERE locations.seller_id = sellers.id
+                ORDER BY id ASC
                 LIMIT 1
             )
             where "locations"."address" = ?';
@@ -84,6 +85,7 @@ class WhereJoinTest extends TestCase
                 SELECT id
                 FROM zip_codes
                 WHERE zip_codes.city_id = cities.id
+                ORDER BY id ASC
                 LIMIT 1
             )
             where "zip_codes"."name" = ?';
@@ -104,6 +106,7 @@ class WhereJoinTest extends TestCase
                 SELECT id
                 FROM locations
                 WHERE locations.seller_id = sellers.id
+                ORDER BY id ASC
                 LIMIT 1
             )
             left join "location_addresses" 
@@ -114,6 +117,7 @@ class WhereJoinTest extends TestCase
                 SELECT id
                 FROM location_addresses
                 WHERE location_addresses.location_id = locations.id
+                ORDER BY id ASC
                 LIMIT 1
             )
             where "location_addresses"."name" = ?';
@@ -134,6 +138,7 @@ class WhereJoinTest extends TestCase
                 SELECT id
                 FROM locations
                 WHERE locations.seller_id = sellers.id
+                ORDER BY id ASC
                 LIMIT 1
             )
             left join "cities" 
