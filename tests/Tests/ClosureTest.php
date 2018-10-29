@@ -15,7 +15,7 @@ class ClosureTest extends TestCase
                 ->orWhereJoin('order.id', '=', 2);
         })->get();
 
-        $queryTest = 'select "order_items".* 
+        $queryTest = 'select distinct "order_items".* 
             from "order_items" 
             left join "orders" on "orders"."id" = "order_items"."order_id" 
             and "orders"."deleted_at" is null 
@@ -36,7 +36,7 @@ class ClosureTest extends TestCase
                 });
         })->get();
 
-        $queryTest = 'select "order_items".* from "order_items" 
+        $queryTest = 'select distinct "order_items".* from "order_items" 
             left join "orders" on "orders"."id" = "order_items"."order_id" 
             and "orders"."deleted_at" is null 
             left join "sellers" on "sellers"."id" = "orders"."seller_id" 
