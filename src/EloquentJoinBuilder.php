@@ -66,19 +66,17 @@ class EloquentJoinBuilder extends Builder
         return $this->orWhere($column, $operator, $value);
     }
 
-    public function orderByJoin($column, $direction = 'asc', $leftJoin = true, $columnJoin = null, $directionJoin = null)
+    public function orderByJoin($column, $direction = 'asc', $columnJoin = null, $directionJoin = null)
     {
         $query = $this->baseBuilder ? $this->baseBuilder : $this;
-        $query->setLeftJoin($leftJoin);
         $column = $query->performJoin($column, $columnJoin, $directionJoin);
 
         return $this->orderBy($column, $direction);
     }
 
-    public function relationJoin($column, $leftJoin = true, $columnJoin = null, $directionJoin = null)
+    public function relationJoin($column, $columnJoin = null, $directionJoin = null)
     {
         $query = $this->baseBuilder ? $this->baseBuilder : $this;
-        $query->setLeftJoin($leftJoin);
         $column = $query->performJoin($column, $columnJoin, $directionJoin);
 
         return $this;
