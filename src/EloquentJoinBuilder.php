@@ -9,7 +9,7 @@ use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationWhere;
 use Illuminate\Database\Eloquent\Builder;
 use Fico7489\Laravel\EloquentJoin\Relations\BelongsToJoin;
 use Fico7489\Laravel\EloquentJoin\Relations\HasOneJoin;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Fico7489\Laravel\EloquentJoin\Relations\HasManyJoin;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -131,7 +131,7 @@ class EloquentJoinBuilder extends Builder
 
                         $this->joinQuery($join, $relatedRelation, $relatedTableAlias);
                     });
-                } elseif ($relatedRelation instanceof HasOneJoin  ||  $relatedRelation instanceof HasMany) {
+                } elseif ($relatedRelation instanceof HasOneJoin  ||  $relatedRelation instanceof HasManyJoin) {
                     $relatedKey = $relatedRelation->getQualifiedForeignKeyName();
                     $relatedKey = last(explode('.', $relatedKey));
 
