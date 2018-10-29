@@ -69,12 +69,12 @@ class EloquentJoinBuilder extends Builder
         return $this->orWhere($column, $operator, $value);
     }
 
-    public function orderByJoin($column, $direction = 'asc', $columnJoin = null, $directionJoin = null)
+    public function orderByJoin($column, $direction = 'asc')
     {
         $sortByRelated = false !== strpos($column, '.');
 
         $query = $this->baseBuilder ? $this->baseBuilder : $this;
-        $column = $query->performJoin($column, $columnJoin, $directionJoin);
+        $column = $query->performJoin($column);
         if ($sortByRelated) {
             $query->selectRaw($this->aggregateMethod.'('.$column.') as sort');
         }
@@ -82,15 +82,15 @@ class EloquentJoinBuilder extends Builder
         return $this->orderBy($column, $direction);
     }
 
-    public function relationJoin($column, $columnJoin = null, $directionJoin = null)
+    public function relationJoin($column)
     {
         $query = $this->baseBuilder ? $this->baseBuilder : $this;
-        $column = $query->performJoin($column, $columnJoin, $directionJoin);
+        $column = $query->performJoin($column);
 
         return $this;
     }
 
-    private function performJoin($relations, $columnJoin = null, $directionJoin = null)
+    private function performJoin($relations)
     {
         $relations = explode('.', $relations);
 
@@ -135,23 +135,10 @@ class EloquentJoinBuilder extends Builder
                     $relatedKey = $relatedRelation->getQualifiedForeignKeyName();
                     $relatedKey = last(explode('.', $relatedKey));
 
-                    $this->$joinMethod($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $relatedPrimaryKey, $currentTableAlias, $relatedKey, $currentPrimaryKey, $columnJoin, $directionJoin) {
+                    $this->$joinMethod($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $relatedPrimaryKey, $currentTableAlias, $relatedKey, $currentPrimaryKey) {
                         $join->on($relatedTableAlias.'.'.$relatedKey, '=', $currentTableAlias.'.'.$currentPrimaryKey);
 
                         $this->joinQuery($join, $relatedRelation, $relatedTableAlias);
-
-                        $columnJoin    = $columnJoin ? $columnJoin : $relatedPrimaryKey;
-                        $directionJoin = $directionJoin ? $directionJoin : 'ASC';
-
-                        /*$join->whereRaw(
-                            $relatedTableAlias.'.'.$relatedPrimaryKey.' =  (
-                            SELECT '.$relatedPrimaryKey.'
-                                FROM '.$relatedTableAlias.'
-                                WHERE '.$relatedTableAlias.'.'.$relatedKey.' = '.$currentTableAlias.'.'.$currentPrimaryKey.'
-                                ORDER BY '.$columnJoin.' '.$directionJoin.'
-                                LIMIT 1
-                            )
-                        ');*/
                     });
                 } else {
                     throw new InvalidRelation();
