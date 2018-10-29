@@ -115,7 +115,7 @@ class WhereJoinTest extends TestCase
             on "cities"."id" = "locations"."city_id" 
             and "cities"."deleted_at" is null 
             where "cities"."name" = ?
-             group by "sellers"."id"';
+            group by "sellers"."id"';
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }
