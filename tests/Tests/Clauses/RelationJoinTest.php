@@ -5,11 +5,11 @@ namespace Fico7489\Laravel\EloquentJoin\Tests\Tests\Clauses;
 use Fico7489\Laravel\EloquentJoin\Tests\Models\Order;
 use Fico7489\Laravel\EloquentJoin\Tests\TestCase;
 
-class RelationJoinTest extends TestCase
+class joinRelationsTest extends TestCase
 {
     public function testWhere()
     {
-        Order::relationJoin('seller')
+        Order::joinRelations('seller')
             ->get();
 
         $queryTest = 'select "orders".* 

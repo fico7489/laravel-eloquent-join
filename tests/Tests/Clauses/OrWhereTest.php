@@ -9,7 +9,7 @@ class OrWhereTest extends TestCase
 {
     public function testWhere()
     {
-        Order::relationJoin('seller')
+        Order::joinRelations('seller')
             ->whereJoin('seller.id', '=', 1)
             ->orWhereJoin('seller.id', '=', 2)
             ->get();

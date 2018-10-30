@@ -9,7 +9,7 @@ class HasManyTest extends TestCase
 {
     public function testHasMany()
     {
-        Seller::relationJoin('locations')->get();
+        Seller::joinRelations('locations')->get();
 
         $queryTest = 'select "sellers".* 
             from "sellers" 
@@ -22,7 +22,7 @@ class HasManyTest extends TestCase
 
     public function testHasManyHasOne()
     {
-        Seller::relationJoin('locations.city')->get();
+        Seller::joinRelations('locations.city')->get();
 
         $queryTest = 'select "sellers".* 
             from "sellers" left join "locations" on "locations"."seller_id" = "sellers"."id" 
@@ -36,7 +36,7 @@ class HasManyTest extends TestCase
 
     public function testHasManyBelongsTo()
     {
-        Seller::relationJoin('locations.integrations')->get();
+        Seller::joinRelations('locations.integrations')->get();
 
         $queryTest = 'select "sellers".* 
             from "sellers" 

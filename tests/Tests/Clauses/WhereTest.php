@@ -9,7 +9,7 @@ class WhereTest extends TestCase
 {
     public function testWhere()
     {
-        Order::relationJoin('seller')
+        Order::joinRelations('seller')
             ->whereJoin('seller.id', '=', 1)
             ->get();
 

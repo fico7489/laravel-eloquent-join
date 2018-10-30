@@ -9,7 +9,7 @@ class BelongsToTest extends TestCase
 {
     public function testBelongsTo()
     {
-        Order::relationJoin('seller')->get();
+        Order::joinRelations('seller')->get();
 
         $queryTest = 'select "orders".* from "orders" 
             left join "sellers" on "sellers"."id" = "orders"."seller_id" 
@@ -21,7 +21,7 @@ class BelongsToTest extends TestCase
 
     public function testBelongsToHasOne()
     {
-        Order::relationJoin('seller.locationPrimary')->get();
+        Order::joinRelations('seller.locationPrimary')->get();
 
         $queryTest = 'select "orders".* from "orders" 
             left join "sellers" on "sellers"."id" = "orders"."seller_id" 
@@ -36,7 +36,7 @@ class BelongsToTest extends TestCase
 
     public function testBelongsToHasMany()
     {
-        Order::relationJoin('seller.locations')->get();
+        Order::joinRelations('seller.locations')->get();
 
         $queryTest = 'select "orders".* from "orders" 
             left join "sellers" on "sellers"."id" = "orders"."seller_id" 
@@ -50,7 +50,7 @@ class BelongsToTest extends TestCase
 
     public function testBelongsToHasOneHasMany()
     {
-        Order::relationJoin('seller.locationPrimary.integrations')->get();
+        Order::joinRelations('seller.locationPrimary.integrations')->get();
 
         $queryTest = 'select "orders".* from "orders" 
             left join "sellers" on "sellers"."id" = "orders"."seller_id" 
@@ -66,7 +66,7 @@ class BelongsToTest extends TestCase
 
     public function testBelongsToHasManyHasOne()
     {
-        Order::relationJoin('seller.locationPrimary.locationAddressPrimary')->get();
+        Order::joinRelations('seller.locationPrimary.locationAddressPrimary')->get();
 
         $queryTest = 'select "orders".* from "orders" 
             left join "sellers" on "sellers"."id" = "orders"."seller_id" 

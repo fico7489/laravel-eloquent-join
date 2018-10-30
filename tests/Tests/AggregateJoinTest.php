@@ -17,7 +17,7 @@ class AggregateJoinTest extends TestCase
 
     public function testAvg()
     {
-        Order::relationJoin('seller')
+        Order::joinRelations('seller')
             ->orderByJoin('seller.id', 'asc', EloquentJoinBuilder::AGGREGATE_SUM)
             ->get();
 
@@ -27,7 +27,7 @@ class AggregateJoinTest extends TestCase
 
     public function testSum()
     {
-        Order::relationJoin('seller')
+        Order::joinRelations('seller')
             ->orderByJoin('seller.id', 'asc', EloquentJoinBuilder::AGGREGATE_AVG)
             ->get();
 
@@ -37,7 +37,7 @@ class AggregateJoinTest extends TestCase
 
     public function testMax()
     {
-        Order::relationJoin('seller')
+        Order::joinRelations('seller')
             ->orderByJoin('seller.id', 'asc', EloquentJoinBuilder::AGGREGATE_MAX)
             ->get();
 
@@ -47,7 +47,7 @@ class AggregateJoinTest extends TestCase
 
     public function testMin()
     {
-        Order::relationJoin('seller')
+        Order::joinRelations('seller')
             ->orderByJoin('seller.id', 'asc', EloquentJoinBuilder::AGGREGATE_MIN)
             ->get();
 
@@ -57,7 +57,7 @@ class AggregateJoinTest extends TestCase
 
     public function testCount()
     {
-        Order::relationJoin('seller')
+        Order::joinRelations('seller')
             ->orderByJoin('seller.id', 'asc', EloquentJoinBuilder::AGGREGATE_COUNT)
             ->get();
 

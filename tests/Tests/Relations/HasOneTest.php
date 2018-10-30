@@ -9,7 +9,7 @@ class HasOneTest extends TestCase
 {
     public function testHasOne()
     {
-        Seller::relationJoin('location')->get();
+        Seller::joinRelations('location')->get();
 
         $queryTest = 'select "sellers".* 
             from "sellers" 
@@ -24,7 +24,7 @@ class HasOneTest extends TestCase
 
     public function testHasOneBelongsTo()
     {
-        Seller::relationJoin('location.city')->get();
+        Seller::joinRelations('location.city')->get();
 
         $queryTest = 'select "sellers".* 
             from "sellers" left join "locations" on "locations"."seller_id" = "sellers"."id" 
@@ -40,7 +40,7 @@ class HasOneTest extends TestCase
 
     public function testHasOneHasMany()
     {
-        Seller::relationJoin('location.integrations')->get();
+        Seller::joinRelations('location.integrations')->get();
 
         $queryTest = 'select "sellers".* 
             from "sellers" 
