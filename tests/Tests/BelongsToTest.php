@@ -50,6 +50,22 @@ class BelongsToTest extends TestCase
 
     public function testBelongsToHasOneHasMany()
     {
+        Order::relationJoin('seller.locationPrimary.integrations')->get();
+
+        $queryTest = 'select "orders".* from "orders" 
+            left join "sellers" on "sellers"."id" = "orders"."seller_id" 
+            left join "locations" on "locations"."seller_id" = "sellers"."id" 
+            and "locations"."is_primary" = ? and "locations"."deleted_at" is null 
+            left join "integrations" on "integrations"."location_id" = "locations"."id" 
+            and "integrations"."deleted_at" is null 
+            where "orders"."deleted_at" is null 
+            group by "orders"."id"';
+
+        $this->assertQueryMatches($queryTest, $this->fetchQuery());
+    }
+
+    public function testBelongsToHasManyHasOne()
+    {
         Order::relationJoin('seller.locationPrimary.locationAddressPrimary')->get();
 
         $queryTest = 'select "orders".* from "orders" 
@@ -64,9 +80,5 @@ class BelongsToTest extends TestCase
             group by "orders"."id"';
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
-    }
-
-    public function testBelongsToHasManyHasOne()
-    {
     }
 }

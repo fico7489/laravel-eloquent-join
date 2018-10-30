@@ -103,6 +103,28 @@ class CreateDatabase extends Migration
             $table->timestamps();
             $table->softDeletes();
         });
+
+        Schema::create('users', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name')->nullable();
+            $table->unsignedInteger('location_address_id')->nullable();
+
+            $table->foreign('location_address_id')->references('id')->on('location_addresses');
+
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
+        Schema::create('integrations', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name')->nullable();
+            $table->unsignedInteger('location_id')->nullable();
+
+            $table->foreign('location_id')->references('id')->on('locations');
+
+            $table->timestamps();
+            $table->softDeletes();
+        });
     }
 
     /**
@@ -118,5 +140,6 @@ class CreateDatabase extends Migration
         Schema::drop('zip_codes');
         Schema::drop('states');
         Schema::drop('location_addresses');
+        Schema::drop('integrations');
     }
 }

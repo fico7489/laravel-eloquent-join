@@ -27,4 +27,9 @@ class Location extends BaseModel
         return $this->hasOne(LocationAddress::class)
             ->where('is_primary', '=', 1);
     }
+
+    public function integrations()
+    {
+        return $this->hasMany(Integration::class);
+    }
 }
