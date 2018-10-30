@@ -91,16 +91,20 @@ class EloquentJoinBuilder extends Builder
         return $this->orderBy($column, $direction);
     }
 
-    public function joinRelations($column)
+    public function joinRelations($column, $leftJoin = null)
     {
+        $leftJoin = $leftJoin ? $leftJoin : $this->leftJoin;
         $query = $this->baseBuilder ? $this->baseBuilder : $this;
-        $column = $query->performJoin($column.'.FAKE_FIELD');
+        $column = $query->performJoin($column.'.FAKE_FIELD', $leftJoin);
 
         return $this;
     }
 
-    private function performJoin($relations)
+    private function performJoin($relations, $leftJoin = null)
     {
+        $leftJoin   = $leftJoin ? $leftJoin : $this->leftJoin;
+        $joinMethod = $this->leftJoin ? 'leftJoin' : 'join';
+
         $relations = explode('.', $relations);
 
         $column    = end($relations);
@@ -129,7 +133,6 @@ class EloquentJoinBuilder extends Builder
             $relationsAccumulated[]    = $relatedTableAlias;
             $relationAccumulatedString = implode('.', $relationsAccumulated);
 
-            $joinMethod = $this->leftJoin ? 'leftJoin' : 'join';
             if (!in_array($relationAccumulatedString, $this->joinedTables)) {
                 $joinQuery = $relatedTable.($this->useTableAlias ? ' as '.$relatedTableAlias : '');
                 if ($relatedRelation instanceof BelongsToJoin) {
