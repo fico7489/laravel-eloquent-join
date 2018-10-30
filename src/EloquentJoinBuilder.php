@@ -85,7 +85,7 @@ class EloquentJoinBuilder extends Builder
     public function relationJoin($column)
     {
         $query = $this->baseBuilder ? $this->baseBuilder : $this;
-        $column = $query->performJoin($column . '.FAKE_FIELD');
+        $column = $query->performJoin($column.'.FAKE_FIELD');
 
         return $this;
     }
