@@ -8,7 +8,7 @@ use Fico7489\Laravel\EloquentJoin\Tests\TestCase;
 
 class JoinTypeTest extends TestCase
 {
-    /*public function testLeftJoin()
+    public function testLeftJoin()
     {
         Seller::setLeftJoin(true)->whereJoin('city.name', '=', 'test')->get();
 
@@ -34,7 +34,7 @@ class JoinTypeTest extends TestCase
             where "cities"."name" = ?';
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
-    }*/
+    }
 
     public function testMixedJoin()
     {

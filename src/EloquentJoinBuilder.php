@@ -135,7 +135,12 @@ class EloquentJoinBuilder extends Builder
             $relatedTableAlias = $this->useTableAlias ? uniqid() : $relatedTable;
 
             $relationsAccumulated[]    = $relatedTableAlias;
-            $relationAccumulatedString = implode('.', $relationsAccumulated);
+            $relationAccumulatedString = implode('_', $relationsAccumulated);
+
+            //relations count
+            if ($this->appendRelationsCount) {
+                $this->selectRaw('COUNT('.$relatedTable.'.'.$relatedPrimaryKey.') as '.$relationAccumulatedString.'_count');
+            }
 
             if (!in_array($relationAccumulatedString, $this->joinedTables)) {
                 $joinQuery = $relatedTable.($this->useTableAlias ? ' as '.$relatedTableAlias : '');
@@ -165,7 +170,7 @@ class EloquentJoinBuilder extends Builder
             $currentTableAlias = $relatedTableAlias;
             $currentPrimaryKey = $relatedPrimaryKey;
 
-            $this->joinedTables[] = implode('.', $relationsAccumulated);
+            $this->joinedTables[] = implode('_', $relationsAccumulated);
         }
 
         if (!$this->selected && count($relations) > 1) {
@@ -252,6 +257,30 @@ class EloquentJoinBuilder extends Builder
     public function setLeftJoin($leftJoin)
     {
         $this->leftJoin = $leftJoin;
+
+        return $this;
+    }
+
+    public function isAppendRelationsCount()
+    {
+        return $this->appendRelationsCount;
+    }
+
+    public function setAppendRelationsCount($appendRelationsCount)
+    {
+        $this->appendRelationsCount = $appendRelationsCount;
+
+        return $this;
+    }
+
+    public function getAggregateMethod()
+    {
+        return $this->aggregateMethod;
+    }
+
+    public function setAggregateMethod($aggregateMethod)
+    {
+        $this->aggregateMethod = $aggregateMethod;
 
         return $this;
     }
