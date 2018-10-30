@@ -28,7 +28,7 @@ class EloquentJoinBuilder extends Builder
     private $leftJoin = true;
 
     //aggregate method
-    private $aggregateMethod = 'MAX';
+    private $aggregateMethod = self::AGGREGATE_MAX;
 
     //base builder
     public $baseBuilder;
