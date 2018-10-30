@@ -11,14 +11,4 @@ class State extends BaseModel
     protected $table = 'states';
 
     protected $fillable = ['name'];
-
-    public function locations()
-    {
-        return $this->hasMany(Location::class);
-    }
-
-    public function states()
-    {
-        return $this->hasMany(City::class);
-    }
 }

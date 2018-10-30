@@ -93,7 +93,8 @@ class EloquentJoinBuilder extends Builder
 
     public function joinRelations($column, $leftJoin = null)
     {
-        $leftJoin = $leftJoin ? $leftJoin : $this->leftJoin;
+        $leftJoin = null !== $leftJoin ? $leftJoin : $this->leftJoin;
+
         $query = $this->baseBuilder ? $this->baseBuilder : $this;
         $column = $query->performJoin($column.'.FAKE_FIELD', $leftJoin);
 
@@ -102,8 +103,8 @@ class EloquentJoinBuilder extends Builder
 
     private function performJoin($relations, $leftJoin = null)
     {
-        $leftJoin   = $leftJoin ? $leftJoin : $this->leftJoin;
-        $joinMethod = $this->leftJoin ? 'leftJoin' : 'join';
+        $leftJoin   = null !== $leftJoin ? $leftJoin : $this->leftJoin;
+        $joinMethod = $leftJoin ? 'leftJoin' : 'join';
 
         $relations = explode('.', $relations);
 
