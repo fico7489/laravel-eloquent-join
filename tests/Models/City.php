@@ -27,4 +27,9 @@ class City extends BaseModel
     {
         return $this->belongsToMany(Seller::class, 'locations', 'seller_id', 'city_id');
     }
+
+    public function locations()
+    {
+        return $this->hasMany(ZipCode::class);
+    }
 }
