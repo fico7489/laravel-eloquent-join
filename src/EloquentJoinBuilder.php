@@ -229,6 +229,8 @@ class EloquentJoinBuilder extends Builder
     public function setUseTableAlias($useTableAlias)
     {
         $this->useTableAlias = $useTableAlias;
+
+        return $this;
     }
 
     /**
@@ -245,5 +247,7 @@ class EloquentJoinBuilder extends Builder
     public function setLeftJoin($leftJoin)
     {
         $this->leftJoin = $leftJoin;
+
+        return $this;
     }
 }

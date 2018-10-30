@@ -18,7 +18,7 @@ class SoftDeleteTest extends TestCase
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }
 
-    public function testNotRelatedWithoutTrashed()
+    public function testNotRelatedWithoutTrashedExplicit()
     {
         OrderItem::orderByJoin('name')->withoutTrashed()->get();
         $queryTest = 'select * 
@@ -29,7 +29,7 @@ class SoftDeleteTest extends TestCase
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }
 
-    public function testNotRelatedOnlyTrashed()
+    public function testNotRelatedOnlyTrashedExplicit()
     {
         OrderItem::orderByJoin('name')->onlyTrashed()->get();
         $queryTest = 'select * 
@@ -40,7 +40,7 @@ class SoftDeleteTest extends TestCase
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }
 
-    public function testNotRelatedWithTrashed()
+    public function testNotRelatedWithTrashedExplicit()
     {
         OrderItem::orderByJoin('name')->withTrashed()->get();
         $queryTest = 'select * 
@@ -64,7 +64,7 @@ class SoftDeleteTest extends TestCase
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }
 
-    public function testRelatedWithoutTrashed()
+    public function testRelatedWithoutTrashedExplicit()
     {
         OrderItem::orderByJoin('order.number')->withoutTrashed()->get();
         $queryTest = 'select "order_items".*, MAX(orders.number) as sort
@@ -79,7 +79,7 @@ class SoftDeleteTest extends TestCase
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }
 
-    public function testRelatedOnlyTrashed()
+    public function testRelatedOnlyTrashedExplicit()
     {
         OrderItem::orderByJoin('order.number')->onlyTrashed()->get();
         $queryTest = 'select "order_items".*, MAX(orders.number) as sort
@@ -94,7 +94,7 @@ class SoftDeleteTest extends TestCase
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }
 
-    public function testRelatedWithTrashed()
+    public function testRelatedWithTrashedExplicit()
     {
         OrderItem::orderByJoin('order.number')->withTrashed()->get();
         $queryTest = 'select "order_items".*, MAX(orders.number) as sort
