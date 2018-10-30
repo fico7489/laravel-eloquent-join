@@ -15,6 +15,13 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class EloquentJoinBuilder extends Builder
 {
+    const AGGREGATE_SUM      = 'SUM';
+    const AGGREGATE_AVG      = 'AVG';
+    const AGGREGATE_MAX      = 'MAX';
+    const AGGREGATE_MIN      = 'MIN ';
+    const AGGREGATE_COUNT    = 'COUNT';
+    const AGGREGATE_DISTINCT = 'DISTINCT';
+
     //use table alias for join (real table name or uniqid())
     private $useTableAlias = false;
 
