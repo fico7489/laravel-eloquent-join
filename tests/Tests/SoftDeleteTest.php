@@ -10,29 +10,44 @@ class SoftDeleteTest extends TestCase
     public function testNotRelatedWithoutTrashedDefault()
     {
         OrderItem::orderByJoin('name')->get();
-        $queryTest = '/select \* from "order_items" where "order_items"."deleted_at" is null order by "order_items"."name" asc/';
-        $this->assertRegExp($queryTest, $this->fetchQuery());
+        $queryTest = 'select * 
+            from "order_items" 
+            where "order_items"."deleted_at" is null 
+            order by "order_items"."name" asc';
+
+        $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }
 
     public function testNotRelatedWithoutTrashed()
     {
         OrderItem::orderByJoin('name')->withoutTrashed()->get();
-        $queryTest = '/select \* from "order_items" where "order_items"."deleted_at" is null order by "order_items"."name" asc/';
-        $this->assertRegExp($queryTest, $this->fetchQuery());
+        $queryTest = 'select * 
+            from "order_items"
+            where "order_items"."deleted_at" is null
+            order by "order_items"."name" asc';
+
+        $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }
 
     public function testNotRelatedOnlyTrashed()
     {
         OrderItem::orderByJoin('name')->onlyTrashed()->get();
-        $queryTest = '/select \* from "order_items" where "order_items"."deleted_at" is not null order by "order_items"."name" asc/';
-        $this->assertRegExp($queryTest, $this->fetchQuery());
+        $queryTest = 'select * 
+            from "order_items" 
+            where "order_items"."deleted_at" is not null
+            order by "order_items"."name" asc';
+
+        $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }
 
     public function testNotRelatedWithTrashed()
     {
         OrderItem::orderByJoin('name')->withTrashed()->get();
-        $queryTest = '/select \* from "order_items" order by "order_items"."name" asc/';
-        $this->assertRegExp($queryTest, $this->fetchQuery());
+        $queryTest = 'select * 
+            from "order_items" 
+            order by "order_items"."name" asc';
+
+        $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }
 
     public function testRelatedWithoutTrashedDefault()
