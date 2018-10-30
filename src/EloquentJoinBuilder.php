@@ -24,6 +24,9 @@ class EloquentJoinBuilder extends Builder
     //use table alias for join (real table name or uniqid())
     private $useTableAlias = false;
 
+    //appendRelationsCount
+    private $appendRelationsCount = false;
+
     //leftJoin
     private $leftJoin = true;
 
@@ -103,11 +106,12 @@ class EloquentJoinBuilder extends Builder
 
     private function performJoin($relations, $leftJoin = null)
     {
+        //detect join method
         $leftJoin   = null !== $leftJoin ? $leftJoin : $this->leftJoin;
         $joinMethod = $leftJoin ? 'leftJoin' : 'join';
 
+        //detect current model data
         $relations = explode('.', $relations);
-
         $column    = end($relations);
         $baseModel = $this->getModel();
         $baseTable = $baseModel->getTable();
@@ -117,7 +121,6 @@ class EloquentJoinBuilder extends Builder
         $currentPrimaryKey = $baseModel->getKeyName();
 
         $relationsAccumulated = [];
-
         foreach ($relations as $relation) {
             if ($relation == $column) {
                 //last item in $relations argument is sort|where column
