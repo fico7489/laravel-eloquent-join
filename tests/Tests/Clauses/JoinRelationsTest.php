@@ -5,7 +5,7 @@ namespace Fico7489\Laravel\EloquentJoin\Tests\Tests\Clauses;
 use Fico7489\Laravel\EloquentJoin\Tests\Models\Order;
 use Fico7489\Laravel\EloquentJoin\Tests\TestCase;
 
-class joinRelationsTest extends TestCase
+class JoinRelationsTest extends TestCase
 {
     public function testWhere()
     {
