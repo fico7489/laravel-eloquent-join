@@ -54,4 +54,14 @@ class AggregateJoinTest extends TestCase
         $queryTest = str_replace(EloquentJoinBuilder::AGGREGATE_SUM, EloquentJoinBuilder::AGGREGATE_MIN, $this->queryTest);
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }
+
+    public function testCount()
+    {
+        Order::relationJoin('seller')
+            ->orderByJoin('seller.id', 'asc', EloquentJoinBuilder::AGGREGATE_COUNT)
+            ->get();
+
+        $queryTest = str_replace(EloquentJoinBuilder::AGGREGATE_SUM, EloquentJoinBuilder::AGGREGATE_COUNT, $this->queryTest);
+        $this->assertQueryMatches($queryTest, $this->fetchQuery());
+    }
 }
