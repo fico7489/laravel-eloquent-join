@@ -20,7 +20,6 @@ class EloquentJoinBuilder extends Builder
     const AGGREGATE_MAX      = 'MAX';
     const AGGREGATE_MIN      = 'MIN ';
     const AGGREGATE_COUNT    = 'COUNT';
-    const AGGREGATE_DISTINCT = 'DISTINCT';
 
     //use table alias for join (real table name or uniqid())
     private $useTableAlias = false;
@@ -76,14 +75,15 @@ class EloquentJoinBuilder extends Builder
         return $this->orWhere($column, $operator, $value);
     }
 
-    public function orderByJoin($column, $direction = 'asc')
+    public function orderByJoin($column, $direction = 'asc', $aggregate = null)
     {
         $sortByRelated = false !== strpos($column, '.');
 
         $query = $this->baseBuilder ? $this->baseBuilder : $this;
         $column = $query->performJoin($column);
         if ($sortByRelated) {
-            $query->selectRaw($this->aggregateMethod.'('.$column.') as sort');
+            $aggregate = $aggregate ? $aggregate : $this->aggregateMethod;
+            $query->selectRaw($aggregate.'('.$column.') as sort');
         }
 
         return $this->orderBy($column, $direction);
