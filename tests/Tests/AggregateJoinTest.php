@@ -13,7 +13,7 @@ class AggregateJoinTest extends TestCase
             left join "sellers" on "sellers"."id" = "orders"."seller_id" 
             where "orders"."deleted_at" is null 
             group by "orders"."id" 
-            order by "sellers"."id" asc';
+            order by sort asc';
 
     public function testAvg()
     {

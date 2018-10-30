@@ -18,7 +18,7 @@ class ClosureOnRelationTest extends TestCase
             and "locations"."is_secondary" = ? 
             and "locations"."deleted_at" is null 
             group by "sellers"."id"
-            order by "locations"."id" desc';
+            order by sort desc';
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
 
@@ -30,7 +30,7 @@ class ClosureOnRelationTest extends TestCase
             and "locations"."is_primary" = ? 
             and "locations"."deleted_at" is null 
             group by "sellers"."id"
-            order by "locations"."id" desc';
+            order by sort desc';
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
 
@@ -42,7 +42,7 @@ class ClosureOnRelationTest extends TestCase
             and "locations"."is_secondary" = ? 
             and "locations"."deleted_at" is null 
             group by "sellers"."id"
-            order by "locations"."id" desc';
+            order by sort desc';
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
 
@@ -55,7 +55,7 @@ class ClosureOnRelationTest extends TestCase
             or "locations"."is_secondary" = ? 
             and "locations"."deleted_at" is null 
             group by "sellers"."id"
-            order by "locations"."id" desc';
+            order by sort desc';
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }

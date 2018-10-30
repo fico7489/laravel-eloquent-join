@@ -59,7 +59,7 @@ class SoftDeleteTest extends TestCase
             and "orders"."deleted_at" is null
             where "order_items"."deleted_at" is null 
             group by "order_items"."id"
-            order by "orders"."number" asc';
+            order by sort asc';
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }
@@ -74,7 +74,7 @@ class SoftDeleteTest extends TestCase
             and "orders"."deleted_at" is null 
             where "order_items"."deleted_at" is null 
             group by "order_items"."id"
-            order by "orders"."number" asc';
+            order by sort asc';
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }
@@ -89,7 +89,7 @@ class SoftDeleteTest extends TestCase
             and "orders"."deleted_at" is null 
             where "order_items"."deleted_at" is not null
             group by "order_items"."id"
-            order by "orders"."number" asc';
+            order by sort asc';
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }
@@ -103,7 +103,7 @@ class SoftDeleteTest extends TestCase
             on "orders"."id" = "order_items"."order_id" 
             and "orders"."deleted_at" is null 
             group by "order_items"."id"
-            order by "orders"."number" asc';
+            order by sort asc';
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }
@@ -117,7 +117,7 @@ class SoftDeleteTest extends TestCase
             on "orders"."id" = "order_items"."order_id" 
             where "order_items"."deleted_at" is null
             group by "order_items"."id"
-            order by "orders"."number" asc';
+            order by sort asc';
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }
@@ -132,7 +132,7 @@ class SoftDeleteTest extends TestCase
             and "orders"."deleted_at" is not null 
             where "order_items"."deleted_at" is null 
             group by "order_items"."id"
-            order by "orders"."number" asc';
+            order by sort asc';
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }

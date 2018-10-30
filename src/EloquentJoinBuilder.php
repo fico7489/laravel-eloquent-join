@@ -77,13 +77,15 @@ class EloquentJoinBuilder extends Builder
 
     public function orderByJoin($column, $direction = 'asc', $aggregate = null)
     {
-        $sortByRelated = false !== strpos($column, '.');
+        $dotPos = strrpos($column, '.');
 
         $query = $this->baseBuilder ? $this->baseBuilder : $this;
         $column = $query->performJoin($column);
-        if ($sortByRelated) {
+        if (false !== $dotPos) {
             $aggregate = $aggregate ? $aggregate : $this->aggregateMethod;
             $query->selectRaw($aggregate.'('.$column.') as sort');
+
+            return $this->orderByRaw('sort '.$direction);
         }
 
         return $this->orderBy($column, $direction);
