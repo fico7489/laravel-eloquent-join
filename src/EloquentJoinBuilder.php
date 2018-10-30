@@ -222,17 +222,12 @@ class EloquentJoinBuilder extends Builder
         }
     }
 
-    /**
-     * @return bool
-     */
+    //getters and setters
     public function isUseTableAlias()
     {
         return $this->useTableAlias;
     }
 
-    /**
-     * @param bool $useTableAlias
-     */
     public function setUseTableAlias($useTableAlias)
     {
         $this->useTableAlias = $useTableAlias;
@@ -240,17 +235,11 @@ class EloquentJoinBuilder extends Builder
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     public function isLeftJoin()
     {
         return $this->leftJoin;
     }
 
-    /**
-     * @param bool $leftJoin
-     */
     public function setLeftJoin($leftJoin)
     {
         $this->leftJoin = $leftJoin;
