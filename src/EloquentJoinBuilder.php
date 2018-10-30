@@ -24,7 +24,7 @@ class EloquentJoinBuilder extends Builder
     //use table alias for join (real table name or uniqid())
     private $useTableAlias = false;
 
-    //use table alias for join (real table name or uniqid())
+    //leftJoin
     private $leftJoin = true;
 
     //aggregate method
