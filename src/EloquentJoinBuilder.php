@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class EloquentJoinBuilder extends Builder
 {
+    //constants
     const AGGREGATE_SUM      = 'SUM';
     const AGGREGATE_AVG      = 'AVG';
     const AGGREGATE_MAX      = 'MAX';
