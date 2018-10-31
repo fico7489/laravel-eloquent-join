@@ -238,48 +238,48 @@ class EloquentJoinBuilder extends Builder
     }
 
     //getters and setters
-    public function isUseTableAlias()
+    public function isUseTableAlias(): bool
     {
         return $this->useTableAlias;
     }
 
-    public function setUseTableAlias($useTableAlias)
+    public function setUseTableAlias(bool $useTableAlias)
     {
         $this->useTableAlias = $useTableAlias;
 
         return $this;
     }
 
-    public function isLeftJoin()
+    public function isLeftJoin(): bool
     {
         return $this->leftJoin;
     }
 
-    public function setLeftJoin($leftJoin)
+    public function setLeftJoin(bool $leftJoin)
     {
         $this->leftJoin = $leftJoin;
 
         return $this;
     }
 
-    public function isAppendRelationsCount()
+    public function isAppendRelationsCount(): bool
     {
         return $this->appendRelationsCount;
     }
 
-    public function setAppendRelationsCount($appendRelationsCount)
+    public function setAppendRelationsCount(bool $appendRelationsCount)
     {
         $this->appendRelationsCount = $appendRelationsCount;
 
         return $this;
     }
 
-    public function getAggregateMethod()
+    public function getAggregateMethod(): string
     {
         return $this->aggregateMethod;
     }
 
-    public function setAggregateMethod($aggregateMethod)
+    public function setAggregateMethod(string $aggregateMethod)
     {
         $this->aggregateMethod = $aggregateMethod;
 
