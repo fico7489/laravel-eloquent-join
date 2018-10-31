@@ -68,7 +68,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             'password'  => '',
             'charset'   => 'utf8',
             'collation' => 'utf8_unicode_ci',
-            'strict'    => true,
+            'strict'    => false,
         ]);
     }
 
