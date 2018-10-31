@@ -86,6 +86,9 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         $expected = str_replace(['\n', '\r'], '', $expected);
         $expected   = '/'.$expected.'/';
         $expected = preg_quote($expected);
+        if ($_ENV['type'] = 'mysql') {
+            $expected = str_replace(['"'], '`', $expected);
+        }
 
         $this->assertRegExp($expected, $actual);
     }

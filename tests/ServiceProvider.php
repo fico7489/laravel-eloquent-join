@@ -16,8 +16,13 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
 
     protected function loadMigrationsFrom($path)
     {
-        \Artisan::call('migrate', ['--database' => 'sqllite']);
-        //\Artisan::call('migrate', ['--database' => 'mysql']);
+        $_ENV['type'] = 'mysql';  //sqllite, mysql, postgresql
+
+        if ($_ENV['type'] = 'mysql') {
+            \Artisan::call('migrate', ['--database' => 'mysql']);
+        } elseif ($_ENV['type'] = 'sqllite') {
+            \Artisan::call('migrate', ['--database' => 'sqllite']);
+        }
 
         $migrator = $this->app->make('migrator');
         $migrator->run($path);

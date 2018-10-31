@@ -20,7 +20,7 @@ class EloquentJoinBuilder extends Builder
     const AGGREGATE_SUM      = 'SUM';
     const AGGREGATE_AVG      = 'AVG';
     const AGGREGATE_MAX      = 'MAX';
-    const AGGREGATE_MIN      = 'MIN ';
+    const AGGREGATE_MIN      = 'MIN';
     const AGGREGATE_COUNT    = 'COUNT';
 
     //use table alias for join (real table name or uniqid())
