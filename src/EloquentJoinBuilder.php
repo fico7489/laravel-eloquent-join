@@ -6,6 +6,7 @@ use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelation;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationClause;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationGlobalScope;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationWhere;
+use Fico7489\Laravel\EloquentJoin\Relations\HasManyJoin;
 use Illuminate\Database\Eloquent\Builder;
 use Fico7489\Laravel\EloquentJoin\Relations\BelongsToJoin;
 use Fico7489\Laravel\EloquentJoin\Relations\HasOneJoin;
@@ -70,7 +71,7 @@ class EloquentJoinBuilder extends Builder
         return $this->orderBy($column, $direction);
     }
 
-    private function performJoin($relations, $leftJoin = true)
+    public function performJoin($relations, $leftJoin = true)
     {
         $relations = explode('.', $relations);
 
@@ -111,7 +112,7 @@ class EloquentJoinBuilder extends Builder
 
                         $this->joinQuery($join, $relatedRelation, $relatedTableAlias);
                     });
-                } elseif ($relatedRelation instanceof HasOneJoin) {
+                } elseif ($relatedRelation instanceof HasOneJoin || $relatedRelation instanceof HasManyJoin) {
                     $relatedKey = $relatedRelation->getQualifiedForeignKeyName();
                     $relatedKey = last(explode('.', $relatedKey));
 
@@ -120,14 +121,17 @@ class EloquentJoinBuilder extends Builder
 
                         $this->joinQuery($join, $relatedRelation, $relatedTableAlias);
 
-                        $join->whereRaw(
-                            $relatedTableAlias.'.'.$relatedPrimaryKey.' =  (
+                        if ($relatedRelation instanceof HasOneJoin) {
+
+                            $join->whereRaw(
+                                $relatedTableAlias.'.'.$relatedPrimaryKey.' =  (
                                 SELECT '.$relatedPrimaryKey.'
                                     FROM '.$relatedTableAlias.'
                                     WHERE '.$relatedTableAlias.'.'.$relatedKey.' = '.$currentTableAlias.'.'.$currentPrimaryKey.'
                                     LIMIT 1
                                 )
                             ');
+                        }
                     });
                 } else {
                     throw new InvalidRelation();
