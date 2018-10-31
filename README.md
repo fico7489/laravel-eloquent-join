@@ -160,7 +160,7 @@ With **true** query will look like this :
 ```
 select "sellers".*, count(locations.id) AS locations_count
 	from "sellers" 
-    left join "locations" as "5b5c093d2e00f" 
+	left join "locations" as "5b5c093d2e00f" 
 	...
 ```
 
@@ -238,7 +238,10 @@ Options are : **SUM**, **AVG**, **MAX**, **MIN**, **COUNT**
 ### Allowed clauses on BelongsTo, HasOne and HasMany relations on which you can use join clauses on the query
 
 * Relations that you want to use for join queries can only have this clauses : **where**, **orWhere**, **withTrashed**, **onlyTrashed**, **withoutTrashed**. 
-* Clauses **where** and **orWhere** can only have this variations **->where($column, $operator, $value)** and **->where([$column => $value])**, closures are not allowed.
+* Clauses **where** and **orWhere** can only have this variations 
+** **->where($column, $operator, $value)** 
+** **->where([$column => $value])**
+* closures are not allowed.
 * Other clauses like **whereHas**, **orderBy** etc. are not allowed.
 * You can add not allowed clauses on relations and use them in the normal eloquent way, but in that case, you can't use those relations for join queries.
 
