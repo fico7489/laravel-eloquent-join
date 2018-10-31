@@ -52,8 +52,8 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     protected function getEnvironmentSetUp($app)
     {
         // Setup default database to use sqlite :memory:
-        $app['config']->set('database.default', 'sqllite');
-        $app['config']->set('database.connections.sqllite', [
+        $app['config']->set('database.default', 'sqlite');
+        $app['config']->set('database.connections.sqlite', [
             'driver'   => 'sqlite',
             'database' => ':memory:',
             'prefix'   => '',
@@ -69,6 +69,19 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             'charset'   => 'utf8',
             'collation' => 'utf8_unicode_ci',
             'strict'    => false,
+        ]);
+
+        $app['config']->set('database.default', 'pgsql');
+        $app['config']->set('database.connections.pgsql', [
+            'driver'    => 'pgsql',
+            'host'      => 'localhost',
+            'database'  => 'join',
+            'username'  => 'postgres',
+            'password'  => 'root',
+            'charset'   => 'utf8',
+            'prefix'    => '',
+            'schema'    => 'public',
+            'sslmode'   => 'prefer',
         ]);
     }
 
@@ -86,7 +99,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         $expected = str_replace(['\n', '\r'], '', $expected);
         $expected   = '/'.$expected.'/';
         $expected = preg_quote($expected);
-        if ($_ENV['type'] = 'mysql') {
+        if ('mysql' == $_ENV['type']) {
             $expected = str_replace(['"'], '`', $expected);
         }
 
