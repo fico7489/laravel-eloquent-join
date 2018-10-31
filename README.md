@@ -263,6 +263,7 @@ Don't worry, if you anyway create the query that is not allowed appropriate exce
 
 ### Other 
 
+* If the model uses SoftDelete trait, where deleted_at != null will be automatically applied
 * You can combine new clauses unlimited times
 * If you combine clauses more times on same relation package will join related table only once
 
