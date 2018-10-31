@@ -10,7 +10,7 @@ class Location extends BaseModel
 
     protected $table = 'locations';
 
-    protected $fillable = ['address', 'seller_id', 'is_primary', 'is_secondary'];
+    protected $fillable = ['address', 'seller_id', 'is_primary', 'is_secondary', 'city_id'];
 
     public function seller()
     {
@@ -26,5 +26,10 @@ class Location extends BaseModel
     {
         return $this->hasOne(LocationAddress::class)
             ->where('is_primary', '=', 1);
+    }
+
+    public function integrations()
+    {
+        return $this->hasMany(Integration::class);
     }
 }

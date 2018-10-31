@@ -15,7 +15,7 @@ class ClosureTest extends TestCase
                 ->orWhereJoin('order.id', '=', 2);
         })->get();
 
-        $queryTest = 'select "order_items".* 
+        $queryTest = 'select order_items.* 
             from "order_items" 
             left join "orders" on "orders"."id" = "order_items"."order_id" 
             and "orders"."deleted_at" is null 
@@ -36,19 +36,15 @@ class ClosureTest extends TestCase
                 });
         })->get();
 
-        $queryTest = 'select "order_items".* from "order_items" 
+        $queryTest = 'select order_items.* 
+            from "order_items" 
             left join "orders" on "orders"."id" = "order_items"."order_id" 
             and "orders"."deleted_at" is null 
             left join "sellers" on "sellers"."id" = "orders"."seller_id" 
             left join "locations" on "locations"."seller_id" = "sellers"."id" 
             and "locations"."is_primary" = ? 
             and "locations"."deleted_at" is null 
-            and locations.id =  (
-            SELECT id
-                FROM locations
-                WHERE locations.seller_id = sellers.id
-                LIMIT 1
-            ) where ("orders"."id" = ? or "orders"."id" = ? 
+            where ("orders"."id" = ? or "orders"."id" = ? 
             and ("locations"."id" = ?)) 
             and "order_items"."deleted_at" is null';
 

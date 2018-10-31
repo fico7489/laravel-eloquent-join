@@ -16,7 +16,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         $seller = Seller::create(['title' => 1]);
         $seller2 = Seller::create(['title' => 2]);
         $seller3 = Seller::create(['title' => 3]);
-        Seller::create(['title' => 4]);
+        $seller4 = Seller::create(['title' => 4]);
 
         Location::create(['address' => 1, 'seller_id' => $seller->id]);
         Location::create(['address' => 2, 'seller_id' => $seller2->id]);
@@ -26,13 +26,13 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         Location::create(['address' => 4, 'seller_id' => $seller3->id, 'is_primary' => 1]);
         Location::create(['address' => 5, 'seller_id' => $seller3->id, 'is_secondary' => 1]);
 
-        Order::create(['number' => '1', 'seller_id' => $seller->id]);
-        Order::create(['number' => '2', 'seller_id' => $seller2->id]);
-        Order::create(['number' => '3', 'seller_id' => $seller3->id]);
+        $order = Order::create(['number' => '1', 'seller_id' => $seller->id]);
+        $order2 = Order::create(['number' => '2', 'seller_id' => $seller2->id]);
+        $order3 = Order::create(['number' => '3', 'seller_id' => $seller3->id]);
 
-        OrderItem::create(['name' => '1', 'order_id' => $seller->id]);
-        OrderItem::create(['name' => '2', 'order_id' => $seller2->id]);
-        OrderItem::create(['name' => '3', 'order_id' => $seller3->id]);
+        OrderItem::create(['name' => '1', 'order_id' => $order->id]);
+        OrderItem::create(['name' => '2', 'order_id' => $order2->id]);
+        OrderItem::create(['name' => '3', 'order_id' => $order3->id]);
 
         $this->startListening();
     }
@@ -52,11 +52,36 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     protected function getEnvironmentSetUp($app)
     {
         // Setup default database to use sqlite :memory:
-        $app['config']->set('database.default', 'testbench');
-        $app['config']->set('database.connections.testbench', [
+        $app['config']->set('database.default', 'sqlite');
+        $app['config']->set('database.connections.sqlite', [
             'driver'   => 'sqlite',
             'database' => ':memory:',
             'prefix'   => '',
+        ]);
+
+        $app['config']->set('database.default', 'mysql');
+        $app['config']->set('database.connections.mysql', [
+            'driver'    => 'mysql',
+            'host'      => 'localhost',
+            'database'  => 'join',
+            'username'  => 'root',
+            'password'  => '',
+            'charset'   => 'utf8',
+            'collation' => 'utf8_unicode_ci',
+            'strict'    => false,
+        ]);
+
+        $app['config']->set('database.default', 'pgsql');
+        $app['config']->set('database.connections.pgsql', [
+            'driver'    => 'pgsql',
+            'host'      => 'localhost',
+            'database'  => 'join',
+            'username'  => 'postgres',
+            'password'  => 'root',
+            'charset'   => 'utf8',
+            'prefix'    => '',
+            'schema'    => 'public',
+            'sslmode'   => 'prefer',
         ]);
     }
 
@@ -74,6 +99,9 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         $expected = str_replace(['\n', '\r'], '', $expected);
         $expected   = '/'.$expected.'/';
         $expected = preg_quote($expected);
+        if ('mysql' == $_ENV['type']) {
+            $expected = str_replace(['"'], '`', $expected);
+        }
 
         $this->assertRegExp($expected, $actual);
     }

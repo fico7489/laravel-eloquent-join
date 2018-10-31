@@ -1,10 +1,14 @@
 # Laravel Eloquent Join
 
-This package introduces the join capability for sorting and filtering on eloquent relations.
+This package introduces the join magic for eloquent models and relations.
 
-## Eloquent Problems
+## Introduction
 
-You can't perform sorting on the relationship field without manually joining related table which is very awkward. Let me give you a few reasons why. If you have a table with posts and related categories your code might look like this:
+Eloquent is a powerful ORM but its join capabilities are very poor.
+
+#### First Eloquent Problem (sorting)
+
+With laravel you can't perform sorting of the relationship fields without manually joining related table which is very awkward. Let me give you a few reasons why. If you have a table with **posts** and related **categories** your code might look like this:
 
 ```
 $posts = Post::select('posts.*')
@@ -21,46 +25,55 @@ $posts = $posts->get();
 ```
 
 1.The first problem is that you need to worry about select.
-
+```
     ->select('posts.*')
-    
-reason : without select() id from category can be selected and hydrated into Post model.
+```
+Reason : without **select** id from the category can be selected and hydrated into the Post model.
 
-2.The second problem is that you need to worry about groupBy.
+2.The second problem is that you need to worry about **groupBy**.
 
     ->groupBy('posts.id');
     
-reason : if the relation is HasOne and there are more than one categories for the post, the query will return more rows for categories.
+Reason : if the relation is HasOne and there are more than one categories for the post, the query will return more rows for categories.
 
 3.The third problem is that you need to change all other where clauses from : 
-
+```
     ->where('date', $date)
-
+```
 to
-
+```
     ->where('posts.date', $date)
-    
-reason : post and category can have "date" attribute and in that case without selecting attribute with table "ambiguous column" error will be thrown.
+```
+Reason : a **post** and **category** can have "date" attribute and in that case without selecting an attribute with table "ambiguous column" error will be thrown.
 
 4.The fourth problem is that you are using table names(not models) and this is also bad and awkward.
-
+```
     ->where('posts.date', $date)
-    
-5.The fifth problem is that you need to worry about soft deletes for joined tables. If the category is using SoftDeletes trait you must add : 
-
+```
+5.The fifth problem is that you need to worry about soft deletes for joined tables. If the **category** is using SoftDeletes trait you must add : 
+```
     ->where('categories.deleted_at', '=', null)
-    
-This package will take care of all above problems for you out of the box.
-Unlike **sorting**, you can perform **filtering** on the relationship fields without joining related tables but this package will give you the ability to do this easier.
+```
+This package will take care of all above problems for you. 
+Unlike **sorting**, you can perform **filtering** on the relationship fields without joining related tables, but this package will give you the ability to do this easier.
 
-## Version Compatibility
+
+#### Second Eloquent Problem (subqueries)
+
+With laravel you can perform where on the relationship attribute but laravel will generate subqueries which are more slower than joins. 
+With this package you will be available to perform where on the relationship with joins in an elegant way.
+
+
+## Requirements
 
 | Laravel Version | Package Tag | Supported | Development Branch
 |-----------------|-------------|-----------| -----------|
-| >= 5.5.0 | 3.* | yes | master
+| >= 5.5.0 | 4.* | yes | master
 | < 5.5.0 | - | no | -
 
-## Install
+Package is also tested for SQLite, MySql and PostgreSql
+
+## Installation & setup
 
 1.Install package with composer
 ```
@@ -81,12 +94,46 @@ abstract class BaseModel extends Model
 ...
 ```
 
+3.IMPORTANT
+
+For **MySql** make sure that **strict** configuration is set to **false**
+
+config/database.php
+
+```
+        'mysql' => [
+			...
+            'strict'    => false,
+			...
+```
+
 and that's it, you are ready to go.
 
 ## Options
 
-##### Use table alias
-Should we use alias for joined tables (default = false)
+Options can be set in the model  : 
+
+```
+class Seller extends BaseModel
+{
+    protected $useTableAlias = false;
+    protected $appendRelationsCount = false;
+    protected $leftJoin = false;
+    protected $aggregateMethod = 'MAX';
+```
+
+or on query : 
+
+```
+    Order::setUseTableAlias(true)->get();
+    Order::setAppendRelationsCount(true)->get();
+    Order::setLeftJoin(true)->get();
+    Order::setAggregateMethod(true)->get();
+```
+
+#### **useTableAlias**
+
+Should we use an alias for joined tables (default = false)
 
 With **true** query will look like this : 
 ```
@@ -97,65 +144,104 @@ select "sellers".* from "sellers"
 
 With **false** query will look like this : 
 ```
-select "sellers".* from "sellers" 
+select "sellers".* 
+	from "sellers" 
 	left join "locations"                    
 	...
 ```
 
-Set option in your base model : 
+Alias is a randomly generated string.
+
+#### **appendRelationsCount**
+
+Should we automatically append relation count field to results  (default = false)
+
+With **true** query will look like this : 
 ```
-    public function __construct(array $attributes = [])
-    {
-        parent::__construct($attributes);
-        
-        $this->useTableAlias = true;
-    }
+select "sellers".*, count(locations.id) AS locations_count
+	from "sellers" 
+	left join "locations" as "5b5c093d2e00f" 
+	...
 ```
 
-## Instructions for use
+Each **relation** is glued with an underscore and at the end **_count** prefix is added. For example for 
+
+    ->joinRelations('seller.locations')
+    
+field would be __seller_locations_count__
+
+#### **leftJoin**
+
+Should we use **inner join** or **left join** (default = true)
+
+```
+select "sellers".* 
+	from "sellers" 
+	inner join "locations"                    
+	...
+```
+
+vs
+
+```
+select "sellers".* 
+	from "sellers" 
+	left join "locations"                    
+	...
+```
+
+#### **aggregateMethod**
+
+Which aggregate method to use for ordering (default = 'MAX'). 
+
+When join is performed on the joined table we must apply aggregate functions on the sorted field so we could perform group by clause and prevent duplication of results.
+
+```
+select "sellers".*, MAX("locations" ."number") AS sort
+	from "sellers" 
+	left join "locations" 
+	group by "locations" ."id"
+	order by sort
+	...
+```
+
+Options are : **SUM**, **AVG**, **MAX**, **MIN**, **COUNT**
+
+## Usage
 
 ### Currently available relations for join queries
 
 * **BelongsTo**
-* **HasOne**.
+* **HasOne**
+* **HasMany**
 
-### New clauses for eloquent builder on BelongsTo and HasOne relations
+### New clauses for eloquent builder on BelongsTo and HasOne relations : 
 
-* **orderByJoin($column, $sortBy = 'asc', $leftJoin = true)**
+ **joinRelations($relations, $leftJoin = null)**
 
-    ***$column*** argument is same as in default eloquent orderBy()
+* ***$relations*** which relations to join
+* ***$leftJoin*** use **left join** or **inner join**, default **left join**
+
+**orderByJoin($column, $direction  = 'asc', $aggregateMethod = null)**
+
+* ***$column*** and ***$direction***  arguments are the same as in default eloquent **orderBy()**
+* ***$aggregateMethod*** argument defines which aggregate method to use ( **SUM**, **AVG**, **MAX**, **MIN**, **COUNT**), default **MAX**
     
-    ***$direction*** argument is same as in default eloquent orderBy()
+**whereJoin($column, $operator, $value, $boolean = 'and')**
+
+* ***$column***, ***$operator***, ***$value*** and ***$boolean*** arguments are the same as in default eloquent **where()**
     
-    ***$leftJoin*** argument defines if eloquent should perform left join or inner join, can be true or false
-    
-* **whereJoin($column, $operator = null, $value = null, $boolean = 'and')**
+**orWhereJoin($column, $operator, $value)**
 
-    ***$column***, ***$operator***, ***$value*** and ***$boolean*** arguments are the same as in default eloquent where()
-    
-* **orWhereJoin($column, $operator = null, $value)**
+* ***$column***, ***$operator*** and ***$value*** arguments are the same as in default eloquent **orWhere()**
 
-    ***$column***, ***$operator*** and ***$value*** arguments are the same as in default eloquent orWhere()
-
-### Rules for column parameter in whereJoin, orWhereJoin and orderByJoin   
-
-*  current table attributes
-```
-->where('title', '=', 'test')
-```
-* related table attributes (relationship names with dots)
-```
-->where('relationName.title', '=', 'test')
-```
-* related tables can be nested unlimited with any combination of HasOne and BelongsTo relations, they only need to meet **relation rules** for join queries.
-```
-->where('relationName.relationNameSecond.title', '=', 'test')
-```
-
-### Allowed clauses on BelongsTo and HasOne relations on which you can use join clauses on the query
+### Allowed clauses on BelongsTo, HasOne and HasMany relations on which you can use join clauses on the query
 
 * Relations that you want to use for join queries can only have this clauses : **where**, **orWhere**, **withTrashed**, **onlyTrashed**, **withoutTrashed**. 
-* Clauses **where** and **orWhere** can only have this variations **->where($column, $operator, $value)** and **->where([$column => $value])**, closures are not allowed.
+* Clauses **where** and **orWhere** can only have this variations 
+** **->where($column, $operator, $value)** 
+** **->where([$column => $value])**
+* closures are not allowed.
 * Other clauses like **whereHas**, **orderBy** etc. are not allowed.
 * You can add not allowed clauses on relations and use them in the normal eloquent way, but in that case, you can't use those relations for join queries.
 
@@ -179,24 +265,47 @@ public function locationPrimary()
         ->orWhere('is_primary', '=', 1)
         ->withTrashed()
         ->whereHas('state', function($query){return $query;}
-        ->orderBy('name');
+        ->orderBy('name')
+        ->where(function($query){
+            return $query->where('is_primary', '=', 1);
+        });
 }
 ```
 
 The reason why the second relation is not allowed is that this package should apply all those clauses on the join clause,  eloquent use all those clauses isolated with subqueries NOT on join clause and that is more simpler to do.
 
-### Other 
-
-* You can combine new clauses unlimited times
-* If you combine clauses more times on same relation package will join related table only once
-* You can combine join clauses e.g. whereJoin() with elouent clauses e.g. orderBy()
-
-```
-Seller::whereJoin('title', 'test')->whereJoin('city.title', 'test')->orderByJoin('city.title')->get();
-```
-
 You might get a picture that there are to many rules and restriction, but it is really not like that. 
 Don't worry, if you anyway create the query that is not allowed appropriate exception will be thrown and you will know what happened.
+
+### Other 
+
+* If the model uses SoftDelete trait, where deleted_at != null will be automatically applied
+* You can combine new clauses unlimited times
+* If you combine clauses more times on same relation package will join related table only once
+
+```
+Seller::whereJoin('city.title', '=', 'test')
+    ->orWhereJoin('city.title', '=', 'test2');
+```
+
+* You can call  new clauses inside closures
+
+```
+Seller::where(function ($query) {
+    $query
+        ->whereJoin('city.title', '=', 'test')
+        ->orWhereJoin('city.title', '=', 'test2');
+});
+```
+
+* You can combine join clauses e.g. whereJoin() with eloquent clauses e.g. orderBy()
+
+```
+Seller::whereJoin('title', '=', 'test')
+    ->whereJoin('city.title', '=', 'test')ž
+    ->orderByJoin('city.title')
+    ->get();
+```
 
 ## See action on real example
 
@@ -209,6 +318,11 @@ Models :
 ```
 class Seller extends BaseModel
 {
+    public function locations()
+    {
+        return $this->hasMany(Location::class);
+    }
+    
     public function locationPrimary()
     {
         return $this->hasOne(Location::class)
@@ -231,10 +345,6 @@ class Location extends BaseModel
     
 ```
 ```
-class LocationAddress extends BaseModel
-{
-```
-```
 class City extends BaseModel
 {
     public function state()
@@ -243,50 +353,124 @@ class City extends BaseModel
     }
 }
 ```
-```
-class State extends BaseModel
-{
-```
+
+### Join
+
+##### Join BelongsTo
+```Seller::joinRelations('city')```
+
+##### Join HasOne
+```Seller::joinRelations('locationPrimary')```
+
+##### Join HasMany
+```Seller::joinRelations('locations')```
+
+##### Join Mixed
+```Seller::joinRelations('city.state')```
+
+### Join (mix left join)
+
+```Seller::joinRelations('city', true)->joinRelations('city.state', false)```
 
 ### Ordering
 
-##### Order sellers by seller title
-```Seller::orderByJoin('title')```
-
-##### Order sellers by city name
+##### Order BelongsTo
 ```Seller::orderByJoin('city.title')```
 
-##### Order sellers by state name
-```Seller::orderByJoin('city.state.title')```
-
-##### Order sellers by primary location address
+##### Order HasOne
 ```Seller::orderByJoin('locationPrimary.address')```
 
-##### Order sellers by locationAddress name of primary location
-```Seller::orderByJoin('locationPrimary.locationAddressPrimary.address')```
+##### Order HasMany
+```Seller::orderByJoin('locations.title')```
 
-##### You can also combine orderBy more times
-```Seller::orderByJoin('title')->orderBy('city.title')```
+##### Order Mixed
+```Seller::orderByJoin('city.state.title')```
 
-### Filtering
+### Ordering (special cases with aggregate functions)
 
-##### Filter sellers which have title = 'test'
-```Seller::whereJoin('title', 'test')```
+##### Order by relation count
+```Seller::orderByJoin('locations.id', 'asc', 'COUNT')```
 
-##### Filter sellers which have city name = 'test'
+##### Order by relation field SUM
+```Seller::orderByJoin('locations.is_primary', 'asc', 'SUM')```
+
+##### Order by relation field AVG
+```Seller::orderByJoin('locations.is_primary', 'asc', 'AVG')```
+
+##### Order by relation field MAX
+```Seller::orderByJoin('locations.is_primary', 'asc', 'MAX')```
+
+##### Order by relation field MIN
+```Seller::orderByJoin('locations.is_primary', 'asc', 'MIN')```
+
+### Filtering (where or orWhere)
+
+##### Filter BelongsTo
 ```Seller::whereJoin('city.title', '=', 'test')```
 
-##### Filter sellers which have state name = 'test'
-```Seller::whereJoin('city.state.title', '=', 'test')```
-
-##### Filter sellers which have primary location address = 'test'
+##### Filter HasOne
 ```Seller::whereJoin('locationPrimary.address', '=', 'test')```
 
-##### Filter sellers which have locationAddress name of primary location = 'test'
-```Seller::whereJoin('locationPrimary.locationAddressPrimary.address', '=', 'test')```
+##### Filter HasMany
+```Seller::whereJoin('locations.title', '=', 'test')```
 
-##### You can also combine orderBy more times
-```Seller::whereJoin('title', 'test')->whereJoin('city.title', 'test')```
+##### Filter Mixed
+```Seller::whereJoin('city.state.title', '=', 'test')```
+
+### Relation count
+
+```
+$sellers = Seller::setAppendRelationsCount(true)->join('locations', '=', 'test')
+    ->get();
+    
+foreach ($sellers as $seller){
+    echo 'Number of location = ' . $seller->locations_count;
+}
+
+```
+
+### Filter (mix left join)
+
+```
+Seller::joinRelations('city', true)
+    ->joinRelations('city.state', false)
+    ->whereJoin('city.id', '=', 1)
+    ->orWhereJoin('city.state.id', '=', 1)
+```
+
+## Generated queries
+
+Query : 
+```
+Order::whereJoin('seller.id', '=', 1)->get();
+```
+
+Sql : 
+```
+select "orders".* 
+    from "orders" 
+    left join "sellers" on "sellers"."id" = "orders"."seller_id" 
+    where "sellers"."id" = ? 
+    and "orders"."deleted_at" is null 
+    group by "orders"."id"
+```
+
+Query : 
+```
+Order::orderByJoin('seller.id', '=', 1)->get();
+```
+
+Sql : 
+```
+select "orders".*, MAX(sellers.id) as sort
+    from "orders" 
+    left join "sellers" on "sellers"."id" = "orders"."seller_id" 
+    where "orders"."deleted_at" is null 
+    group by "orders"."id"
+    order by sort asc
+```
+
+## Elegance of package
 
 Lets look how first example from documentation now looks like. This code : 
 
@@ -298,7 +482,7 @@ $posts = Post::select('posts.*')
     ->orderBy('categories.name');
     
 if(request()->get('date')){
-    $posts->where('posts.date', $date)
+    $posts->where('date', $date)
 }
 
 $posts = $posts->get();

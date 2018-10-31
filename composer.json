@@ -1,14 +1,12 @@
 {
     "name": "fico7489/laravel-eloquent-join",
-    "description": "This package introduces the join capability for sorting and filtering on eloquent relations.",
+    "description": "This package introduces the join magic for eloquent models and relations.",
     "keywords": [
-        "laravel eloquent join",
+        "laravel join",
         "laravel eloquent join",
         "laravel sort join",
         "laravel where join",
-        "laravel join relation",
-        "laravel join relations",
-        "laravel"
+        "laravel join relation"
     ],
     "homepage": "https://github.com/fico7489/laravel-eloquent-join",
     "support": {
