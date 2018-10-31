@@ -94,6 +94,19 @@ abstract class BaseModel extends Model
 ...
 ```
 
+3.IMPORTANT
+
+For **MySql** make sure that **strict** configuration is set to **false**
+
+config/database.php
+
+```
+        'mysql' => [
+			...
+            'strict'    => false,
+			...
+```
+
 and that's it, you are ready to go.
 
 ## Options
