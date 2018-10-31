@@ -2,6 +2,7 @@
 
 namespace Fico7489\Laravel\EloquentJoin;
 
+use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidAggregateMethod;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelation;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationClause;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationGlobalScope;
@@ -79,15 +80,16 @@ class EloquentJoinBuilder extends Builder
         return $this->orWhere($column, $operator, $value);
     }
 
-    public function orderByJoin($column, $direction = 'asc', $aggregate = null)
+    public function orderByJoin($column, $direction = 'asc', $aggregateMethod = null)
     {
         $dotPos = strrpos($column, '.');
 
         $query = $this->baseBuilder ? $this->baseBuilder : $this;
         $column = $query->performJoin($column);
         if (false !== $dotPos) {
-            $aggregate = $aggregate ? $aggregate : $this->aggregateMethod;
-            $query->selectRaw($aggregate.'('.$column.') as sort');
+            $aggregateMethod = $aggregateMethod ? $aggregateMethod : $this->aggregateMethod;
+            $this->checkAggregateMethod($aggregateMethod);
+            $query->selectRaw($aggregateMethod.'('.$column.') as sort');
 
             return $this->orderByRaw('sort '.$direction);
         }
@@ -237,6 +239,19 @@ class EloquentJoinBuilder extends Builder
         }
     }
 
+    private function checkAggregateMethod($aggregateMethod)
+    {
+        if (!in_array($aggregateMethod, [
+            self::AGGREGATE_SUM,
+            self::AGGREGATE_AVG,
+            self::AGGREGATE_MAX,
+            self::AGGREGATE_MIN,
+            self::AGGREGATE_COUNT,
+        ])) {
+            throw new InvalidAggregateMethod();
+        }
+    }
+
     //getters and setters
     public function isUseTableAlias(): bool
     {
@@ -281,6 +296,7 @@ class EloquentJoinBuilder extends Builder
 
     public function setAggregateMethod(string $aggregateMethod)
     {
+        $this->checkAggregateMethod($aggregateMethod);
         $this->aggregateMethod = $aggregateMethod;
 
         return $this;
