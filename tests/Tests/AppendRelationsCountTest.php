@@ -11,7 +11,7 @@ class AppendRelationsCountTest extends TestCase
     {
         Order::setAppendRelationsCount(true)->joinRelations('seller.locationPrimary.locationAddressPrimary')->get();
 
-        $queryTest = 'select COUNT(sellers.id) as sellers_count, COUNT(locations.id) as sellers_locations_count, COUNT(location_addresses.id) as sellers_locations_location_addresses_count, "orders".*
+        $queryTest = 'select COUNT(sellers.id) as sellers_count, COUNT(locations.id) as sellers_locations_count, COUNT(location_addresses.id) as sellers_locations_location_addresses_count, orders.*
             from "orders"
             left join "sellers" on "sellers"."id" = "orders"."seller_id" 
             left join "locations" on "locations"."seller_id" = "sellers"."id" 

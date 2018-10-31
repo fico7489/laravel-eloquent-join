@@ -14,7 +14,7 @@ class OrWhereTest extends TestCase
             ->orWhereJoin('seller.id', '=', 2)
             ->get();
 
-        $queryTest = 'select "orders".* 
+        $queryTest = 'select orders.* 
             from "orders" 
             left join "sellers" on "sellers"."id" = "orders"."seller_id" 
             where ("sellers"."id" = ? or "sellers"."id" = ?) 

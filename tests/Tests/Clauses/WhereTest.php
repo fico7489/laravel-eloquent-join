@@ -13,7 +13,7 @@ class WhereTest extends TestCase
             ->whereJoin('seller.id', '=', 1)
             ->get();
 
-        $queryTest = 'select "orders".* 
+        $queryTest = 'select orders.* 
             from "orders" 
             left join "sellers" on "sellers"."id" = "orders"."seller_id" 
             where "sellers"."id" = ? 

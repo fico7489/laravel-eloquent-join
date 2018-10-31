@@ -11,7 +11,7 @@ class HasOneTest extends TestCase
     {
         Seller::joinRelations('location')->get();
 
-        $queryTest = 'select "sellers".* 
+        $queryTest = 'select sellers.* 
             from "sellers" 
             left join "locations" on "locations"."seller_id" = "sellers"."id" 
             and "locations"."is_primary" = ? 
@@ -26,7 +26,7 @@ class HasOneTest extends TestCase
     {
         Seller::joinRelations('location.city')->get();
 
-        $queryTest = 'select "sellers".* 
+        $queryTest = 'select sellers.* 
             from "sellers" left join "locations" on "locations"."seller_id" = "sellers"."id" 
             and "locations"."is_primary" = ?
             and "locations"."is_secondary" = ? 
@@ -42,7 +42,7 @@ class HasOneTest extends TestCase
     {
         Seller::joinRelations('location.integrations')->get();
 
-        $queryTest = 'select "sellers".* 
+        $queryTest = 'select sellers.* 
             from "sellers" 
             left join "locations" on "locations"."seller_id" = "sellers"."id" 
             and "locations"."is_primary" = ?

@@ -11,7 +11,7 @@ class HasManyTest extends TestCase
     {
         Seller::joinRelations('locations')->get();
 
-        $queryTest = 'select "sellers".* 
+        $queryTest = 'select sellers.* 
             from "sellers" 
             left join "locations" on "locations"."seller_id" = "sellers"."id" 
             and "locations"."deleted_at" is null 
@@ -24,7 +24,7 @@ class HasManyTest extends TestCase
     {
         Seller::joinRelations('locations.city')->get();
 
-        $queryTest = 'select "sellers".* 
+        $queryTest = 'select sellers.* 
             from "sellers" left join "locations" on "locations"."seller_id" = "sellers"."id" 
             and "locations"."deleted_at" is null 
             left join "cities" on "cities"."id" = "locations"."city_id" 
@@ -38,7 +38,7 @@ class HasManyTest extends TestCase
     {
         Seller::joinRelations('locations.integrations')->get();
 
-        $queryTest = 'select "sellers".* 
+        $queryTest = 'select sellers.* 
             from "sellers" 
             left join "locations" on "locations"."seller_id" = "sellers"."id" 
             and "locations"."deleted_at" is null 

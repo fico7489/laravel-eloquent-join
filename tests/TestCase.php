@@ -58,6 +58,18 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             'database' => ':memory:',
             'prefix'   => '',
         ]);
+
+        $app['config']->set('database.default', 'mysql');
+        $app['config']->set('database.connections.mysql', [
+            'driver'    => 'mysql',
+            'host'      => 'localhost',
+            'database'  => 'join',
+            'username'  => 'root',
+            'password'  => '',
+            'charset'   => 'utf8',
+            'collation' => 'utf8_unicode_ci',
+            'strict'    => true,
+        ]);
     }
 
     protected function getPackageProviders($app)

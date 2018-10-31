@@ -12,7 +12,7 @@ class JoinTypeTest extends TestCase
     {
         Seller::setLeftJoin(true)->whereJoin('city.name', '=', 'test')->get();
 
-        $queryTest = 'select "sellers".*
+        $queryTest = 'select sellers.*
             from "sellers"
             left join "cities"
             on "cities"."id" = "sellers"."city_id"
@@ -26,7 +26,7 @@ class JoinTypeTest extends TestCase
     {
         Seller::setLeftJoin(false)->whereJoin('city.name', '=', 'test')->get();
 
-        $queryTest = 'select "sellers".*
+        $queryTest = 'select sellers.*
             from "sellers"
             inner join "cities"
             on "cities"."id" = "sellers"."city_id"
@@ -40,7 +40,7 @@ class JoinTypeTest extends TestCase
     {
         Order::joinRelations('seller', true)->joinRelations('seller.city', false)->joinRelations('seller.city.state', true)->get();
 
-        $queryTest = 'select "orders".* 
+        $queryTest = 'select orders.* 
             from "orders" 
             left join "sellers" on "sellers"."id" = "orders"."seller_id" 
             inner join "cities" on "cities"."id" = "sellers"."city_id" 

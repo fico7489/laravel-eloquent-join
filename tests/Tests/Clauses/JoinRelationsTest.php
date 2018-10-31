@@ -12,7 +12,7 @@ class JoinRelationsTest extends TestCase
         Order::joinRelations('seller')
             ->get();
 
-        $queryTest = 'select "orders".* 
+        $queryTest = 'select orders.* 
             from "orders" 
             left join "sellers" on "sellers"."id" = "orders"."seller_id" 
             where "orders"."deleted_at" is null 

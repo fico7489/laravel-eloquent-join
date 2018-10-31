@@ -17,6 +17,8 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
     protected function loadMigrationsFrom($path)
     {
         \Artisan::call('migrate', ['--database' => 'testbench']);
+        //        \Artisan::call('migrate', ['--database' => 'mysql']);
+
         $migrator = $this->app->make('migrator');
         $migrator->run($path);
     }
