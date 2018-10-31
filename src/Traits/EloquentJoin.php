@@ -21,7 +21,7 @@ trait EloquentJoin
         }
 
         if (isset($this->leftJoin)) {
-            $newEloquentBuilder->setUseTableAlias($this->leftJoin);
+            $newEloquentBuilder->setLeftJoin($this->leftJoin);
         }
 
         if (isset($this->aggregateMethod)) {
