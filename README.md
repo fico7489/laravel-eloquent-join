@@ -71,7 +71,7 @@ With this package you will be available to perform where on the relationship wit
 | >= 5.5.0 | 4.* | yes | master
 | < 5.5.0 | - | no | -
 
-Package is also tested for SQLLite, MySql and PostgreSql
+Package is also tested for SQLite, MySql and PostgreSql
 
 ## Installation & setup
 
@@ -131,7 +131,7 @@ or on query :
     Order::setAggregateMethod(true)->get();
 ```
 
-##### **useTableAlias**
+#### **useTableAlias**
 
 Should we use an alias for joined tables (default = false)
 
@@ -152,7 +152,7 @@ select "sellers".*
 
 Alias is a randomly generated string.
 
-##### **appendRelationsCount**
+#### **appendRelationsCount**
 
 Should we automatically append relation count field to results  (default = false)
 
@@ -170,7 +170,7 @@ Each **relation** is glued with an underscore and at the end **_count** prefix i
     
 field would be __seller_locations_count__
 
-##### **leftJoin**
+#### **leftJoin**
 
 Should we use **inner join** or **left join** (default = true)
 
@@ -190,7 +190,7 @@ select "sellers".*
 	...
 ```
 
-##### **aggregateMethod**
+#### **aggregateMethod**
 
 Which aggregate method to use for ordering (default = 'MAX'). 
 
