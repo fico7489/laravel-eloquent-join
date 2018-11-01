@@ -302,7 +302,7 @@ Seller::where(function ($query) {
 
 ```
 Seller::whereJoin('title', '=', 'test')
-    ->whereJoin('city.title', '=', 'test')ž
+    ->whereJoin('city.title', '=', 'test')
     ->orderByJoin('city.title')
     ->get();
 ```
