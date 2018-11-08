@@ -2,6 +2,7 @@
 
 namespace Fico7489\Laravel\EloquentJoin;
 
+use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidAggregateMethod;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelation;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationClause;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationGlobalScope;
@@ -9,13 +10,33 @@ use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationWhere;
 use Illuminate\Database\Eloquent\Builder;
 use Fico7489\Laravel\EloquentJoin\Relations\BelongsToJoin;
 use Fico7489\Laravel\EloquentJoin\Relations\HasOneJoin;
+use Fico7489\Laravel\EloquentJoin\Relations\HasManyJoin;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class EloquentJoinBuilder extends Builder
 {
+    //constants
+    const AGGREGATE_SUM      = 'SUM';
+    const AGGREGATE_AVG      = 'AVG';
+    const AGGREGATE_MAX      = 'MAX';
+    const AGGREGATE_MIN      = 'MIN';
+    const AGGREGATE_COUNT    = 'COUNT';
+
     //use table alias for join (real table name or uniqid())
     private $useTableAlias = false;
+
+    //appendRelationsCount
+    private $appendRelationsCount = false;
+
+    //leftJoin
+    private $leftJoin = true;
+
+    //aggregate method
+    private $aggregateMethod = self::AGGREGATE_MAX;
+
+    //base builder
+    public $baseBuilder;
 
     //store if ->select(...) is already called on builder (we want only one groupBy())
     private $selected = false;
@@ -26,31 +47,74 @@ class EloquentJoinBuilder extends Builder
     //store clauses on relation for join
     public $relationClauses = [];
 
-    public function whereJoin($column, $operator = null, $value = null, $boolean = 'and')
+    public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
-        $column = $this->performJoin($column);
+        if ($column instanceof \Closure) {
+            $query = $this->model->newModelQuery();
+            $baseBuilderCurrent = $this->baseBuilder ? $this->baseBuilder : $this;
+            $query->baseBuilder = $baseBuilderCurrent;
+
+            $column($query);
+
+            $this->query->addNestedWhereQuery($query->getQuery(), $boolean);
+        } else {
+            $this->query->where(...func_get_args());
+        }
+
+        return $this;
+    }
+
+    public function whereJoin($column, $operator, $value, $boolean = 'and')
+    {
+        $query = $this->baseBuilder ? $this->baseBuilder : $this;
+        $column = $query->performJoin($column);
 
         return $this->where($column, $operator, $value, $boolean);
     }
 
-    public function orWhereJoin($column, $operator = null, $value = null)
+    public function orWhereJoin($column, $operator, $value)
     {
-        $column = $this->performJoin($column);
+        $query = $this->baseBuilder ? $this->baseBuilder : $this;
+        $column = $query->performJoin($column);
 
         return $this->orWhere($column, $operator, $value);
     }
 
-    public function orderByJoin($column, $direction = 'asc', $leftJoin = true)
+    public function orderByJoin($column, $direction = 'asc', $aggregateMethod = null)
     {
-        $column = $this->performJoin($column, $leftJoin);
+        $dotPos = strrpos($column, '.');
+
+        $query = $this->baseBuilder ? $this->baseBuilder : $this;
+        $column = $query->performJoin($column);
+        if (false !== $dotPos) {
+            $aggregateMethod = $aggregateMethod ? $aggregateMethod : $this->aggregateMethod;
+            $this->checkAggregateMethod($aggregateMethod);
+            $query->selectRaw($aggregateMethod.'('.$column.') as sort');
+
+            return $this->orderByRaw('sort '.$direction);
+        }
 
         return $this->orderBy($column, $direction);
     }
 
-    private function performJoin($relations, $leftJoin = true)
+    public function joinRelations($relations, $leftJoin = null)
     {
-        $relations = explode('.', $relations);
+        $leftJoin = null !== $leftJoin ? $leftJoin : $this->leftJoin;
 
+        $query = $this->baseBuilder ? $this->baseBuilder : $this;
+        $column = $query->performJoin($relations.'.FAKE_FIELD', $leftJoin);
+
+        return $this;
+    }
+
+    private function performJoin($relations, $leftJoin = null)
+    {
+        //detect join method
+        $leftJoin   = null !== $leftJoin ? $leftJoin : $this->leftJoin;
+        $joinMethod = $leftJoin ? 'leftJoin' : 'join';
+
+        //detect current model data
+        $relations = explode('.', $relations);
         $column    = end($relations);
         $baseModel = $this->getModel();
         $baseTable = $baseModel->getTable();
@@ -60,7 +124,6 @@ class EloquentJoinBuilder extends Builder
         $currentPrimaryKey = $baseModel->getKeyName();
 
         $relationsAccumulated = [];
-
         foreach ($relations as $relation) {
             if ($relation == $column) {
                 //last item in $relations argument is sort|where column
@@ -75,9 +138,13 @@ class EloquentJoinBuilder extends Builder
             $relatedTableAlias = $this->useTableAlias ? uniqid() : $relatedTable;
 
             $relationsAccumulated[]    = $relatedTableAlias;
-            $relationAccumulatedString = implode('.', $relationsAccumulated);
+            $relationAccumulatedString = implode('_', $relationsAccumulated);
 
-            $joinMethod = $leftJoin ? 'leftJoin' : 'join';
+            //relations count
+            if ($this->appendRelationsCount) {
+                $this->selectRaw('COUNT('.$relatedTable.'.'.$relatedPrimaryKey.') as '.$relationAccumulatedString.'_count');
+            }
+
             if (!in_array($relationAccumulatedString, $this->joinedTables)) {
                 $joinQuery = $relatedTable.($this->useTableAlias ? ' as '.$relatedTableAlias : '');
                 if ($relatedRelation instanceof BelongsToJoin) {
@@ -88,7 +155,7 @@ class EloquentJoinBuilder extends Builder
 
                         $this->joinQuery($join, $relatedRelation, $relatedTableAlias);
                     });
-                } elseif ($relatedRelation instanceof HasOneJoin) {
+                } elseif ($relatedRelation instanceof HasOneJoin  ||  $relatedRelation instanceof HasManyJoin) {
                     $relatedKey = $relatedRelation->getQualifiedForeignKeyName();
                     $relatedKey = last(explode('.', $relatedKey));
 
@@ -96,15 +163,6 @@ class EloquentJoinBuilder extends Builder
                         $join->on($relatedTableAlias.'.'.$relatedKey, '=', $currentTableAlias.'.'.$currentPrimaryKey);
 
                         $this->joinQuery($join, $relatedRelation, $relatedTableAlias);
-
-                        $join->whereRaw(
-                            $relatedTableAlias.'.'.$relatedPrimaryKey.' =  (
-                                SELECT '.$relatedPrimaryKey.'
-                                    FROM '.$relatedTableAlias.'
-                                    WHERE '.$relatedTableAlias.'.'.$relatedKey.' = '.$currentTableAlias.'.'.$currentPrimaryKey.'
-                                    LIMIT 1
-                                )
-                            ');
                     });
                 } else {
                     throw new InvalidRelation();
@@ -115,12 +173,13 @@ class EloquentJoinBuilder extends Builder
             $currentTableAlias = $relatedTableAlias;
             $currentPrimaryKey = $relatedPrimaryKey;
 
-            $this->joinedTables[] = implode('.', $relationsAccumulated);
+            $this->joinedTables[] = implode('_', $relationsAccumulated);
         }
 
         if (!$this->selected && count($relations) > 1) {
             $this->selected = true;
-            $this->select($baseTable.'.*');
+            $this->selectRaw($baseTable.'.*');
+            $this->groupBy($baseTable.'.id');
         }
 
         return $currentTableAlias.'.'.$column;
@@ -178,5 +237,68 @@ class EloquentJoinBuilder extends Builder
         } else {
             throw new InvalidRelationClause();
         }
+    }
+
+    private function checkAggregateMethod($aggregateMethod)
+    {
+        if (!in_array($aggregateMethod, [
+            self::AGGREGATE_SUM,
+            self::AGGREGATE_AVG,
+            self::AGGREGATE_MAX,
+            self::AGGREGATE_MIN,
+            self::AGGREGATE_COUNT,
+        ])) {
+            throw new InvalidAggregateMethod();
+        }
+    }
+
+    //getters and setters
+    public function isUseTableAlias(): bool
+    {
+        return $this->useTableAlias;
+    }
+
+    public function setUseTableAlias(bool $useTableAlias)
+    {
+        $this->useTableAlias = $useTableAlias;
+
+        return $this;
+    }
+
+    public function isLeftJoin(): bool
+    {
+        return $this->leftJoin;
+    }
+
+    public function setLeftJoin(bool $leftJoin)
+    {
+        $this->leftJoin = $leftJoin;
+
+        return $this;
+    }
+
+    public function isAppendRelationsCount(): bool
+    {
+        return $this->appendRelationsCount;
+    }
+
+    public function setAppendRelationsCount(bool $appendRelationsCount)
+    {
+        $this->appendRelationsCount = $appendRelationsCount;
+
+        return $this;
+    }
+
+    public function getAggregateMethod(): string
+    {
+        return $this->aggregateMethod;
+    }
+
+    public function setAggregateMethod(string $aggregateMethod)
+    {
+        $this->checkAggregateMethod($aggregateMethod);
+        $this->aggregateMethod = $aggregateMethod;
+
+        return $this;
     }
 }
