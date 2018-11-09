@@ -118,6 +118,7 @@ class EloquentJoinBuilder extends Builder
         $column    = end($relations);
         $baseModel = $this->getModel();
         $baseTable = $baseModel->getTable();
+        $basePrimaryKey = $baseModel->getKeyName();
 
         $currentModel      = $baseModel;
         $currentTableAlias = $baseTable;
@@ -179,7 +180,7 @@ class EloquentJoinBuilder extends Builder
         if (!$this->selected && count($relations) > 1) {
             $this->selected = true;
             $this->selectRaw($baseTable.'.*');
-            $this->groupBy($baseTable.'.'.$currentPrimaryKey);
+            $this->groupBy($baseTable.'.'.$basePrimaryKey);
         }
 
         return $currentTableAlias.'.'.$column;
