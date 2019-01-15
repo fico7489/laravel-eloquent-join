@@ -237,15 +237,16 @@ Options are : **SUM**, **AVG**, **MAX**, **MIN**, **COUNT**
 
 ### Allowed clauses on BelongsTo, HasOne and HasMany relations on which you can use join clauses on the query
 
-* Relations that you want to use for join queries can only have this clauses : **where**, **orWhere**, **withTrashed**, **onlyTrashed**, **withoutTrashed**. 
-* Clauses **where** and **orWhere** can only have this variations 
+* Relations that you want to use for join queries can only have these clauses : **where**, **orWhere**, **withTrashed**, **onlyTrashed**, **withoutTrashed**. 
+* Clauses **where** and **orWhere** can only have these variations 
 ** **->where($column, $operator, $value)** 
 ** **->where([$column => $value])**
-* closures are not allowed.
+* Closures are not allowed.
 * Other clauses like **whereHas**, **orderBy** etc. are not allowed.
-* You can add not allowed clauses on relations and use them in the normal eloquent way, but in that case, you can't use those relations for join queries.
+* You can add not allowed clauses on relations and use them in the normal eloquent way, but in these cases, you can't use those relations for join queries.
 
-Allowed relation
+Allowed relation:
+
 ```
 public function locationPrimary()
 {
@@ -255,7 +256,7 @@ public function locationPrimary()
         ->withTrashed();
 }
 ```
-Not allowed relation : 
+Not allowed relation: 
 
 ```
 public function locationPrimary()
@@ -274,12 +275,12 @@ public function locationPrimary()
 
 The reason why the second relation is not allowed is that this package should apply all those clauses on the join clause,  eloquent use all those clauses isolated with subqueries NOT on join clause and that is more simpler to do.
 
-You might get a picture that there are to many rules and restriction, but it is really not like that. 
-Don't worry, if you anyway create the query that is not allowed appropriate exception will be thrown and you will know what happened.
+You might get a picture that there are too many rules and restriction, but it is really not like that. 
+Don't worry, if you do create the query that is not allowed appropriate exception will be thrown and you will know what happened.
 
 ### Other 
 
-* If the model uses SoftDelete trait, where deleted_at != null will be automatically applied
+* If the model uses the SoftDelete trait, where deleted_at != null will be automatically applied
 * You can combine new clauses unlimited times
 * If you combine clauses more times on same relation package will join related table only once
 
