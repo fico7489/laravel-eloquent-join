@@ -161,8 +161,8 @@ class EloquentJoinBuilder extends Builder
                     $relatedKey = $relatedRelation->getQualifiedForeignKeyName();
                     $relatedKey = last(explode('.', $relatedKey));
 
-                    $this->$joinMethod($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $relatedKey, $currentTableAlias, $basePrimaryKey) {
-                        $join->on($relatedTableAlias.'.'.$relatedKey, '=', $currentTableAlias.'.'.$basePrimaryKey);
+                    $this->$joinMethod($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $relatedKey, $currentTableAlias, $currentPrimaryKey) {
+                        $join->on($relatedTableAlias.'.'.$relatedKey, '=', $currentTableAlias.'.'.$currentPrimaryKey);
 
                         $this->joinQuery($join, $relatedRelation, $relatedTableAlias);
                     });

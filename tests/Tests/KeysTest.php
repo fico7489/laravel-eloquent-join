@@ -33,4 +33,17 @@ class KeysTest extends TestCase
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }
+
+    public function testHasMany()
+    {
+        Seller::joinRelations('locations')
+            ->get();
+
+        $queryTest = 'select key_sellers.* 
+            from "key_sellers" 
+            left join "key_locations" on "key_locations"."key_seller_id" = "key_sellers"."key_id_seller" 
+            group by "key_sellers"."key_id_seller"';
+
+        $this->assertQueryMatches($queryTest, $this->fetchQuery());
+    }
 }
