@@ -148,9 +148,6 @@ class CreateDatabase extends Migration
             $table->unsignedInteger('key_seller_id')->nullable();
 
             $table->foreign('key_seller_id')->references('id')->on('sellers');
-
-            $table->timestamps();
-            $table->softDeletes();
         });
     }
 
