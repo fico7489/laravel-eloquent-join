@@ -134,8 +134,8 @@ class EloquentJoinBuilder extends Builder
             /** @var Relation $relatedRelation */
             $relatedRelation   = $currentModel->$relation();
             $relatedModel      = $relatedRelation->getRelated();
-            $relatedTable      = $relatedModel->getTable();
             $relatedPrimaryKey = $relatedModel->getKeyName();
+            $relatedTable      = $relatedModel->getTable();
             $relatedTableAlias = $this->useTableAlias ? uniqid() : $relatedTable;
 
             $relationsAccumulated[]    = $relatedTableAlias;
