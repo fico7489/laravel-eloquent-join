@@ -14,7 +14,7 @@ class Seller extends BaseModel
 
     public function location()
     {
-        return $this->hasOne(Location::class);
+        return $this->hasOne(Location::class, 'key_seller_id');
     }
 
     public function locations()

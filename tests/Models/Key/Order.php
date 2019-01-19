@@ -14,6 +14,6 @@ class Order extends BaseModel
 
     public function seller()
     {
-        return $this->belongsTo(Seller::class, 'key_seller_id');
+        return $this->belongsTo(Seller::class, 'key_seller_id', 'key_id_order');
     }
 }
