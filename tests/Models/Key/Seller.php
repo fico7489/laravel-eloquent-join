@@ -11,4 +11,14 @@ class Seller extends BaseModel
     protected $table = 'key_sellers';
 
     protected $fillable = ['title', 'deleted_at'];
+
+    public function location()
+    {
+        return $this->hasOne(Location::class);
+    }
+
+    public function locations()
+    {
+        return $this->hasMany(Location::class);
+    }
 }
