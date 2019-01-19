@@ -152,8 +152,10 @@ class EloquentJoinBuilder extends Builder
                     $relatedKey = $relatedRelation->getQualifiedForeignKey();
                     $relatedKey = last(explode('.', $relatedKey));
 
-                    $this->$joinMethod($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $relatedKey, $currentTableAlias, $relatedPrimaryKey) {
-                        $join->on($relatedTableAlias.'.'.$relatedPrimaryKey, '=', $currentTableAlias.'.'.$relatedKey);
+                    $ownerKey = $relatedRelation->getOwnerKey();
+
+                    $this->$joinMethod($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $relatedKey, $currentTableAlias, $ownerKey) {
+                        $join->on($relatedTableAlias.'.'.$ownerKey, '=', $currentTableAlias.'.'.$relatedKey);
 
                         $this->joinQuery($join, $relatedRelation, $relatedTableAlias);
                     });
@@ -161,8 +163,11 @@ class EloquentJoinBuilder extends Builder
                     $relatedKey = $relatedRelation->getQualifiedForeignKeyName();
                     $relatedKey = last(explode('.', $relatedKey));
 
-                    $this->$joinMethod($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $relatedKey, $currentTableAlias, $currentPrimaryKey) {
-                        $join->on($relatedTableAlias.'.'.$relatedKey, '=', $currentTableAlias.'.'.$currentPrimaryKey);
+                    $localKey = $relatedRelation->getQualifiedParentKeyName();
+                    $localKey = last(explode('.', $localKey));
+
+                    $this->$joinMethod($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $relatedKey, $currentTableAlias, $localKey) {
+                        $join->on($relatedTableAlias.'.'.$relatedKey, '=', $currentTableAlias.'.'.$localKey);
 
                         $this->joinQuery($join, $relatedRelation, $relatedTableAlias);
                     });

@@ -6,19 +6,14 @@ use Fico7489\Laravel\EloquentJoin\Tests\Models\BaseModel;
 
 class Seller extends BaseModel
 {
-    protected $primaryKey = 'key_id_seller';
+    protected $primaryKey = 'id';
 
     protected $table = 'key_sellers';
 
-    protected $fillable = ['title', 'deleted_at'];
+    protected $fillable = ['secondary_key', 'key_id_location', 'title', 'city_id', 'deleted_at'];
 
-    public function location()
+    public function orders()
     {
-        return $this->hasOne(Location::class, 'key_seller_id', 'key_id_seller');
-    }
-
-    public function locations()
-    {
-        return $this->hasMany(Location::class, 'key_seller_id', 'key_id_seller');
+        return $this->hasMany(Order::class, 'secondary_key_seller', 'secondary_key');
     }
 }

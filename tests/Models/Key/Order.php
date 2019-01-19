@@ -6,14 +6,14 @@ use Fico7489\Laravel\EloquentJoin\Tests\Models\BaseModel;
 
 class Order extends BaseModel
 {
-    protected $primaryKey = 'key_id_order';
+    protected $primaryKey = 'id';
 
     protected $table = 'key_orders';
 
-    protected $fillable = ['number', 'seller_id'];
+    protected $fillable = ['secondary_key_seller', 'number'];
 
     public function seller()
     {
-        return $this->belongsTo(Seller::class, 'key_seller_id', 'key_id_order');
+        return $this->belongsTo(Seller::class, 'secondary_key_seller', 'secondary_key');
     }
 }
