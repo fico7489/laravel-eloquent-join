@@ -149,11 +149,11 @@ class EloquentJoinBuilder extends Builder
             if (!in_array($relationAccumulatedString, $this->joinedTables)) {
                 $joinQuery = $relatedTable.($this->useTableAlias ? ' as '.$relatedTableAlias : '');
                 if ($relatedRelation instanceof BelongsToJoin) {
-                    $relatedKey = $relatedRelation->getForeignKey();
-                    $ownerKey = $relatedRelation->getOwnerKey();
+                    $relatedKey = $relatedRelation->getQualifiedForeignKey();
+                    $relatedKey = last(explode('.', $relatedKey));
 
-                    $this->$joinMethod($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $ownerKey, $currentTableAlias, $relatedKey) {
-                        $join->on($relatedTableAlias.'.'.$ownerKey, '=', $currentTableAlias.'.'.$relatedKey);
+                    $this->$joinMethod($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $relatedKey, $currentTableAlias, $relatedPrimaryKey) {
+                        $join->on($relatedTableAlias.'.'.$relatedPrimaryKey, '=', $currentTableAlias.'.'.$relatedKey);
 
                         $this->joinQuery($join, $relatedRelation, $relatedTableAlias);
                     });

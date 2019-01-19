@@ -125,6 +125,21 @@ class CreateDatabase extends Migration
             $table->timestamps();
             $table->softDeletes();
         });
+
+        //for key tests
+        Schema::create('key_orders', function (Blueprint $table) {
+            $table->increments('key_id_order');
+            $table->string('number')->nullable();
+            $table->unsignedInteger('key_seller_id')->nullable();
+
+            $table->foreign('key_seller_id')->references('id')->on('sellers');
+        });
+
+        Schema::create('key_sellers', function (Blueprint $table) {
+            $table->increments('key_id_seller');
+            $table->string('title')->nullable();
+            $table->unsignedInteger('city_id')->nullable();
+        });
     }
 
     /**
@@ -141,5 +156,10 @@ class CreateDatabase extends Migration
         Schema::drop('states');
         Schema::drop('location_addresses');
         Schema::drop('integrations');
+        Schema::drop('orders');
+
+        //for key tests
+        Schema::drop('key_orders');
+        Schema::drop('key_sellers');
     }
 }
