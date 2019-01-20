@@ -6,7 +6,7 @@ use Fico7489\Laravel\EloquentJoin\Tests\Models\BaseModel;
 
 class Location extends BaseModel
 {
-    protected $primaryKey = 'id_location_primar';
+    protected $primaryKey = 'id_location_primary';
 
     protected $table = 'key_locations';
 
