@@ -19,12 +19,12 @@ class Seller extends BaseModel
 
     public function locations()
     {
-        return $this->hasMany(Location::class, 'id_seller_foreign', 'id_seller_owner');
+        return $this->hasMany(Location::class, 'id_seller_foreign', 'id_seller_primary');
     }
 
     public function locationOwner()
     {
-        return $this->hasOne(Location::class, 'id_seller_foreign', 'id_seller_primary');
+        return $this->hasOne(Location::class, 'id_seller_foreign', 'id_seller_owner');
     }
 
     public function locationsOwner()

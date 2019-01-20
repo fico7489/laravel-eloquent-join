@@ -28,7 +28,7 @@ class KeysOwnerTest extends TestCase
 
         $queryTest = 'select key_sellers.* 
             from "key_sellers" 
-            left join "key_locations" on "key_locations"."id_seller_foreign" = "key_sellers"."id_seller_primary" 
+            left join "key_locations" on "key_locations"."id_seller_foreign" = "key_sellers"."id_seller_owner" 
             group by "key_sellers"."id_seller_primary"';
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
@@ -41,7 +41,7 @@ class KeysOwnerTest extends TestCase
 
         $queryTest = 'select key_sellers.* 
             from "key_sellers" 
-            left join "key_locations" on "key_locations"."id_seller_foreign" = "key_sellers"."id_seller_primary" 
+            left join "key_locations" on "key_locations"."id_seller_foreign" = "key_sellers"."id_seller_owner" 
             group by "key_sellers"."id_seller_primary"';
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
