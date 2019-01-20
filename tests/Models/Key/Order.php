@@ -14,11 +14,11 @@ class Order extends BaseModel
 
     public function seller()
     {
-        return $this->belongsTo(Seller::class, 'id_seller_foreign', 'id_order_primary');
+        return $this->belongsTo(Seller::class, 'id_seller_foreign', 'id_seller_primary');
     }
 
     public function sellerOwner()
     {
-        return $this->belongsTo(Seller::class, 'id_seller_foreign', 'id_order_owner');
+        return $this->belongsTo(Seller::class, 'id_seller_foreign', 'id_seller_owner');
     }
 }
