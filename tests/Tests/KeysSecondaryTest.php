@@ -21,14 +21,14 @@ class KeysSecondaryTest extends TestCase
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }
 
-    public function testHasOneSecondary()
+    /*public function testHasOneSecondary()
     {
         Seller::joinRelations('locationSecondary')
             ->get();
 
-        $queryTest = 'select key_sellers.* 
-            from "key_sellers" 
-            left join "key_locations" on "key_locations"."key_seller_id" = "key_sellers"."key_id_seller_secondary" 
+        $queryTest = 'select key_sellers.*
+            from "key_sellers"
+            left join "key_locations" on "key_locations"."key_seller_id" = "key_sellers"."key_id_seller_secondary"
             group by "key_sellers"."key_id_seller"';
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
@@ -39,11 +39,11 @@ class KeysSecondaryTest extends TestCase
         Seller::joinRelations('locationsSecondary')
             ->get();
 
-        $queryTest = 'select key_sellers.* 
-            from "key_sellers" 
-            left join "key_locations" on "key_locations"."key_seller_id" = "key_sellers"."key_id_seller_secondary" 
+        $queryTest = 'select key_sellers.*
+            from "key_sellers"
+            left join "key_locations" on "key_locations"."key_seller_id" = "key_sellers"."key_id_seller_secondary"
             group by "key_sellers"."key_id_seller"';
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
-    }
+    }*/
 }
