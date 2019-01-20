@@ -122,7 +122,6 @@ class EloquentJoinBuilder extends Builder
 
         $currentModel      = $baseModel;
         $currentTableAlias = $baseTable;
-        $currentPrimaryKey = $baseModel->getKeyName();
 
         $relationsAccumulated = [];
         foreach ($relations as $relation) {
@@ -164,7 +163,7 @@ class EloquentJoinBuilder extends Builder
                     $localKey = $relatedRelation->getQualifiedParentKeyName();
                     $localKey = last(explode('.', $localKey));
 
-                    $this->$joinMethod($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $relatedKey, $currentTableAlias, $currentPrimaryKey, $localKey) {
+                    $this->$joinMethod($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $relatedKey, $currentTableAlias, $localKey) {
                         $join->on($relatedTableAlias.'.'.$relatedKey, '=', $currentTableAlias.'.'.$localKey);
 
                         $this->joinQuery($join, $relatedRelation, $relatedTableAlias);
@@ -176,7 +175,6 @@ class EloquentJoinBuilder extends Builder
 
             $currentModel      = $relatedModel;
             $currentTableAlias = $relatedTableAlias;
-            $currentPrimaryKey = $relatedPrimaryKey;
 
             $this->joinedTables[] = implode('_', $relationsAccumulated);
         }
