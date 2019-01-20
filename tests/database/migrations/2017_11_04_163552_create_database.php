@@ -128,26 +128,30 @@ class CreateDatabase extends Migration
 
         //for key tests
         Schema::create('key_orders', function (Blueprint $table) {
-            $table->increments('key_id_order');
-            $table->string('number')->nullable();
-            $table->unsignedInteger('key_seller_id')->nullable();
+            $table->increments('id_order_primary');
+            $table->unsignedInteger('id_order_owner')->nullable();
 
-            $table->foreign('key_seller_id')->references('id')->on('sellers');
+            $table->string('number')->nullable();
+
+            $table->unsignedInteger('id_seller_foreign')->nullable();
+            $table->foreign('id_seller_foreign')->references('id')->on('sellers');
         });
 
         Schema::create('key_sellers', function (Blueprint $table) {
-            $table->increments('key_id_seller');
+            $table->increments('id_seller_primary');
+            $table->unsignedInteger('id_seller_owner')->nullable();
+
             $table->string('title')->nullable();
-            $table->unsignedInteger('city_id')->nullable();
         });
 
         Schema::create('key_locations', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('address')->nullable();
-            $table->boolean('is_primary')->default(0);
-            $table->unsignedInteger('key_seller_id')->nullable();
+            $table->increments('id_location_primary');
+            $table->unsignedInteger('id_location_owner')->nullable();
 
-            $table->foreign('key_seller_id')->references('id')->on('sellers');
+            $table->string('address')->nullable();
+
+            $table->unsignedInteger('id_seller_foreign')->nullable();
+            $table->foreign('id_seller_foreign')->references('id')->on('sellers');
         });
     }
 
