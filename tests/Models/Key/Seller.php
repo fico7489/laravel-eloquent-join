@@ -21,4 +21,14 @@ class Seller extends BaseModel
     {
         return $this->hasMany(Location::class, 'key_seller_id', 'key_id_seller');
     }
+
+    public function locationSeconday()
+    {
+        return $this->hasOne(Location::class, 'key_seller_id', 'key_id_seller_secondary');
+    }
+
+    public function locationsSeconday()
+    {
+        return $this->hasMany(Location::class, 'key_seller_id', 'key_id_seller_secondary');
+    }
 }

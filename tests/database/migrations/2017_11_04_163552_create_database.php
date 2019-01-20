@@ -129,6 +129,8 @@ class CreateDatabase extends Migration
         //for key tests
         Schema::create('key_orders', function (Blueprint $table) {
             $table->increments('key_id_order');
+            $table->unsignedInteger('key_id_order_secondary')->nullable();
+
             $table->string('number')->nullable();
             $table->unsignedInteger('key_seller_id')->nullable();
 
@@ -137,12 +139,16 @@ class CreateDatabase extends Migration
 
         Schema::create('key_sellers', function (Blueprint $table) {
             $table->increments('key_id_seller');
+            $table->unsignedInteger('key_id_seller_secondary')->nullable();
+
             $table->string('title')->nullable();
             $table->unsignedInteger('city_id')->nullable();
         });
 
         Schema::create('key_locations', function (Blueprint $table) {
-            $table->increments('id');
+            $table->increments('key_id_location');
+            $table->unsignedInteger('key_id_location_secondary')->nullable();
+
             $table->string('address')->nullable();
             $table->boolean('is_primary')->default(0);
             $table->unsignedInteger('key_seller_id')->nullable();

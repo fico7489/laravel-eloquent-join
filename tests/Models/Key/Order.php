@@ -16,4 +16,9 @@ class Order extends BaseModel
     {
         return $this->belongsTo(Seller::class, 'key_seller_id', 'key_id_order');
     }
+
+    public function sellerSecondary()
+    {
+        return $this->belongsTo(Seller::class, 'key_seller_id', 'key_id_order_secondary');
+    }
 }
