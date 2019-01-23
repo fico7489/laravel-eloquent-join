@@ -8,12 +8,12 @@ use Fico7489\Laravel\EloquentJoin\Tests\TestCase;
 
 class AggregateJoinTest extends TestCase
 {
-    private $queryTest = 'select orders.*, SUM(sellers.id) as sort 
+    private $queryTest = 'select orders.*, SUM(sellers.id) as sort0 
             from "orders" 
             left join "sellers" on "sellers"."id" = "orders"."seller_id" 
             where "orders"."deleted_at" is null 
             group by "orders"."id" 
-            order by sort asc';
+            order by sort0 asc';
 
     public function testAvg()
     {
