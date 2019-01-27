@@ -87,6 +87,7 @@ class EloquentJoinBuilder extends Builder
         $query = $this->baseBuilder ? $this->baseBuilder : $this;
         $column = $query->performJoin($column);
         if (false !== $dotPos) {
+            //order by related table field
             $aggregateMethod = $aggregateMethod ? $aggregateMethod : $this->aggregateMethod;
             $this->checkAggregateMethod($aggregateMethod);
 
@@ -97,6 +98,8 @@ class EloquentJoinBuilder extends Builder
 
             return $this->orderByRaw($sortAlias.' '.$direction);
         }
+
+        //order by base table field
 
         return $this->orderBy($column, $direction);
     }
