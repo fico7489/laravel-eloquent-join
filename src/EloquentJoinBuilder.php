@@ -89,7 +89,10 @@ class EloquentJoinBuilder extends Builder
         if (false !== $dotPos) {
             $aggregateMethod = $aggregateMethod ? $aggregateMethod : $this->aggregateMethod;
             $this->checkAggregateMethod($aggregateMethod);
-            $sortAlias = 'sort'.count($this->query->orders ?? []);
+
+            $sortsCount = count($this->query->orders ?? []);
+            $sortAlias = 'sort'.(0 == $sortsCount ? '' : ($sortsCount + 1));
+
             $query->selectRaw($aggregateMethod.'('.$column.') as '.$sortAlias);
 
             return $this->orderByRaw($sortAlias.' '.$direction);
