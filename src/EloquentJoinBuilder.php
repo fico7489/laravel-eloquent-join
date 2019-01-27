@@ -47,6 +47,7 @@ class EloquentJoinBuilder extends Builder
     //store clauses on relation for join
     public $relationClauses = [];
 
+    //query methods
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
         if ($column instanceof \Closure) {
@@ -130,6 +131,7 @@ class EloquentJoinBuilder extends Builder
         return $this;
     }
 
+    //helpers methods
     private function performJoin($relations, $leftJoin = null)
     {
         //detect join method
