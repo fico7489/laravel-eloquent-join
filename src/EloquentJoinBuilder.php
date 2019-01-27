@@ -80,6 +80,14 @@ class EloquentJoinBuilder extends Builder
         return $this->orWhere($column, $operator, $value);
     }
 
+    public function whereInJoin($column, $values, $boolean = 'and', $not = false)
+    {
+        $query = $this->baseBuilder ? $this->baseBuilder : $this;
+        $column = $query->performJoin($column);
+
+        return $this->whereIn($column, $values, $boolean, $not);
+    }
+
     public function orderByJoin($column, $direction = 'asc', $aggregateMethod = null)
     {
         $dotPos = strrpos($column, '.');
