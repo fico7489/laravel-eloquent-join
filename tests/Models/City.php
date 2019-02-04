@@ -22,4 +22,14 @@ class City extends BaseModel
         return $this->hasOne(ZipCode::class)
             ->where('is_primary', '=', 1);
     }
+
+    public function sellers()
+    {
+        return $this->belongsToMany(Seller::class, 'locations', 'seller_id', 'city_id');
+    }
+
+    public function zipCodes()
+    {
+        return $this->hasMany(ZipCode::class);
+    }
 }
