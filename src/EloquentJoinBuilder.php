@@ -153,7 +153,7 @@ class EloquentJoinBuilder extends Builder
             }
 
             if (!in_array($relationAccumulatedString, $this->joinedTables)) {
-                $joinQuery = $relatedTableAlias.($this->useTableAlias ? ' as '.$relatedTableAlias : '');
+                $joinQuery = $relatedTable.($this->useTableAlias ? ' as '.$relatedTableAlias : '');
                 if ($relatedRelation instanceof BelongsToJoin) {
                     $relatedKey = $relatedRelation->getQualifiedForeignKey();
                     $relatedKey = last(explode('.', $relatedKey));
