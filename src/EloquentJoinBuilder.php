@@ -48,6 +48,7 @@ class EloquentJoinBuilder extends Builder
     //store clauses on relation for join
     public $relationClauses = [];
 
+    //query methods
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
         if ($column instanceof \Closure) {
@@ -79,6 +80,38 @@ class EloquentJoinBuilder extends Builder
         $column = $query->performJoin($column);
 
         return $this->orWhere($column, $operator, $value);
+    }
+
+    public function whereInJoin($column, $values, $boolean = 'and', $not = false)
+    {
+        $query = $this->baseBuilder ? $this->baseBuilder : $this;
+        $column = $query->performJoin($column);
+
+        return $this->whereIn($column, $values, $boolean, $not);
+    }
+
+    public function whereNotInJoin($column, $values, $boolean = 'and')
+    {
+        $query = $this->baseBuilder ? $this->baseBuilder : $this;
+        $column = $query->performJoin($column);
+
+        return $this->whereNotIn($column, $values, $boolean);
+    }
+
+    public function orWhereInJoin($column, $values)
+    {
+        $query = $this->baseBuilder ? $this->baseBuilder : $this;
+        $column = $query->performJoin($column);
+
+        return $this->whereIn($column, $values, 'or');
+    }
+
+    public function orWhereNotInJoin($column, $values, $boolean = 'and')
+    {
+        $query = $this->baseBuilder ? $this->baseBuilder : $this;
+        $column = $query->performJoin($column);
+
+        return $this->whereIn($column, $values, $boolean, true);
     }
 
     public function orderByJoin($column, $direction = 'asc', $aggregateMethod = null)
@@ -115,6 +148,7 @@ class EloquentJoinBuilder extends Builder
         return $this;
     }
 
+    //helpers methods
     private function performJoin($relations, $leftJoin = null)
     {
         //detect join method
