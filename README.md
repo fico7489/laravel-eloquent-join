@@ -240,15 +240,15 @@ Options are : **SUM**, **AVG**, **MAX**, **MIN**, **COUNT**
 
 * arguments are the same as in default eloquent **whereIn()**
 
-**whereNotInJoin($column, $operator, $value)**
+**whereNotInJoin($column, $values, $boolean = 'and')**
 
 * arguments are the same as in default eloquent **whereNotIn()**
 
-**orWhereInJoin($column, $operator, $value)**
+**orWhereInJoin($column, $values)**
 
 * arguments are the same as in default eloquent **orWhereIn()**
 
-**orWhereNotInJoin($column, $operator, $value)**
+**orWhereNotInJoin($column, $values, $boolean = 'and')**
 
 * arguments are the same as in default eloquent **orWhereNotIn()**
 
