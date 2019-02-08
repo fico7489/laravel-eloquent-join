@@ -242,15 +242,15 @@ Options are : **SUM**, **AVG**, **MAX**, **MIN**, **COUNT**
 
 **whereNotInJoin($column, $operator, $value)**
 
-* **whereNotIn()**
+* arguments are the same as in default eloquent **whereNotIn()**
 
 **orWhereInJoin($column, $operator, $value)**
 
-*  **orWhereIn()**
+* arguments are the same as in default eloquent **orWhereIn()**
 
 **orWhereNotInJoin($column, $operator, $value)**
 
-* **orWhereNotIn()**
+* arguments are the same as in default eloquent **orWhereNotIn()**
 
 
 ### Allowed clauses on BelongsTo, HasOne and HasMany relations on which you can use join clauses on the query
