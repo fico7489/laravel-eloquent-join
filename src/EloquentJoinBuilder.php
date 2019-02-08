@@ -13,6 +13,7 @@ use Fico7489\Laravel\EloquentJoin\Relations\HasOneJoin;
 use Fico7489\Laravel\EloquentJoin\Relations\HasManyJoin;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Database\Query\JoinClause;
 
 class EloquentJoinBuilder extends Builder
 {
@@ -219,7 +220,7 @@ class EloquentJoinBuilder extends Builder
         }
     }
 
-    private function applyClauseOnRelation($join, $method, $params, $relatedTableAlias)
+    private function applyClauseOnRelation(JoinClause $join, string $method, array $params, string $relatedTableAlias)
     {
         if (in_array($method, ['where', 'orWhere'])) {
             try {
