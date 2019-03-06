@@ -17,8 +17,9 @@ class OrWhereNotInTest extends TestCase
         $queryTest = 'select orders.* 
             from "orders" 
             left join "sellers" on "sellers"."id" = "orders"."seller_id" 
-            where "sellers"."id" in (?, ?) 
-            and "sellers"."id" not in (?, ?)
+            where ("sellers"."id" in (?, ?) 
+                or 
+                "sellers"."id" not in (?, ?))
             and "orders"."deleted_at" is null 
             group by "orders"."id"';
 

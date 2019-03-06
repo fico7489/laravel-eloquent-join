@@ -248,7 +248,7 @@ Options are : **SUM**, **AVG**, **MAX**, **MIN**, **COUNT**
 
 * arguments are the same as in default eloquent **orWhereIn()**
 
-**orWhereNotInJoin($column, $values, $boolean = 'and')**
+**orWhereNotInJoin($column, $values)**
 
 * arguments are the same as in default eloquent **orWhereNotIn()**
 
