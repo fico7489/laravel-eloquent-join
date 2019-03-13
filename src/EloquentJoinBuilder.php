@@ -188,7 +188,6 @@ class EloquentJoinBuilder extends Builder
                 $this->selectRaw('COUNT('.$relatedTableAlias.'.'.$relatedPrimaryKey.') as '.$relationAccumulatedString.'_count');
             }
 
-
             if (!in_array($relationAccumulatedString, $this->joinedTables)) {
                 $joinQuery = $relatedTable.($this->useTableAlias ? ' as '.$relatedTableAlias : '');
                 if ($relatedRelation instanceof BelongsToJoin) {
