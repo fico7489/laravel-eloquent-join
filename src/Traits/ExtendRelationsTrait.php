@@ -5,6 +5,7 @@ namespace Fico7489\Laravel\EloquentJoin\Traits;
 use Fico7489\Laravel\EloquentJoin\Relations\BelongsToJoin;
 use Fico7489\Laravel\EloquentJoin\Relations\HasManyJoin;
 use Fico7489\Laravel\EloquentJoin\Relations\HasOneJoin;
+use Fico7489\Laravel\EloquentJoin\Relations\MorphOneJoin;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -23,5 +24,10 @@ trait ExtendRelationsTrait
     protected function newHasMany(Builder $query, Model $parent, $foreignKey, $localKey)
     {
         return new HasManyJoin($query, $parent, $foreignKey, $localKey);
+    }
+
+    protected function newMorphOne(Builder $query, Model $parent, $type, $id, $localKey)
+    {
+        return new MorphOneJoin($query, $parent, $type, $id, $localKey);
     }
 }

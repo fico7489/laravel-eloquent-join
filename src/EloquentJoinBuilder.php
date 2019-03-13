@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Fico7489\Laravel\EloquentJoin\Relations\BelongsToJoin;
 use Fico7489\Laravel\EloquentJoin\Relations\HasOneJoin;
 use Fico7489\Laravel\EloquentJoin\Relations\HasManyJoin;
+use Fico7489\Laravel\EloquentJoin\Relations\MorphOneJoin;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Query\JoinClause;
@@ -187,6 +188,7 @@ class EloquentJoinBuilder extends Builder
                 $this->selectRaw('COUNT('.$relatedTableAlias.'.'.$relatedPrimaryKey.') as '.$relationAccumulatedString.'_count');
             }
 
+
             if (!in_array($relationAccumulatedString, $this->joinedTables)) {
                 $joinQuery = $relatedTable.($this->useTableAlias ? ' as '.$relatedTableAlias : '');
                 if ($relatedRelation instanceof BelongsToJoin) {
@@ -199,14 +201,22 @@ class EloquentJoinBuilder extends Builder
 
                         $this->joinQuery($join, $relatedRelation, $relatedTableAlias);
                     });
-                } elseif ($relatedRelation instanceof HasOneJoin  ||  $relatedRelation instanceof HasManyJoin) {
+                } elseif ($relatedRelation instanceof HasOneJoin || $relatedRelation instanceof HasManyJoin || $relatedRelation instanceof MorphOneJoin) {
                     $relatedKey = $relatedRelation->getQualifiedForeignKeyName();
                     $relatedKey = last(explode('.', $relatedKey));
                     $localKey = $relatedRelation->getQualifiedParentKeyName();
                     $localKey = last(explode('.', $localKey));
 
                     $this->$joinMethod($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $relatedKey, $currentTableAlias, $localKey) {
-                        $join->on($relatedTableAlias.'.'.$relatedKey, '=', $currentTableAlias.'.'.$localKey);
+                        $join = $join->on($relatedTableAlias.'.'.$relatedKey, '=', $currentTableAlias.'.'.$localKey);
+
+                        if ($relatedRelation instanceof MorphOneJoin) {
+                            $join->where(
+                                $relatedTableAlias.'.'.$relatedRelation->getMorphType(),
+                                '=',
+                                $relatedRelation->getParent()->getActualClassNameForMorph(get_class($relatedRelation->getParent()))
+                            );
+                        }
 
                         $this->joinQuery($join, $relatedRelation, $relatedTableAlias);
                     });

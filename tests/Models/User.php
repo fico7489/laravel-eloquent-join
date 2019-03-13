@@ -11,4 +11,12 @@ class User extends BaseModel
     protected $table = 'users';
 
     protected $fillable = ['name'];
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne
+     */
+    public function tags()
+    {
+    	return $this->morphOne(Tag::class, 'taggable');
+    }
 }
