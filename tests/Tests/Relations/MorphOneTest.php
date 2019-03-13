@@ -11,7 +11,7 @@ class MorphOneTest extends TestCase
     {
         $sql = User::joinRelations('tags')->toSql();
 
-        $queryTest = sprintf('select users.* from `users` left join `tags` on `tags`.`taggable_id` = `users`.`id` and `tags`.`taggable_type` = ? where `users`.`deleted_at` is null group by `users`.`id`', User::class);
+        $queryTest = 'select users.* from `users` left join `tags` on `tags`.`taggable_id` = `users`.`id` and `tags`.`taggable_type` = ? where `users`.`deleted_at` is null group by `users`.`id`';
 
         $this->assertEquals($queryTest, $sql);
     }

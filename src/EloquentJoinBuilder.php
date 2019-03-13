@@ -208,7 +208,7 @@ class EloquentJoinBuilder extends Builder
                     $localKey = last(explode('.', $localKey));
 
                     $this->$joinMethod($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $relatedKey, $currentTableAlias, $localKey) {
-                        $join = $join->on($relatedTableAlias.'.'.$relatedKey, '=', $currentTableAlias.'.'.$localKey);
+                        $join->on($relatedTableAlias.'.'.$relatedKey, '=', $currentTableAlias.'.'.$localKey);
 
                         if ($relatedRelation instanceof MorphOneJoin) {
                             $join->where(
