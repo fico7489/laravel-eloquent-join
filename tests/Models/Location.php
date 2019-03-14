@@ -32,4 +32,12 @@ class Location extends BaseModel
     {
         return $this->hasMany(Integration::class);
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne
+     */
+    public function tags()
+    {
+        return $this->morphMany(Tag::class, 'taggable');
+    }
 }

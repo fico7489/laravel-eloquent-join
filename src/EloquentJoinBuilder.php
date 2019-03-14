@@ -12,6 +12,7 @@ use Fico7489\Laravel\EloquentJoin\Relations\BelongsToJoin;
 use Fico7489\Laravel\EloquentJoin\Relations\HasOneJoin;
 use Fico7489\Laravel\EloquentJoin\Relations\HasManyJoin;
 use Fico7489\Laravel\EloquentJoin\Relations\MorphOneJoin;
+use Fico7489\Laravel\EloquentJoin\Relations\MorphManyJoin;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Query\JoinClause;
@@ -200,7 +201,12 @@ class EloquentJoinBuilder extends Builder
 
                         $this->joinQuery($join, $relatedRelation, $relatedTableAlias);
                     });
-                } elseif ($relatedRelation instanceof HasOneJoin || $relatedRelation instanceof HasManyJoin || $relatedRelation instanceof MorphOneJoin) {
+                } elseif (
+                    $relatedRelation instanceof HasOneJoin || 
+                    $relatedRelation instanceof HasManyJoin || 
+                    $relatedRelation instanceof MorphOneJoin || 
+                    $relatedRelation instanceof MorphManyJoin
+                ) {
                     $relatedKey = $relatedRelation->getQualifiedForeignKeyName();
                     $relatedKey = last(explode('.', $relatedKey));
                     $localKey = $relatedRelation->getQualifiedParentKeyName();
@@ -209,7 +215,7 @@ class EloquentJoinBuilder extends Builder
                     $this->$joinMethod($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $relatedKey, $currentTableAlias, $localKey) {
                         $join->on($relatedTableAlias.'.'.$relatedKey, '=', $currentTableAlias.'.'.$localKey);
 
-                        if ($relatedRelation instanceof MorphOneJoin) {
+                        if ($relatedRelation instanceof MorphOneJoin || $relatedRelation instanceof MorphManyJoin) {
                             $join->where(
                                 $relatedTableAlias.'.'.$relatedRelation->getMorphType(),
                                 '=',
