@@ -242,12 +242,16 @@ class EloquentJoinBuilder extends Builder
         /** @var Builder $relationQuery */
         $relationBuilder = $relation->getQuery();   
 
-        $wheres = array_slice($relationBuilder->getQuery()->wheres, 2);
+        $wheres = array_slice($relationBuilder->getQuery()->wheres, $relation instanceof BelongsTo ? 1 : 2);
 
         foreach ($wheres as $clause) {
 
             $method = $clause['type'] === 'Basic' ? 'where' : 'where'.$clause['type'];
             unset ($clause['type']);
+
+            if (!isset($clause['column'])) {
+                throw new InvalidRelationWhere();
+            }
 
             // Remove first alias table name
             $partsColumn = explode(".", $clause['column']);
