@@ -242,59 +242,54 @@ class EloquentJoinBuilder extends Builder
         /** @var Builder $relationQuery */
         $relationBuilder = $relation->getQuery();   
 
+        $wheres = array_slice($relationBuilder->getQuery()->wheres, 2);
 
-        //apply clauses on relation
-        if (isset($relation->getQuery()->getQuery()->wheres)) {
-            foreach ($relation->getQuery()->getQuery()->wheres as $clause) {
+        foreach ($wheres as $clause) {
 
-                $method = $clause['type'] === 'Basic' ? 'where' : 'where'.$clause['type'];
-                unset ($clause['type']);
+            $method = $clause['type'] === 'Basic' ? 'where' : 'where'.$clause['type'];
+            unset ($clause['type']);
 
-                // Remove first alias table name
-                $partsColumn = explode(".", $clause['column']);
+            // Remove first alias table name
+            $partsColumn = explode(".", $clause['column']);
 
-                if (count($partsColumn) > 1) {
-                    $clause['column'] = implode(".", array_slice($partsColumn, 1));
-                }
-
-
-                
-                if (!in_array($method, ['whereNull', 'whereNotNull'])) {
-                    $this->applyClauseOnRelation($join, $method, array_values($clause), $relatedTableAlias);
-                }
+            if (count($partsColumn) > 1) {
+                $clause['column'] = implode(".", array_slice($partsColumn, 1));
             }
+
+            $this->applyWheresOnRelation($join, $method, array_values($clause), $relatedTableAlias);
         }
 
         //apply global SoftDeletingScope
         foreach ($relationBuilder->scopes as $scope) {
             if ($scope instanceof SoftDeletingScope) {
-                $this->applyClauseOnRelation($join, 'withoutTrashed', [], $relatedTableAlias);
+                $this->applyScopeOnRelation($join, 'withoutTrashed', [], $relatedTableAlias);
             } else {
                 throw new InvalidRelationGlobalScope();
             }
         }
     }
 
-    private function applyClauseOnRelation(JoinClause $join, string $method, array $params, string $relatedTableAlias)
-    {
-        if (in_array($method, ['where', 'orWhere'])) {
-
-            try {
-                if (is_array($params[0])) {
-                    foreach ($params[0] as $k => $param) {
-                        $params[0][$relatedTableAlias.'.'.$k] = $param;
-                        unset($params[0][$k]);
-                    }
-                } else {
-                    $params[0] = $relatedTableAlias.'.'.$params[0];
+    private function applyWheresOnRelation(JoinClause $join, string $method, array $params, string $relatedTableAlias)
+    {        
+        try {
+            if (is_array($params[0])) {
+                foreach ($params[0] as $k => $param) {
+                    $params[0][$relatedTableAlias.'.'.$k] = $param;
+                    unset($params[0][$k]);
                 }
-
-
-                call_user_func_array([$join, $method], $params);
-            } catch (\Exception $e) {
-                throw new InvalidRelationWhere();
+            } else {
+                $params[0] = $relatedTableAlias.'.'.$params[0];
             }
-        } elseif (in_array($method, ['withoutTrashed', 'onlyTrashed', 'withTrashed'])) {
+
+            call_user_func_array([$join, $method], $params);
+        } catch (\Exception $e) {
+            throw new InvalidRelationWhere();
+        }
+    }
+
+    private function applyScopeOnRelation(JoinClause $join, string $method, array $params, string $relatedTableAlias)
+    {
+        if (in_array($method, ['withoutTrashed', 'onlyTrashed', 'withTrashed'])) {
             if ('withTrashed' == $method) {
                 //do nothing
             } elseif ('withoutTrashed' == $method) {
