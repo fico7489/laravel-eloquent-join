@@ -8,11 +8,11 @@ use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationClause;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationGlobalScope;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationWhere;
 use Illuminate\Database\Eloquent\Builder;
-use Fico7489\Laravel\EloquentJoin\Relations\BelongsToJoin;
-use Fico7489\Laravel\EloquentJoin\Relations\HasOneJoin;
-use Fico7489\Laravel\EloquentJoin\Relations\HasManyJoin;
-use Fico7489\Laravel\EloquentJoin\Relations\MorphOneJoin;
-use Fico7489\Laravel\EloquentJoin\Relations\MorphManyJoin;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Query\JoinClause;
@@ -191,7 +191,7 @@ class EloquentJoinBuilder extends Builder
 
             if (!in_array($relationAccumulatedString, $this->joinedTables)) {
                 $joinQuery = $relatedTable.($this->useTableAlias ? ' as '.$relatedTableAlias : '');
-                if ($relatedRelation instanceof BelongsToJoin) {
+                if ($relatedRelation instanceof BelongsTo) {
                     $relatedKey = ((float) \App::version() < 5.8) ? $relatedRelation->getQualifiedForeignKey() : $relatedRelation->getQualifiedForeignKeyName();
                     $relatedKey = last(explode('.', $relatedKey));
                     $ownerKey = ((float) \App::version() < 5.8) ? $relatedRelation->getOwnerKey() : $relatedRelation->getOwnerKeyName();
@@ -202,10 +202,10 @@ class EloquentJoinBuilder extends Builder
                         $this->joinQuery($join, $relatedRelation, $relatedTableAlias);
                     });
                 } elseif (
-                    $relatedRelation instanceof HasOneJoin || 
-                    $relatedRelation instanceof HasManyJoin || 
-                    $relatedRelation instanceof MorphOneJoin || 
-                    $relatedRelation instanceof MorphManyJoin
+                    $relatedRelation instanceof HasOne || 
+                    $relatedRelation instanceof HasMany || 
+                    $relatedRelation instanceof MorphOne || 
+                    $relatedRelation instanceof MorphMany
                 ) {
                     $relatedKey = $relatedRelation->getQualifiedForeignKeyName();
                     $relatedKey = last(explode('.', $relatedKey));
@@ -215,7 +215,7 @@ class EloquentJoinBuilder extends Builder
                     $this->$joinMethod($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $relatedKey, $currentTableAlias, $localKey) {
                         $join->on($relatedTableAlias.'.'.$relatedKey, '=', $currentTableAlias.'.'.$localKey);
 
-                        if ($relatedRelation instanceof MorphOneJoin || $relatedRelation instanceof MorphManyJoin) {
+                        if ($relatedRelation instanceof MorphOne || $relatedRelation instanceof MorphMany) {
                             $join->where(
                                 $relatedTableAlias.'.'.$relatedRelation->getMorphType(),
                                 '=',
