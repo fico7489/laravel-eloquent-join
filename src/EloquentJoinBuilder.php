@@ -25,6 +25,18 @@ class EloquentJoinBuilder extends Builder
     const AGGREGATE_MAX      = 'MAX';
     const AGGREGATE_MIN      = 'MIN';
     const AGGREGATE_COUNT    = 'COUNT';
+    const DISABLED_COMPONENTS = [
+        'aggregate',
+        'columns',
+        'joins',
+        'groups',
+        'havings',
+        'orders',
+        'limit',
+        'offset',
+        'unions',
+        'lock'
+    ];
 
     //use table alias for join (real table name or uniqid())
     private $useTableAlias = false;
@@ -242,6 +254,12 @@ class EloquentJoinBuilder extends Builder
         /** @var Builder $relationQuery */
         $relationBuilder = $relation->getQuery();   
 
+        foreach (static::DISABLED_COMPONENTS as $component) {
+            if (!empty($relationBuilder->getQuery()->$component)) {
+                throw new InvalidRelationClause();
+            }
+        }
+
         $wheres = array_slice($relationBuilder->getQuery()->wheres, $relation instanceof BelongsTo ? 1 : 2);
 
         foreach ($wheres as $clause) {
@@ -293,16 +311,10 @@ class EloquentJoinBuilder extends Builder
 
     private function applyScopeOnRelation(JoinClause $join, string $method, array $params, string $relatedTableAlias)
     {
-        if (in_array($method, ['withoutTrashed', 'onlyTrashed', 'withTrashed'])) {
-            if ('withTrashed' == $method) {
-                //do nothing
-            } elseif ('withoutTrashed' == $method) {
-                call_user_func_array([$join, 'where'], [$relatedTableAlias.'.deleted_at', '=', null]);
-            } elseif ('onlyTrashed' == $method) {
-                call_user_func_array([$join, 'where'], [$relatedTableAlias.'.deleted_at', '<>', null]);
-            }
-        } else {
-            throw new InvalidRelationClause();
+        if ('withoutTrashed' == $method) {
+            call_user_func_array([$join, 'where'], [$relatedTableAlias.'.deleted_at', '=', null]);
+        } elseif ('onlyTrashed' == $method) {
+            call_user_func_array([$join, 'where'], [$relatedTableAlias.'.deleted_at', '<>', null]);
         }
     }
 
