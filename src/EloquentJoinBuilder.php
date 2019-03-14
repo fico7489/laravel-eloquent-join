@@ -248,13 +248,26 @@ class EloquentJoinBuilder extends Builder
     private function joinQuery($join, $relation, $relatedTableAlias)
     {
         /** @var Builder $relationQuery */
-        $relationBuilder = $relation->getQuery();
+        $relationBuilder = $relation->getQuery();   
+
 
         //apply clauses on relation
-        if (isset($relationBuilder->relationClauses)) {
-            foreach ($relationBuilder->relationClauses as $clause) {
-                foreach ($clause as $method => $params) {
-                    $this->applyClauseOnRelation($join, $method, $params, $relatedTableAlias);
+        if (isset($relation->getQuery()->getQuery()->wheres)) {
+            foreach ($relation->getQuery()->getQuery()->wheres as $clause) {
+
+                $method = $clause['type'] === 'Basic' ? 'where' : 'where'.$clause['type'];
+                unset ($clause['type']);
+
+                // Remove first alias table name
+                $partsColumn = explode(".", $clause['column']);
+
+                if (count($partsColumn) > 1) {
+                    $clause['column'] = implode(".", array_slice($partsColumn, 1));
+                }
+
+
+                if (!in_array($method, ['whereNull', 'whereNotNull'])) {
+                    $this->applyClauseOnRelation($join, $method, array_values($clause), $relatedTableAlias);
                 }
             }
         }
@@ -272,6 +285,7 @@ class EloquentJoinBuilder extends Builder
     private function applyClauseOnRelation(JoinClause $join, string $method, array $params, string $relatedTableAlias)
     {
         if (in_array($method, ['where', 'orWhere'])) {
+
             try {
                 if (is_array($params[0])) {
                     foreach ($params[0] as $k => $param) {
@@ -281,6 +295,7 @@ class EloquentJoinBuilder extends Builder
                 } else {
                     $params[0] = $relatedTableAlias.'.'.$params[0];
                 }
+
 
                 call_user_func_array([$join, $method], $params);
             } catch (\Exception $e) {
