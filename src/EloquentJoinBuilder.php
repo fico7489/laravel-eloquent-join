@@ -215,14 +215,6 @@ class EloquentJoinBuilder extends Builder
                     $this->$joinMethod($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $relatedKey, $currentTableAlias, $localKey) {
                         $join->on($relatedTableAlias.'.'.$relatedKey, '=', $currentTableAlias.'.'.$localKey);
 
-                        if ($relatedRelation instanceof MorphOne || $relatedRelation instanceof MorphMany) {
-                            $join->where(
-                                $relatedTableAlias.'.'.$relatedRelation->getMorphType(),
-                                '=',
-                                $relatedRelation->getParent()->getActualClassNameForMorph(get_class($relatedRelation->getParent()))
-                            );
-                        }
-
                         $this->joinQuery($join, $relatedRelation, $relatedTableAlias);
                     });
                 } else {
@@ -266,6 +258,7 @@ class EloquentJoinBuilder extends Builder
                 }
 
 
+                
                 if (!in_array($method, ['whereNull', 'whereNotNull'])) {
                     $this->applyClauseOnRelation($join, $method, array_values($clause), $relatedTableAlias);
                 }
