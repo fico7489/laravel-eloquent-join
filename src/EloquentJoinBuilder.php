@@ -15,7 +15,6 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\JoinClause;
-use Illuminate\Support\Facades\DB;
 use Closure;
 
 class EloquentJoinBuilder extends Builder
@@ -66,7 +65,7 @@ class EloquentJoinBuilder extends Builder
     //query methods
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
-        if ($column instanceof \Closure) {
+        if ($column instanceof Closure) {
             $query = $this->model->newModelQuery();
             $baseBuilderCurrent = $this->baseBuilder ? $this->baseBuilder : $this;
             $query->baseBuilder = $baseBuilderCurrent;
