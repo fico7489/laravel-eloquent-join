@@ -13,7 +13,10 @@ use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\JoinClause;
+use Illuminate\Support\Facades\DB;
+use Closure;
 
 class EloquentJoinBuilder extends Builder
 {
@@ -178,6 +181,7 @@ class EloquentJoinBuilder extends Builder
         $currentTableAlias = $baseTable;
 
         $relationsAccumulated = [];
+
         foreach ($relations as $relation) {
             if ($relation == $column) {
                 //last item in $relations argument is sort|where column
@@ -189,7 +193,8 @@ class EloquentJoinBuilder extends Builder
             $relatedModel      = $relatedRelation->getRelated();
             $relatedPrimaryKey = $relatedModel->getKeyName();
             $relatedTable      = $relatedModel->getTable();
-            $relatedTableAlias = $this->useTableAlias ? uniqid() : $relatedTable;
+
+            $relatedTableAlias = $this->parseAlias($relatedModel, array_merge($relationsAccumulated, [$relation]));
 
             $relationsAccumulated[]    = $relatedTableAlias;
             $relationAccumulatedString = implode('_', $relationsAccumulated);
@@ -200,33 +205,7 @@ class EloquentJoinBuilder extends Builder
             }
 
             if (!in_array($relationAccumulatedString, $this->joinedTables)) {
-                $joinQuery = $relatedTable.($this->useTableAlias ? ' as '.$relatedTableAlias : '');
-                if ($relatedRelation instanceof MorphTo) {
-
-                } elseif ($relatedRelation instanceof BelongsTo) {
-                    $relatedKey = ((float) \App::version() < 5.8) ? $relatedRelation->getQualifiedForeignKey() : $relatedRelation->getQualifiedForeignKeyName();
-                    $relatedKey = last(explode('.', $relatedKey));
-                    $ownerKey = ((float) \App::version() < 5.8) ? $relatedRelation->getOwnerKey() : $relatedRelation->getOwnerKeyName();
-
-                    $this->$joinMethod($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $relatedKey, $currentTableAlias, $ownerKey) {
-                        $join->on($relatedTableAlias.'.'.$ownerKey, '=', $currentTableAlias.'.'.$relatedKey);
-
-                        $this->joinQuery($join, $relatedRelation, $relatedTableAlias);
-                    });
-                } elseif ($relatedRelation instanceof HasOneOrMany) {
-                    $relatedKey = $relatedRelation->getQualifiedForeignKeyName();
-                    $relatedKey = last(explode('.', $relatedKey));
-                    $localKey = $relatedRelation->getQualifiedParentKeyName();
-                    $localKey = last(explode('.', $localKey));
-
-                    $this->$joinMethod($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $relatedKey, $currentTableAlias, $localKey) {
-                        $join->on($relatedTableAlias.'.'.$relatedKey, '=', $currentTableAlias.'.'.$localKey);
-
-                        $this->joinQuery($join, $relatedRelation, $relatedTableAlias);
-                    });
-                } else {
-                    throw new InvalidRelation();
-                }
+                $this->joinRelation($relatedRelation, $currentTableAlias, $relatedTableAlias, $joinMethod);
             }
 
             $currentModel      = $relatedModel;
@@ -244,10 +223,62 @@ class EloquentJoinBuilder extends Builder
         return $currentTableAlias.'.'.$column;
     }
 
+    public function joinRelation(Relation $relation, string $currentTableAlias, string $relatedTableAlias, string $joinMethod) 
+    {
+        $relatedModel = $relation->getRelated();
+        $relatedTable = $relatedModel->getTable();
+        $joinQuery = $relatedTable.($relatedTableAlias !== $relatedTable ? ' as '.$relatedTableAlias : '');
+
+
+        if ($relation instanceof MorphTo) {
+            return;
+        }
+
+        if ($relation instanceof BelongsTo) {
+
+            if ((float) \App::version() >= 5.8) {
+                $relatedKey = $relation->getOwnerKeyName();
+                $currentKey = $relation->getQualifiedForeignKeyName();
+            } else {
+                $relatedKey = $relation->getOwnerKey();
+                $currentKey = $relation->getQualifiedForeignKey();
+            }
+
+            $currentKey = last(explode('.', $currentKey));
+
+        } elseif ($relation instanceof HasOneOrMany) {
+            $currentKey = $relation->getQualifiedParentKeyName();
+            $currentKey = last(explode('.', $currentKey));
+            $relatedKey = $relation->getQualifiedForeignKeyName();
+            $relatedKey = last(explode('.', $relatedKey));
+        }
+
+        if (!isset($relatedKey)) {
+            throw new InvalidRelation();
+        }
+
+        $this->$joinMethod($joinQuery, function ($join) use ($relation, $relatedTableAlias, $relatedKey, $currentTableAlias, $currentKey) {
+
+            $join->on($this->parseAliasableKey($relatedTableAlias, $relatedKey), '=', $this->parseAliasableKey($currentTableAlias, $currentKey));
+
+            $this->joinQuery($join, $relation, $relatedTableAlias);
+        });
+    }
+
+    protected function parseAlias(Model $relatedModel, array $relations): string
+    {
+        return $this->useTableAlias ? uniqid() : $relatedModel->getTable();
+    }
+
+    protected function parseAliasableKey(string $alias, string $key)
+    {
+        return $alias.'.'.$key;
+    }
+
     private function joinQuery($join, $relation, $relatedTableAlias)
     {
         /** @var Builder $relationQuery */
-        $relationBuilder = $relation->getQuery();   
+        $relationBuilder = $relation->getQuery();
 
         foreach (static::DISABLED_COMPONENTS as $component) {
             if (!empty($relationBuilder->getQuery()->$component)) {
@@ -273,7 +304,9 @@ class EloquentJoinBuilder extends Builder
                 $clause['column'] = implode(".", array_slice($partsColumn, 1));
             }
 
-            $this->applyWheresOnRelation($join, $method, array_values($clause), $relatedTableAlias);
+            $clause['column'] = $this->parseAliasableKey($relatedTableAlias, $clause['column']);
+
+            $join->$method(...array_values($clause));
         }
 
         //apply global SoftDeletingScope
@@ -286,30 +319,12 @@ class EloquentJoinBuilder extends Builder
         }
     }
 
-    private function applyWheresOnRelation(JoinClause $join, string $method, array $params, string $relatedTableAlias)
-    {        
-        try {
-            if (is_array($params[0])) {
-                foreach ($params[0] as $k => $param) {
-                    $params[0][$relatedTableAlias.'.'.$k] = $param;
-                    unset($params[0][$k]);
-                }
-            } else {
-                $params[0] = $relatedTableAlias.'.'.$params[0];
-            }
-
-            call_user_func_array([$join, $method], $params);
-        } catch (\Exception $e) {
-            throw new InvalidRelationWhere();
-        }
-    }
-
     private function applyScopeOnRelation(JoinClause $join, string $method, array $params, string $relatedTableAlias)
     {
         if ('withoutTrashed' == $method) {
-            call_user_func_array([$join, 'where'], [$relatedTableAlias.'.deleted_at', '=', null]);
+            call_user_func_array([$join, 'where'], [$this->parseAliasableKey($relatedTableAlias, 'deleted_at'), '=', null]);
         } elseif ('onlyTrashed' == $method) {
-            call_user_func_array([$join, 'where'], [$relatedTableAlias.'.deleted_at', '<>', null]);
+            call_user_func_array([$join, 'where'], [$this->parseAliasableKey($relatedTableAlias, 'deleted_at'), '<>', null]);
         }
     }
 
