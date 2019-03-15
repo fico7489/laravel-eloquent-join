@@ -35,7 +35,7 @@ class EloquentJoinBuilder extends Builder
         'limit',
         'offset',
         'unions',
-        'lock'
+        'lock',
     ];
 
     //use table alias for join (real table name or uniqid())
@@ -222,19 +222,17 @@ class EloquentJoinBuilder extends Builder
         return $currentTableAlias.'.'.$column;
     }
 
-    public function joinRelation(Relation $relation, string $currentTableAlias, string $relatedTableAlias, string $joinMethod) 
+    public function joinRelation(Relation $relation, string $currentTableAlias, string $relatedTableAlias, string $joinMethod)
     {
         $relatedModel = $relation->getRelated();
         $relatedTable = $relatedModel->getTable();
         $joinQuery = $relatedTable.($relatedTableAlias !== $relatedTable ? ' as '.$relatedTableAlias : '');
-
 
         if ($relation instanceof MorphTo) {
             return;
         }
 
         if ($relation instanceof BelongsTo) {
-
             if ((float) \App::version() >= 5.8) {
                 $relatedKey = $relation->getOwnerKeyName();
                 $currentKey = $relation->getQualifiedForeignKeyName();
@@ -244,7 +242,6 @@ class EloquentJoinBuilder extends Builder
             }
 
             $currentKey = last(explode('.', $currentKey));
-
         } elseif ($relation instanceof HasOneOrMany) {
             $currentKey = $relation->getQualifiedParentKeyName();
             $currentKey = last(explode('.', $currentKey));
@@ -257,7 +254,6 @@ class EloquentJoinBuilder extends Builder
         }
 
         $this->$joinMethod($joinQuery, function ($join) use ($relation, $relatedTableAlias, $relatedKey, $currentTableAlias, $currentKey) {
-
             $join->on($this->parseAliasableKey($relatedTableAlias, $relatedKey), '=', $this->parseAliasableKey($currentTableAlias, $currentKey));
 
             $this->joinQuery($join, $relation, $relatedTableAlias);
@@ -288,19 +284,18 @@ class EloquentJoinBuilder extends Builder
         $wheres = array_slice($relationBuilder->getQuery()->wheres, $relation instanceof BelongsTo ? 1 : 2);
 
         foreach ($wheres as $clause) {
-
-            $method = $clause['type'] === 'Basic' ? 'where' : 'where'.$clause['type'];
-            unset ($clause['type']);
+            $method = 'Basic' === $clause['type'] ? 'where' : 'where'.$clause['type'];
+            unset($clause['type']);
 
             if (!isset($clause['column'])) {
                 throw new InvalidRelationWhere();
             }
 
             // Remove first alias table name
-            $partsColumn = explode(".", $clause['column']);
+            $partsColumn = explode('.', $clause['column']);
 
             if (count($partsColumn) > 1) {
-                $clause['column'] = implode(".", array_slice($partsColumn, 1));
+                $clause['column'] = implode('.', array_slice($partsColumn, 1));
             }
 
             $clause['column'] = $this->parseAliasableKey($relatedTableAlias, $clause['column']);

@@ -9,6 +9,6 @@ class Tag extends BaseModel
      */
     public function taggable()
     {
-    	return $this->morphTo();
+        return $this->morphTo();
     }
 }
