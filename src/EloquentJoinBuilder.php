@@ -181,7 +181,7 @@ class EloquentJoinBuilder extends Builder
 
         $relationsAccumulated = [];
 
-        foreach ($relations as $relation) {
+        foreach ($relations as $i => $relation) {
             if ($relation == $column) {
                 //last item in $relations argument is sort|where column
                 break;
@@ -193,7 +193,7 @@ class EloquentJoinBuilder extends Builder
             $relatedPrimaryKey = $relatedModel->getKeyName();
             $relatedTable      = $relatedModel->getTable();
 
-            $relatedTableAlias = $this->parseAlias($relatedModel, array_merge($relationsAccumulated, [$relation]));
+            $relatedTableAlias = $this->parseAlias($relatedModel, array_slice($relations, 0, $i + 1));
 
             $relationsAccumulated[]    = $relatedTableAlias;
             $relationAccumulatedString = implode('_', $relationsAccumulated);
