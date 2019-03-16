@@ -222,6 +222,29 @@ class EloquentJoinBuilder extends Builder
         return $currentTableAlias.'.'.$column;
     }
 
+    public function getKeyFromRelation(Relation $relation, string $keyName)
+    {
+        $getQualifiedKeyMethod = "getQualified".ucfirst($keyName)."Name";
+
+        if (method_exists($relation, $getQualifiedKeyMethod)) {
+            return last(explode(".", $relation->$getQualifiedKeyMethod()));
+        }
+
+        $getKeyMethod = "get".ucfirst($keyName);
+
+        if (method_exists($relation, $getKeyMethod)) {
+            return $relation->$getKeyMethod();
+        }
+
+        // relatedKey is protected before 5.7 in BelongsToMany
+
+        $reflection = new \ReflectionClass($relation);
+        $property = $reflection->getProperty($keyName);
+        $property->setAccessible(true);
+
+        return $property->getValue($relation);
+    }
+
     public function joinRelation(Relation $relation, string $currentTableAlias, string $relatedTableAlias, string $joinMethod)
     {
         $relatedModel = $relation->getRelated();
@@ -239,32 +262,23 @@ class EloquentJoinBuilder extends Builder
 
             $this->$joinMethod(
                 $joinPivotQuery,
-                $this->parseAliasableKey($pivotTableAlias, $relation->getRelatedPivotKeyName()), 
+                $this->parseAliasableKey($pivotTableAlias, $this->getKeyFromRelation($relation, 'relatedPivotKey')), 
                 '=', 
-                $this->parseAliasableKey($currentTableAlias, $relation->getParentKeyName())
+                $this->parseAliasableKey($currentTableAlias, $this->getKeyFromRelation($relation, 'parentKey'))
             );
 
-            $relatedKey = $relation->getRelatedKeyName();
+            $relatedKey = $this->getKeyFromRelation($relation, 'relatedKey');
 
             $currentTableAlias = $pivotTableAlias;
-            $currentKey = $relation->getForeignPivotKeyName();
+            $currentKey = $this->getKeyFromRelation($relation, 'foreignPivotKey');
         }
 
         if ($relation instanceof BelongsTo) {
-            if ((float) \App::version() >= 5.8) {
-                $relatedKey = $relation->getOwnerKeyName();
-                $currentKey = $relation->getQualifiedForeignKeyName();
-            } else {
-                $relatedKey = $relation->getOwnerKey();
-                $currentKey = $relation->getQualifiedForeignKey();
-            }
-
-            $currentKey = last(explode('.', $currentKey));
+            $relatedKey = $this->getKeyFromRelation($relation, 'ownerKey');
+            $currentKey = $this->getKeyFromRelation($relation, 'foreignKey');
         } elseif ($relation instanceof HasOneOrMany) {
-            $currentKey = $relation->getQualifiedParentKeyName();
-            $currentKey = last(explode('.', $currentKey));
-            $relatedKey = $relation->getQualifiedForeignKeyName();
-            $relatedKey = last(explode('.', $relatedKey));
+            $currentKey = $this->getKeyFromRelation($relation, 'parentKey');
+            $relatedKey = $this->getKeyFromRelation($relation, 'foreignKey');
         }
 
         if (!isset($relatedKey)) {
