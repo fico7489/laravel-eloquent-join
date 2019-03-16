@@ -3,17 +3,14 @@
 namespace Fico7489\Laravel\EloquentJoin\Tests\Tests;
 
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidAggregateMethod;
-use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelation;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationClause;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationGlobalScope;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationWhere;
-use Fico7489\Laravel\EloquentJoin\Tests\Models\City;
 use Fico7489\Laravel\EloquentJoin\Tests\Models\Seller;
 use Fico7489\Laravel\EloquentJoin\Tests\TestCase;
 
 class ExceptionTest extends TestCase
 {
-
     public function testInvalidRelationWhere()
     {
         try {

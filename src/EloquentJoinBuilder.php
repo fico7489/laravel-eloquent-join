@@ -224,13 +224,13 @@ class EloquentJoinBuilder extends Builder
 
     public function getKeyFromRelation(Relation $relation, string $keyName)
     {
-        $getQualifiedKeyMethod = "getQualified".ucfirst($keyName)."Name";
+        $getQualifiedKeyMethod = 'getQualified'.ucfirst($keyName).'Name';
 
         if (method_exists($relation, $getQualifiedKeyMethod)) {
-            return last(explode(".", $relation->$getQualifiedKeyMethod()));
+            return last(explode('.', $relation->$getQualifiedKeyMethod()));
         }
 
-        $getKeyMethod = "get".ucfirst($keyName);
+        $getKeyMethod = 'get'.ucfirst($keyName);
 
         if (method_exists($relation, $getKeyMethod)) {
             return $relation->$getKeyMethod();
@@ -256,14 +256,13 @@ class EloquentJoinBuilder extends Builder
         }
 
         if ($relation instanceof BelongsToMany) {
-
             $joinPivotQuery = $relation->getTable();
             $pivotTableAlias = $relation->getTable();
 
             $this->$joinMethod(
                 $joinPivotQuery,
-                $this->parseAliasableKey($pivotTableAlias, $this->getKeyFromRelation($relation, 'relatedPivotKey')), 
-                '=', 
+                $this->parseAliasableKey($pivotTableAlias, $this->getKeyFromRelation($relation, 'relatedPivotKey')),
+                '=',
                 $this->parseAliasableKey($currentTableAlias, $this->getKeyFromRelation($relation, 'parentKey'))
             );
 
@@ -307,7 +306,7 @@ class EloquentJoinBuilder extends Builder
         if ($relation instanceof BelongsTo) {
             return 1;
         }
-        
+
         if ($relation instanceof HasOneOrMany) {
             return 2;
         }
