@@ -13,18 +13,6 @@ use Fico7489\Laravel\EloquentJoin\Tests\TestCase;
 
 class ExceptionTest extends TestCase
 {
-    public function testInvalidRelation()
-    {
-        try {
-            City::whereJoin('sellers.id', '=', 'test')->get();
-        } catch (InvalidRelation $e) {
-            $this->assertEquals((new InvalidRelation())->message, $e->getMessage());
-
-            return;
-        }
-
-        $this->assertTrue(false);
-    }
 
     public function testInvalidRelationWhere()
     {

@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Eloquent\Model;
@@ -28,7 +29,6 @@ class EloquentJoinBuilder extends Builder
     const DISABLED_COMPONENTS = [
         'aggregate',
         'columns',
-        'joins',
         'groups',
         'havings',
         'orders',
@@ -232,6 +232,24 @@ class EloquentJoinBuilder extends Builder
             return;
         }
 
+        if ($relation instanceof BelongsToMany) {
+
+            $joinPivotQuery = $relation->getTable();
+            $pivotTableAlias = $relation->getTable();
+
+            $this->$joinMethod(
+                $joinPivotQuery,
+                $this->parseAliasableKey($pivotTableAlias, $relation->getRelatedPivotKeyName()), 
+                '=', 
+                $this->parseAliasableKey($currentTableAlias, $relation->getParentKeyName())
+            );
+
+            $relatedKey = $relation->getRelatedKeyName();
+
+            $currentTableAlias = $pivotTableAlias;
+            $currentKey = $relation->getForeignPivotKeyName();
+        }
+
         if ($relation instanceof BelongsTo) {
             if ((float) \App::version() >= 5.8) {
                 $relatedKey = $relation->getOwnerKeyName();
@@ -270,6 +288,21 @@ class EloquentJoinBuilder extends Builder
         return $alias.'.'.$key;
     }
 
+    protected function skipClausesByClassRelation(Relation $relation)
+    {
+        if ($relation instanceof BelongsTo) {
+            return 1;
+        }
+        
+        if ($relation instanceof HasOneOrMany) {
+            return 2;
+        }
+
+        if ($relation instanceof BelongsToMany) {
+            return 3;
+        }
+    }
+
     private function joinQuery($join, $relation, $relatedTableAlias)
     {
         /** @var Builder $relationQuery */
@@ -281,7 +314,7 @@ class EloquentJoinBuilder extends Builder
             }
         }
 
-        $wheres = array_slice($relationBuilder->getQuery()->wheres, $relation instanceof BelongsTo ? 1 : 2);
+        $wheres = array_slice($relationBuilder->getQuery()->wheres, $this->skipClausesByClassRelation($relation));
 
         foreach ($wheres as $clause) {
             $method = 'Basic' === $clause['type'] ? 'where' : 'where'.$clause['type'];
