@@ -229,11 +229,29 @@ Options are : **SUM**, **AVG**, **MAX**, **MIN**, **COUNT**
     
 **whereJoin($column, $operator, $value, $boolean = 'and')**
 
-* ***$column***, ***$operator***, ***$value*** and ***$boolean*** arguments are the same as in default eloquent **where()**
+* arguments are the same as in default eloquent **where()**
     
 **orWhereJoin($column, $operator, $value)**
 
-* ***$column***, ***$operator*** and ***$value*** arguments are the same as in default eloquent **orWhere()**
+* arguments are the same as in default eloquent **orWhere()**
+
+
+**whereInJoin($column, $values, $boolean = 'and', $not = false)**
+
+* arguments are the same as in default eloquent **whereIn()**
+
+**whereNotInJoin($column, $values, $boolean = 'and')**
+
+* arguments are the same as in default eloquent **whereNotIn()**
+
+**orWhereInJoin($column, $values)**
+
+* arguments are the same as in default eloquent **orWhereIn()**
+
+**orWhereNotInJoin($column, $values)**
+
+* arguments are the same as in default eloquent **orWhereNotIn()**
+
 
 ### Allowed clauses on BelongsTo, HasOne and HasMany relations on which you can use join clauses on the query
 

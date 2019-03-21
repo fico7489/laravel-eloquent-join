@@ -13,6 +13,7 @@ use Fico7489\Laravel\EloquentJoin\Relations\HasOneJoin;
 use Fico7489\Laravel\EloquentJoin\Relations\HasManyJoin;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Database\Query\JoinClause;
 
 class EloquentJoinBuilder extends Builder
 {
@@ -47,6 +48,7 @@ class EloquentJoinBuilder extends Builder
     //store clauses on relation for join
     public $relationClauses = [];
 
+    //query methods
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
         if ($column instanceof \Closure) {
@@ -78,6 +80,38 @@ class EloquentJoinBuilder extends Builder
         $column = $query->performJoin($column);
 
         return $this->orWhere($column, $operator, $value);
+    }
+
+    public function whereInJoin($column, $values, $boolean = 'and', $not = false)
+    {
+        $query = $this->baseBuilder ? $this->baseBuilder : $this;
+        $column = $query->performJoin($column);
+
+        return $this->whereIn($column, $values, $boolean, $not);
+    }
+
+    public function whereNotInJoin($column, $values, $boolean = 'and')
+    {
+        $query = $this->baseBuilder ? $this->baseBuilder : $this;
+        $column = $query->performJoin($column);
+
+        return $this->whereNotIn($column, $values, $boolean);
+    }
+
+    public function orWhereInJoin($column, $values)
+    {
+        $query = $this->baseBuilder ? $this->baseBuilder : $this;
+        $column = $query->performJoin($column);
+
+        return $this->orWhereIn($column, $values);
+    }
+
+    public function orWhereNotInJoin($column, $values)
+    {
+        $query = $this->baseBuilder ? $this->baseBuilder : $this;
+        $column = $query->performJoin($column);
+
+        return $this->orWhereNotIn($column, $values);
     }
 
     public function orderByJoin($column, $direction = 'asc', $aggregateMethod = null)
@@ -114,6 +148,7 @@ class EloquentJoinBuilder extends Builder
         return $this;
     }
 
+    //helpers methods
     private function performJoin($relations, $leftJoin = null)
     {
         //detect join method
@@ -153,11 +188,11 @@ class EloquentJoinBuilder extends Builder
             }
 
             if (!in_array($relationAccumulatedString, $this->joinedTables)) {
-                $joinQuery = $relatedTableAlias.($this->useTableAlias ? ' as '.$relatedTableAlias : '');
+                $joinQuery = $relatedTable.($this->useTableAlias ? ' as '.$relatedTableAlias : '');
                 if ($relatedRelation instanceof BelongsToJoin) {
-                    $relatedKey = $relatedRelation->getQualifiedForeignKey();
+                    $relatedKey = ((float) \App::version() < 5.8) ? $relatedRelation->getQualifiedForeignKey() : $relatedRelation->getQualifiedForeignKeyName();
                     $relatedKey = last(explode('.', $relatedKey));
-                    $ownerKey = $relatedRelation->getOwnerKey();
+                    $ownerKey = ((float) \App::version() < 5.8) ? $relatedRelation->getOwnerKey() : $relatedRelation->getOwnerKeyName();
 
                     $this->$joinMethod($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $relatedKey, $currentTableAlias, $ownerKey) {
                         $join->on($relatedTableAlias.'.'.$ownerKey, '=', $currentTableAlias.'.'.$relatedKey);
@@ -219,7 +254,7 @@ class EloquentJoinBuilder extends Builder
         }
     }
 
-    private function applyClauseOnRelation($join, $method, $params, $relatedTableAlias)
+    private function applyClauseOnRelation(JoinClause $join, string $method, array $params, string $relatedTableAlias)
     {
         if (in_array($method, ['where', 'orWhere'])) {
             try {
