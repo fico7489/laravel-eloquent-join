@@ -4,10 +4,26 @@ namespace Fico7489\Laravel\EloquentJoin\Traits;
 
 use Fico7489\Laravel\EloquentJoin\EloquentJoinBuilder;
 
+/**
+ * Trait EloquentJoin
+ * @package Fico7489\Laravel\EloquentJoin\Traits
+ * @method static EloquentJoinBuilder joinRelations($relations, $leftJoin = null)
+ * @method static EloquentJoinBuilder whereJoin($column, $operator, $value, $boolean = 'and')
+ * @method static EloquentJoinBuilder orWhereJoin($column, $operator, $value)
+ * @method static EloquentJoinBuilder whereInJoin($column, $values, $boolean = 'and', $not = false)
+ * @method static EloquentJoinBuilder whereNotInJoin($column, $values, $boolean = 'and')
+ * @method static EloquentJoinBuilder orWhereInJoin($column, $values)
+ * @method static EloquentJoinBuilder orWhereNotInJoin($column, $values)
+ * @method static EloquentJoinBuilder orderByJoin($column, $direction = 'asc', $aggregateMethod = null)
+ */
 trait EloquentJoin
 {
     use ExtendRelationsTrait;
 
+    /**
+     * @param $query
+     * @return EloquentJoinBuilder
+     */
     public function newEloquentBuilder($query)
     {
         $newEloquentBuilder = new EloquentJoinBuilder($query);
