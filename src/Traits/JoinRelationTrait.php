@@ -2,6 +2,8 @@
 
 namespace Fico7489\Laravel\EloquentJoin\Traits;
 
+use Fico7489\Laravel\EloquentJoin\EloquentJoinBuilder;
+
 trait JoinRelationTrait
 {
     /**
@@ -14,7 +16,9 @@ trait JoinRelationTrait
      */
     public function __call($method, $parameters)
     {
-        $this->getQuery()->relationClauses[] = [$method => $parameters];
+        if ($this->getQuery() instanceof EloquentJoinBuilder) {
+            $this->getQuery()->relationClauses[] = [$method => $parameters];
+        }
 
         return parent::__call($method, $parameters);
     }
