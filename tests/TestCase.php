@@ -2,10 +2,12 @@
 
 namespace Fico7489\Laravel\EloquentJoin\Tests;
 
+use Fico7489\Laravel\EloquentJoin\EloquentJoinBuilder;
 use Fico7489\Laravel\EloquentJoin\Tests\Models\Seller;
 use Fico7489\Laravel\EloquentJoin\Tests\Models\Order;
 use Fico7489\Laravel\EloquentJoin\Tests\Models\OrderItem;
 use Fico7489\Laravel\EloquentJoin\Tests\Models\Location;
+use ReflectionProperty;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
@@ -104,5 +106,13 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         }
 
         $this->assertRegExp($expected, $actual);
+    }
+
+    protected function getBuilderJoinedTables(EloquentJoinBuilder $queryBuilder): array
+    {
+        $joinTableProperty = new ReflectionProperty(EloquentJoinBuilder::class, 'joinedTables');
+        $joinTableProperty->setAccessible(true);
+
+        return $joinTableProperty->getValue($queryBuilder);
     }
 }

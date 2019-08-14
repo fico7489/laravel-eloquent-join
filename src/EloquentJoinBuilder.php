@@ -143,7 +143,7 @@ class EloquentJoinBuilder extends Builder
         $leftJoin = null !== $leftJoin ? $leftJoin : $this->leftJoin;
 
         $query = $this->baseBuilder ? $this->baseBuilder : $this;
-        $column = $query->performJoin($relations.'.FAKE_FIELD', $leftJoin);
+        $query->performJoin($relations.'.FAKE_FIELD', $leftJoin);
 
         return $this;
     }
@@ -167,7 +167,7 @@ class EloquentJoinBuilder extends Builder
 
         $relationsAccumulated = [];
         foreach ($relations as $relation) {
-            if ($relation == $column) {
+            if ($relation === $column) {
                 //last item in $relations argument is sort|where column
                 break;
             }
@@ -177,22 +177,28 @@ class EloquentJoinBuilder extends Builder
             $relatedModel      = $relatedRelation->getRelated();
             $relatedPrimaryKey = $relatedModel->getKeyName();
             $relatedTable      = $relatedModel->getTable();
-            $relatedTableAlias = $this->useTableAlias ? uniqid() : $relatedTable;
 
-            $relationsAccumulated[]    = $relatedTableAlias;
+            $relationsAccumulated[] = $relatedTable;
             $relationAccumulatedString = implode('_', $relationsAccumulated);
+            $relatedTableAlias = $this->useTableAlias ? $this->getTableAlias($relationAccumulatedString) : $relatedTable;
 
             //relations count
             if ($this->appendRelationsCount) {
                 $this->selectRaw('COUNT('.$relatedTableAlias.'.'.$relatedPrimaryKey.') as '.$relationAccumulatedString.'_count');
             }
 
-            if (!in_array($relationAccumulatedString, $this->joinedTables)) {
+            if (!isset($this->joinedTables[$relationAccumulatedString])) {
                 $joinQuery = $relatedTable.($this->useTableAlias ? ' as '.$relatedTableAlias : '');
                 if ($relatedRelation instanceof BelongsToJoin) {
-                    $relatedKey = ((float) \App::version() < 5.8) ? $relatedRelation->getQualifiedForeignKey() : $relatedRelation->getQualifiedForeignKeyName();
+                    $relatedKey = ((float) \App::version() < 5.8)
+                        ? $relatedRelation->getQualifiedForeignKey()
+                        : $relatedRelation->getQualifiedForeignKeyName();
+
                     $relatedKey = last(explode('.', $relatedKey));
-                    $ownerKey = ((float) \App::version() < 5.8) ? $relatedRelation->getOwnerKey() : $relatedRelation->getOwnerKeyName();
+
+                    $ownerKey = ((float) \App::version() < 5.8)
+                        ? $relatedRelation->getOwnerKey()
+                        : $relatedRelation->getOwnerKeyName();
 
                     $this->$joinMethod($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $relatedKey, $currentTableAlias, $ownerKey) {
                         $join->on($relatedTableAlias.'.'.$ownerKey, '=', $currentTableAlias.'.'.$relatedKey);
@@ -218,7 +224,7 @@ class EloquentJoinBuilder extends Builder
             $currentModel      = $relatedModel;
             $currentTableAlias = $relatedTableAlias;
 
-            $this->joinedTables[] = implode('_', $relationsAccumulated);
+            $this->joinedTables[$relationAccumulatedString] = $relatedTableAlias;
         }
 
         if (!$this->selected && count($relations) > 1) {
@@ -284,7 +290,7 @@ class EloquentJoinBuilder extends Builder
         }
     }
 
-    private function checkAggregateMethod($aggregateMethod)
+    private function checkAggregateMethod($aggregateMethod): void
     {
         if (!in_array($aggregateMethod, [
             self::AGGREGATE_SUM,
@@ -297,13 +303,18 @@ class EloquentJoinBuilder extends Builder
         }
     }
 
+    private function getTableAlias(string $relationAccumulatedString): string
+    {
+        return $this->joinedTables[$relationAccumulatedString] ?? uniqid('', false);
+    }
+
     //getters and setters
     public function isUseTableAlias(): bool
     {
         return $this->useTableAlias;
     }
 
-    public function setUseTableAlias(bool $useTableAlias)
+    public function setUseTableAlias(bool $useTableAlias): self
     {
         $this->useTableAlias = $useTableAlias;
 
@@ -315,7 +326,7 @@ class EloquentJoinBuilder extends Builder
         return $this->leftJoin;
     }
 
-    public function setLeftJoin(bool $leftJoin)
+    public function setLeftJoin(bool $leftJoin): self
     {
         $this->leftJoin = $leftJoin;
 
