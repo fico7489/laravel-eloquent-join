@@ -24,7 +24,7 @@ class EloquentJoinBuilder extends Builder
     const AGGREGATE_MIN      = 'MIN';
     const AGGREGATE_COUNT    = 'COUNT';
 
-    //use table alias for join (real table name or uniqid())
+    //use table alias for join (real table name or sha1)
     private $useTableAlias = false;
 
     //appendRelationsCount
@@ -177,7 +177,7 @@ class EloquentJoinBuilder extends Builder
             $relatedModel      = $relatedRelation->getRelated();
             $relatedPrimaryKey = $relatedModel->getKeyName();
             $relatedTable      = $relatedModel->getTable();
-            $relatedTableAlias = $this->useTableAlias ? uniqid() : $relatedTable;
+            $relatedTableAlias = $this->useTableAlias ? sha1($relatedTable) : $relatedTable;
 
             $relationsAccumulated[]    = $relatedTableAlias;
             $relationAccumulatedString = implode('_', $relationsAccumulated);
