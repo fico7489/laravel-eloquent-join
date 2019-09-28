@@ -5,8 +5,8 @@ namespace Fico7489\Laravel\EloquentJoin\Traits;
 use Fico7489\Laravel\EloquentJoin\EloquentJoinBuilder;
 
 /**
- * Trait EloquentJoin
- * @package Fico7489\Laravel\EloquentJoin\Traits
+ * Trait EloquentJoin.
+ *
  * @method static EloquentJoinBuilder joinRelations($relations, $leftJoin = null)
  * @method static EloquentJoinBuilder whereJoin($column, $operator, $value, $boolean = 'and')
  * @method static EloquentJoinBuilder orWhereJoin($column, $operator, $value)
@@ -22,6 +22,7 @@ trait EloquentJoin
 
     /**
      * @param $query
+     *
      * @return EloquentJoinBuilder
      */
     public function newEloquentBuilder($query)
