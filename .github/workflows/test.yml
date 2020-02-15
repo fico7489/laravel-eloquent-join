@@ -5,9 +5,19 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php_version: [7.2, 7.4]
+        laravel_version: [5.8.0, 6.0.0]
+
     steps:
       - name: Checkout commit
         uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v1
+        with:
+          php-version: ${{ matrix.php_version }}
 
       - name: Validate composer.json
         run: composer validate
@@ -15,5 +25,8 @@ jobs:
       - name: Run composer install
         run: composer install
       
+      - name: Install Laravel
+        run: composer require illuminate/database ^${{ matrix.laravel_version }}
+
       - name: Run PHPUnit
         run: ./vendor/bin/phpunit
