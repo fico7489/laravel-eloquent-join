@@ -23,10 +23,10 @@ jobs:
         run: composer validate
       
       - name: Run composer install
-        run: composer install
+        run: composer install --no-interaction --no-suggest
       
       - name: Install Laravel
-        run: composer require illuminate/database ^${{ matrix.laravel_version }}
+        run: composer require --no-interaction illuminate/database ^${{ matrix.laravel_version }}
 
       - name: Run PHPUnit
         run: ./vendor/bin/phpunit
