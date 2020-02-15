@@ -1,0 +1,19 @@
+name: Test
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout commit
+        uses: actions/checkout@v2
+
+      - name: Validate composer.json
+        run: composer validate
+      
+      - name: Run composer install
+        run: composer install
+      
+      - name: Run PHPUnit
+        run: ./vendor/bin/phpunit
