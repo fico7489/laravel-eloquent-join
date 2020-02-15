@@ -3,6 +3,7 @@
 namespace Fico7489\Laravel\EloquentJoin\Tests\Tests;
 
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidAggregateMethod;
+use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidDirection;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelation;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationClause;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationGlobalScope;
@@ -76,5 +77,11 @@ class ExceptionTest extends TestCase
         }
 
         $this->assertTrue(false);
+    }
+
+    public function testOrderByInvalidDirection()
+    {
+        $this->expectException(InvalidDirection::class);
+        Seller::orderByJoin('locationPrimary.id', ';DROP TABLE orders;--', 'test')->get();
     }
 }
