@@ -42,11 +42,20 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         \DB::enableQueryLog();
     }
 
-    protected function fetchQuery()
+    protected function fetchLastLog()
     {
         $log = \DB::getQueryLog();
+        return end($log);
+    }
 
-        return end($log)['query'];
+    protected function fetchQuery()
+    {
+        return $this->fetchLastLog()['query'];
+    }
+
+    protected function fetchBindings()
+    {
+        return $this->fetchLastLog()['bindings'];
     }
 
     protected function getEnvironmentSetUp($app)

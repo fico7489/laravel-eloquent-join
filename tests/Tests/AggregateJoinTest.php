@@ -8,12 +8,14 @@ use Fico7489\Laravel\EloquentJoin\Tests\TestCase;
 
 class AggregateJoinTest extends TestCase
 {
-    private $queryTest = 'select orders.*, SUM(sellers.id) as sort 
+    private $queryTest = 'select orders.*, SUM(?) as sort 
             from "orders" 
             left join "sellers" on "sellers"."id" = "orders"."seller_id" 
             where "orders"."deleted_at" is null 
             group by "orders"."id" 
             order by sort asc';
+
+    private $bindingsTest = ['sellers.id'];
 
     public function testAvg()
     {
@@ -23,6 +25,7 @@ class AggregateJoinTest extends TestCase
 
         $queryTest = str_replace(EloquentJoinBuilder::AGGREGATE_SUM, EloquentJoinBuilder::AGGREGATE_SUM, $this->queryTest);
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
+        $this->assertEquals($this->bindingsTest, $this->fetchBindings());
     }
 
     public function testSum()
@@ -33,6 +36,7 @@ class AggregateJoinTest extends TestCase
 
         $queryTest = str_replace(EloquentJoinBuilder::AGGREGATE_SUM, EloquentJoinBuilder::AGGREGATE_AVG, $this->queryTest);
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
+        $this->assertEquals($this->bindingsTest, $this->fetchBindings());
     }
 
     public function testMax()
@@ -43,6 +47,7 @@ class AggregateJoinTest extends TestCase
 
         $queryTest = str_replace(EloquentJoinBuilder::AGGREGATE_SUM, EloquentJoinBuilder::AGGREGATE_MAX, $this->queryTest);
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
+        $this->assertEquals($this->bindingsTest, $this->fetchBindings());
     }
 
     public function testMin()
@@ -53,6 +58,7 @@ class AggregateJoinTest extends TestCase
 
         $queryTest = str_replace(EloquentJoinBuilder::AGGREGATE_SUM, EloquentJoinBuilder::AGGREGATE_MIN, $this->queryTest);
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
+        $this->assertEquals($this->bindingsTest, $this->fetchBindings());
     }
 
     public function testCount()
@@ -63,5 +69,6 @@ class AggregateJoinTest extends TestCase
 
         $queryTest = str_replace(EloquentJoinBuilder::AGGREGATE_SUM, EloquentJoinBuilder::AGGREGATE_COUNT, $this->queryTest);
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
+        $this->assertEquals($this->bindingsTest, $this->fetchBindings());
     }
 }
