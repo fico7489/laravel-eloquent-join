@@ -1,3 +1,5 @@
+![Tests status](https://github.com/fico7489/laravel-eloquent-join/workflows/Test/badge.svg)
+
 # Laravel Eloquent Join
 
 This package introduces the join magic for eloquent models and relations.
