@@ -128,7 +128,8 @@ class EloquentJoinBuilder extends Builder
             $sortsCount = count($this->query->orders ?? []);
             $sortAlias = 'sort'.(0 == $sortsCount ? '' : ($sortsCount + 1));
 
-            $query->selectRaw($aggregateMethod.'('.$column.') as '.$sortAlias);
+            $grammar = \DB::query()->getGrammar();
+            $query->selectRaw($aggregateMethod.'('.$grammar->wrap($column).') as '.$sortAlias);
 
             return $this->orderByRaw($sortAlias.' '.$direction);
         }
