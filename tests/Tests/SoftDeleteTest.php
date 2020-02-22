@@ -61,7 +61,10 @@ class SoftDeleteTest extends TestCase
             group by "order_items"."id"
             order by sort asc';
 
+        $bindingsTest = ['orders.number'];
+
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
+        $this->assertEquals($bindingsTest, $this->fetchBindings());
     }
 
     public function testRelatedWithoutTrashedExplicit()
@@ -76,7 +79,10 @@ class SoftDeleteTest extends TestCase
             group by "order_items"."id"
             order by sort asc';
 
+        $bindingsTest = ['orders.number'];
+
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
+        $this->assertEquals($bindingsTest, $this->fetchBindings());
     }
 
     public function testRelatedOnlyTrashedExplicit()
@@ -90,8 +96,10 @@ class SoftDeleteTest extends TestCase
             where "order_items"."deleted_at" is not null
             group by "order_items"."id"
             order by sort asc';
+        $bindingsTest = ['orders.number'];
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
+        $this->assertEquals($bindingsTest, $this->fetchBindings());
     }
 
     public function testRelatedWithTrashedExplicit()
@@ -104,8 +112,10 @@ class SoftDeleteTest extends TestCase
             and "orders"."deleted_at" is null 
             group by "order_items"."id"
             order by sort asc';
+        $bindingsTest = ['orders.number'];
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
+        $this->assertEquals($bindingsTest, $this->fetchBindings());
     }
 
     public function testRelatedWithTrashedOnRelation()
@@ -118,8 +128,10 @@ class SoftDeleteTest extends TestCase
             where "order_items"."deleted_at" is null
             group by "order_items"."id"
             order by sort asc';
+        $bindingsTest = ['orders.number'];
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
+        $this->assertEquals($bindingsTest, $this->fetchBindings());
     }
 
     public function testRelatedOnlyTrashedOnRelation()
@@ -133,7 +145,9 @@ class SoftDeleteTest extends TestCase
             where "order_items"."deleted_at" is null 
             group by "order_items"."id"
             order by sort asc';
+        $bindingsTest = ['orders.number'];
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
+        $this->assertEquals($bindingsTest, $this->fetchBindings());
     }
 }

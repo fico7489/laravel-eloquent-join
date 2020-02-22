@@ -19,8 +19,10 @@ class OrderByTest extends TestCase
             where "orders"."deleted_at" is null 
             group by "orders"."id"
             order by sort asc';
+        $bindingsTest = ['sellers.id'];
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
+        $this->assertEquals($bindingsTest, $this->fetchBindings());
     }
 
     public function testOrderByMultiple()
@@ -36,7 +38,9 @@ class OrderByTest extends TestCase
             where "orders"."deleted_at" is null 
             group by "orders"."id"
             order by sort asc, sort2 desc';
+        $bindingsTest = ['sellers.id', 'sellers.title'];
 
+        $this->assertEquals($bindingsTest, $this->fetchBindings());
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }
 }

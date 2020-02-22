@@ -19,8 +19,10 @@ class ClosureOnRelationTest extends TestCase
             and "locations"."deleted_at" is null 
             group by "sellers"."id"
             order by sort desc';
+        $bindingsTest = ['locations.id', 0, 0];
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
+        $this->assertEquals($bindingsTest, $this->fetchBindings());
 
         //locationPrimary have one where ['is_primary => 1']
         $items = Seller::orderByJoin('locationPrimary.id', 'desc')->get();
@@ -32,7 +34,9 @@ class ClosureOnRelationTest extends TestCase
             group by "sellers"."id"
             order by sort desc';
 
+        $bindingsTest = ['locations.id', 1];
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
+        $this->assertEquals($bindingsTest, $this->fetchBindings());
 
         //locationPrimary have one where ['is_secondary => 1']
         $items = Seller::orderByJoin('locationSecondary.id', 'desc')->get();
@@ -44,7 +48,9 @@ class ClosureOnRelationTest extends TestCase
             group by "sellers"."id"
             order by sort desc';
 
+        $bindingsTest = ['locations.id', 1];
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
+        $this->assertEquals($bindingsTest, $this->fetchBindings());
 
         //locationPrimary have one where ['is_primary => 1'] and one orWhere ['is_secondary => 1']
         $items = Seller::orderByJoin('locationPrimaryOrSecondary.id', 'desc')->get();
@@ -57,7 +63,9 @@ class ClosureOnRelationTest extends TestCase
             group by "sellers"."id"
             order by sort desc';
 
+        $bindingsTest = ['locations.id', 1, 1];
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
+        $this->assertEquals($bindingsTest, $this->fetchBindings());
     }
 
     public function testWhereOnRelationWithoutOrderByJoin()
