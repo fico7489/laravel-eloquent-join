@@ -2,10 +2,10 @@
 
 namespace Fico7489\Laravel\EloquentJoin\Tests;
 
-use Fico7489\Laravel\EloquentJoin\Tests\Models\Seller;
+use Fico7489\Laravel\EloquentJoin\Tests\Models\Location;
 use Fico7489\Laravel\EloquentJoin\Tests\Models\Order;
 use Fico7489\Laravel\EloquentJoin\Tests\Models\OrderItem;
-use Fico7489\Laravel\EloquentJoin\Tests\Models\Location;
+use Fico7489\Laravel\EloquentJoin\Tests\Models\Seller;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
