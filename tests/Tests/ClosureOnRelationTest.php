@@ -11,7 +11,7 @@ class ClosureOnRelationTest extends TestCase
     {
         //location have two where  ['is_primary => 0', 'is_secondary' => 0]
         $items = Seller::orderByJoin('location.id', 'desc')->get();
-        $queryTest = 'select sellers.*, MAX(locations.id) as sort from "sellers" 
+        $queryTest = 'select sellers.*, MAX(?) as sort from "sellers" 
             left join "locations" 
             on "locations"."seller_id" = "sellers"."id" 
             and "locations"."is_primary" = ? 
@@ -24,7 +24,7 @@ class ClosureOnRelationTest extends TestCase
 
         //locationPrimary have one where ['is_primary => 1']
         $items = Seller::orderByJoin('locationPrimary.id', 'desc')->get();
-        $queryTest = 'select sellers.*, MAX(locations.id) as sort from "sellers" 
+        $queryTest = 'select sellers.*, MAX(?) as sort from "sellers" 
             left join "locations" 
             on "locations"."seller_id" = "sellers"."id" 
             and "locations"."is_primary" = ? 
@@ -36,7 +36,7 @@ class ClosureOnRelationTest extends TestCase
 
         //locationPrimary have one where ['is_secondary => 1']
         $items = Seller::orderByJoin('locationSecondary.id', 'desc')->get();
-        $queryTest = 'select sellers.*, MAX(locations.id) as sort from "sellers" 
+        $queryTest = 'select sellers.*, MAX(?) as sort from "sellers" 
             left join "locations" 
             on "locations"."seller_id" = "sellers"."id" 
             and "locations"."is_secondary" = ? 
@@ -48,7 +48,7 @@ class ClosureOnRelationTest extends TestCase
 
         //locationPrimary have one where ['is_primary => 1'] and one orWhere ['is_secondary => 1']
         $items = Seller::orderByJoin('locationPrimaryOrSecondary.id', 'desc')->get();
-        $queryTest = 'select sellers.*, MAX(locations.id) as sort from "sellers" 
+        $queryTest = 'select sellers.*, MAX(?) as sort from "sellers" 
             left join "locations" 
             on "locations"."seller_id" = "sellers"."id" 
             and "locations"."is_primary" = ? 

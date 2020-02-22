@@ -13,7 +13,7 @@ class OrderByTest extends TestCase
             ->orderByJoin('seller.id', 'asc')
             ->get();
 
-        $queryTest = 'select orders.*, MAX(sellers.id) as sort
+        $queryTest = 'select orders.*, MAX(?) as sort
             from "orders" 
             left join "sellers" on "sellers"."id" = "orders"."seller_id" 
             where "orders"."deleted_at" is null 
@@ -30,7 +30,7 @@ class OrderByTest extends TestCase
             ->orderByJoin('seller.title', 'desc')
             ->get();
 
-        $queryTest = 'select orders.*, MAX(sellers.id) as sort, MAX(sellers.title) as sort2
+        $queryTest = 'select orders.*, MAX(?) as sort, MAX(?) as sort2
             from "orders" 
             left join "sellers" on "sellers"."id" = "orders"."seller_id" 
             where "orders"."deleted_at" is null 
