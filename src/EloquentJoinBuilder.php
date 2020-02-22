@@ -3,6 +3,7 @@
 namespace Fico7489\Laravel\EloquentJoin;
 
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidAggregateMethod;
+use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidDirection;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelation;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationClause;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationGlobalScope;
@@ -116,6 +117,8 @@ class EloquentJoinBuilder extends Builder
 
     public function orderByJoin($column, $direction = 'asc', $aggregateMethod = null)
     {
+        $direction = strtolower($direction);
+        $this->checkDirection($direction);
         $dotPos = strrpos($column, '.');
 
         $query = $this->baseBuilder ? $this->baseBuilder : $this;
@@ -294,6 +297,13 @@ class EloquentJoinBuilder extends Builder
             self::AGGREGATE_COUNT,
         ])) {
             throw new InvalidAggregateMethod();
+        }
+    }
+
+    private function checkDirection($direction)
+    {
+        if (!in_array($direction, ['asc', 'desc'], true)) {
+            throw new InvalidDirection();
         }
     }
 
