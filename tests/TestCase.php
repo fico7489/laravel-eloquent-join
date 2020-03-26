@@ -63,32 +63,32 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     {
         // Setup default database to use sqlite :memory:
         $app['config']->set('database.connections.sqlite', [
-            'driver'   => 'sqlite',
+            'driver' => 'sqlite',
             'database' => ':memory:',
-            'prefix'   => '',
+            'prefix' => '',
         ]);
 
         $app['config']->set('database.connections.mysql', [
-            'driver'    => 'mysql',
-            'host'      => 'localhost',
-            'database'  => 'join',
-            'username'  => 'root',
-            'password'  => '',
-            'charset'   => 'utf8',
+            'driver' => 'mysql',
+            'host' => 'localhost',
+            'database' => 'join',
+            'username' => 'root',
+            'password' => '',
+            'charset' => 'utf8',
             'collation' => 'utf8_unicode_ci',
-            'strict'    => true,
+            'strict' => true,
         ]);
 
         $app['config']->set('database.connections.pgsql', [
-            'driver'    => 'pgsql',
-            'host'      => 'localhost',
-            'database'  => 'join',
-            'username'  => 'postgres',
-            'password'  => 'root',
-            'charset'   => 'utf8',
-            'prefix'    => '',
-            'schema'    => 'public',
-            'sslmode'   => 'prefer',
+            'driver' => 'pgsql',
+            'host' => 'localhost',
+            'database' => 'join',
+            'username' => 'postgres',
+            'password' => 'root',
+            'charset' => 'utf8',
+            'prefix' => '',
+            'schema' => 'public',
+            'sslmode' => 'prefer',
         ]);
 
         $app['config']->set('database.default', env('type', 'sqlite'));
@@ -101,12 +101,12 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
     protected function assertQueryMatches($expected, $actual)
     {
-        $actual   = preg_replace('/\s\s+/', ' ', $actual);
-        $actual   = str_replace(['\n', '\r'], '', $actual);
+        $actual = preg_replace('/\s\s+/', ' ', $actual);
+        $actual = str_replace(['\n', '\r'], '', $actual);
 
         $expected = preg_replace('/\s\s+/', ' ', $expected);
         $expected = str_replace(['\n', '\r'], '', $expected);
-        $expected   = '/'.$expected.'/';
+        $expected = '/'.$expected.'/';
         $expected = preg_quote($expected);
         if ('mysql' == $_ENV['type']) {
             $expected = str_replace(['"'], '`', $expected);
