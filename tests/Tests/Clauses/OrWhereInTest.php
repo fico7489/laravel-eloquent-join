@@ -17,9 +17,9 @@ class OrWhereInTest extends TestCase
         $queryTest = 'select orders.* 
             from "orders" 
             left join "sellers" on "sellers"."id" = "orders"."seller_id" 
-            where ("sellers"."id" in (?, ?) 
+            where ("sellers"."id" in (1, 2) 
                 or 
-                "sellers"."id" in (?, ?))
+                "sellers"."id" in (3, 4))
             and "orders"."deleted_at" is null 
             group by "orders"."id"';
 

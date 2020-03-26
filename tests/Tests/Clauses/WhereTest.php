@@ -16,7 +16,7 @@ class WhereTest extends TestCase
         $queryTest = 'select orders.* 
             from "orders" 
             left join "sellers" on "sellers"."id" = "orders"."seller_id" 
-            where "sellers"."id" = ? 
+            where "sellers"."id" = 1 
             and "orders"."deleted_at" is null 
             group by "orders"."id"';
 

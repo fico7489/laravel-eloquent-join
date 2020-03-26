@@ -16,7 +16,7 @@ class WhereNotInTest extends TestCase
         $queryTest = 'select orders.* 
             from "orders" 
             left join "sellers" on "sellers"."id" = "orders"."seller_id" 
-            where "sellers"."id" not in (?, ?)
+            where "sellers"."id" not in (1, 2)
             and "orders"."deleted_at" is null 
             group by "orders"."id"';
 
