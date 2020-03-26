@@ -17,7 +17,7 @@ class JoinTypeTest extends TestCase
             left join "cities"
             on "cities"."id" = "sellers"."city_id"
             and "cities"."deleted_at" is null
-            where "cities"."name" = ?';
+            where "cities"."name" = test';
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }
@@ -31,7 +31,7 @@ class JoinTypeTest extends TestCase
             inner join "cities"
             on "cities"."id" = "sellers"."city_id"
             and "cities"."deleted_at" is null
-            where "cities"."name" = ?';
+            where "cities"."name" = test';
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
     }
