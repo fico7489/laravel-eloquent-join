@@ -55,6 +55,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         $bindings = $this->fetchLastLog()['bindings'];
 
         foreach ($bindings as $binding) {
+            $binding = is_string($binding) ? ('"'.$binding.'"') : $binding;
             $query = preg_replace('/\?/', $binding, $query, 1);
         }
 
@@ -113,7 +114,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
         $expected = preg_replace('/\s\s+/', ' ', $expected);
         $expected = str_replace(['\n', '\r'], '', $expected);
-        $expected = '/' . $expected . '/';
+        $expected = '/'.$expected.'/';
         $expected = preg_quote($expected);
         if ('mysql' == $_ENV['type']) {
             $expected = str_replace(['"'], '`', $expected);
