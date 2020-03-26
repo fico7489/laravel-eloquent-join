@@ -53,7 +53,7 @@ class SoftDeleteTest extends TestCase
     public function testRelatedWithoutTrashedDefault()
     {
         OrderItem::orderByJoin('order.number')->get();
-        $queryTest = 'select order_items.*, MAX(orders.number) as sort
+        $queryTest = 'select order_items.*, MAX(?) as sort
             from "order_items" left join "orders" 
             on "orders"."id" = "order_items"."order_id" 
             and "orders"."deleted_at" is null
@@ -61,13 +61,16 @@ class SoftDeleteTest extends TestCase
             group by "order_items"."id"
             order by sort asc';
 
+        $bindingsTest = ['orders.number'];
+
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
+        $this->assertEquals($bindingsTest, $this->fetchBindings());
     }
 
     public function testRelatedWithoutTrashedExplicit()
     {
         OrderItem::orderByJoin('order.number')->withoutTrashed()->get();
-        $queryTest = 'select order_items.*, MAX(orders.number) as sort
+        $queryTest = 'select order_items.*, MAX(?) as sort
             from "order_items" 
             left join "orders" 
             on "orders"."id" = "order_items"."order_id" 
@@ -76,13 +79,16 @@ class SoftDeleteTest extends TestCase
             group by "order_items"."id"
             order by sort asc';
 
+        $bindingsTest = ['orders.number'];
+
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
+        $this->assertEquals($bindingsTest, $this->fetchBindings());
     }
 
     public function testRelatedOnlyTrashedExplicit()
     {
         OrderItem::orderByJoin('order.number')->onlyTrashed()->get();
-        $queryTest = 'select order_items.*, MAX(orders.number) as sort
+        $queryTest = 'select order_items.*, MAX(?) as sort
             from "order_items" 
             left join "orders" 
             on "orders"."id" = "order_items"."order_id" 
@@ -90,42 +96,48 @@ class SoftDeleteTest extends TestCase
             where "order_items"."deleted_at" is not null
             group by "order_items"."id"
             order by sort asc';
+        $bindingsTest = ['orders.number'];
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
+        $this->assertEquals($bindingsTest, $this->fetchBindings());
     }
 
     public function testRelatedWithTrashedExplicit()
     {
         OrderItem::orderByJoin('order.number')->withTrashed()->get();
-        $queryTest = 'select order_items.*, MAX(orders.number) as sort
+        $queryTest = 'select order_items.*, MAX(?) as sort
             from "order_items" 
             left join "orders" 
             on "orders"."id" = "order_items"."order_id" 
             and "orders"."deleted_at" is null 
             group by "order_items"."id"
             order by sort asc';
+        $bindingsTest = ['orders.number'];
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
+        $this->assertEquals($bindingsTest, $this->fetchBindings());
     }
 
     public function testRelatedWithTrashedOnRelation()
     {
         OrderItem::orderByJoin('orderWithTrashed.number')->get();
-        $queryTest = 'select order_items.*, MAX(orders.number) as sort
+        $queryTest = 'select order_items.*, MAX(?) as sort
             from "order_items" 
             left join "orders" 
             on "orders"."id" = "order_items"."order_id" 
             where "order_items"."deleted_at" is null
             group by "order_items"."id"
             order by sort asc';
+        $bindingsTest = ['orders.number'];
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
+        $this->assertEquals($bindingsTest, $this->fetchBindings());
     }
 
     public function testRelatedOnlyTrashedOnRelation()
     {
         OrderItem::orderByJoin('orderOnlyTrashed.number')->get();
-        $queryTest = 'select order_items.*, MAX(orders.number) as sort
+        $queryTest = 'select order_items.*, MAX(?) as sort
             from "order_items"
             left join "orders" 
             on "orders"."id" = "order_items"."order_id"
@@ -133,7 +145,9 @@ class SoftDeleteTest extends TestCase
             where "order_items"."deleted_at" is null 
             group by "order_items"."id"
             order by sort asc';
+        $bindingsTest = ['orders.number'];
 
         $this->assertQueryMatches($queryTest, $this->fetchQuery());
+        $this->assertEquals($bindingsTest, $this->fetchBindings());
     }
 }

@@ -3,14 +3,15 @@
 namespace Fico7489\Laravel\EloquentJoin;
 
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidAggregateMethod;
+use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidDirection;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelation;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationClause;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationGlobalScope;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationWhere;
-use Illuminate\Database\Eloquent\Builder;
 use Fico7489\Laravel\EloquentJoin\Relations\BelongsToJoin;
-use Fico7489\Laravel\EloquentJoin\Relations\HasOneJoin;
 use Fico7489\Laravel\EloquentJoin\Relations\HasManyJoin;
+use Fico7489\Laravel\EloquentJoin\Relations\HasOneJoin;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Query\JoinClause;
@@ -18,11 +19,11 @@ use Illuminate\Database\Query\JoinClause;
 class EloquentJoinBuilder extends Builder
 {
     //constants
-    const AGGREGATE_SUM      = 'SUM';
-    const AGGREGATE_AVG      = 'AVG';
-    const AGGREGATE_MAX      = 'MAX';
-    const AGGREGATE_MIN      = 'MIN';
-    const AGGREGATE_COUNT    = 'COUNT';
+    const AGGREGATE_SUM = 'SUM';
+    const AGGREGATE_AVG = 'AVG';
+    const AGGREGATE_MAX = 'MAX';
+    const AGGREGATE_MIN = 'MIN';
+    const AGGREGATE_COUNT = 'COUNT';
 
     //use table alias for join (real table name or sha1)
     private $useTableAlias = false;
@@ -116,6 +117,8 @@ class EloquentJoinBuilder extends Builder
 
     public function orderByJoin($column, $direction = 'asc', $aggregateMethod = null)
     {
+        $direction = strtolower($direction);
+        $this->checkDirection($direction);
         $dotPos = strrpos($column, '.');
 
         $query = $this->baseBuilder ? $this->baseBuilder : $this;
@@ -153,17 +156,17 @@ class EloquentJoinBuilder extends Builder
     private function performJoin($relations, $leftJoin = null)
     {
         //detect join method
-        $leftJoin   = null !== $leftJoin ? $leftJoin : $this->leftJoin;
+        $leftJoin = null !== $leftJoin ? $leftJoin : $this->leftJoin;
         $joinMethod = $leftJoin ? 'leftJoin' : 'join';
 
         //detect current model data
         $relations = explode('.', $relations);
-        $column    = end($relations);
+        $column = end($relations);
         $baseModel = $this->getModel();
         $baseTable = $baseModel->getTable();
         $basePrimaryKey = $baseModel->getKeyName();
 
-        $currentModel      = $baseModel;
+        $currentModel = $baseModel;
         $currentTableAlias = $baseTable;
 
         $relationsAccumulated = [];
@@ -174,13 +177,13 @@ class EloquentJoinBuilder extends Builder
             }
 
             /** @var Relation $relatedRelation */
-            $relatedRelation   = $currentModel->$relation();
-            $relatedModel      = $relatedRelation->getRelated();
+            $relatedRelation = $currentModel->$relation();
+            $relatedModel = $relatedRelation->getRelated();
             $relatedPrimaryKey = $relatedModel->getKeyName();
-            $relatedTable      = $relatedModel->getTable();
+            $relatedTable = $relatedModel->getTable();
             $relatedTableAlias = $this->useTableAlias ? sha1($relatedTable) : $relatedTable;
 
-            $relationsAccumulated[]    = $relatedTableAlias;
+            $relationsAccumulated[] = $relatedTableAlias;
             $relationAccumulatedString = implode('_', $relationsAccumulated);
 
             //relations count
@@ -200,7 +203,7 @@ class EloquentJoinBuilder extends Builder
 
                         $this->joinQuery($join, $relatedRelation, $relatedTableAlias);
                     });
-                } elseif ($relatedRelation instanceof HasOneJoin  ||  $relatedRelation instanceof HasManyJoin) {
+                } elseif ($relatedRelation instanceof HasOneJoin || $relatedRelation instanceof HasManyJoin) {
                     $relatedKey = $relatedRelation->getQualifiedForeignKeyName();
                     $relatedKey = last(explode('.', $relatedKey));
                     $localKey = $relatedRelation->getQualifiedParentKeyName();
@@ -216,7 +219,7 @@ class EloquentJoinBuilder extends Builder
                 }
             }
 
-            $currentModel      = $relatedModel;
+            $currentModel = $relatedModel;
             $currentTableAlias = $relatedTableAlias;
 
             $this->joinedTables[] = implode('_', $relationsAccumulated);
@@ -295,6 +298,13 @@ class EloquentJoinBuilder extends Builder
             self::AGGREGATE_COUNT,
         ])) {
             throw new InvalidAggregateMethod();
+        }
+    }
+
+    private function checkDirection($direction)
+    {
+        if (!in_array($direction, ['asc', 'desc'], true)) {
+            throw new InvalidDirection();
         }
     }
 
