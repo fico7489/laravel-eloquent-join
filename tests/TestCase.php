@@ -51,7 +51,15 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
     protected function fetchQuery()
     {
-        return $this->fetchLastLog()['query'];
+        $query = $this->fetchLastLog()['query'];
+        $bindings = $this->fetchLastLog()['bindings'];
+
+        foreach ($bindings as $binding) {
+            $binding = is_string($binding) ? ('"'.$binding.'"') : $binding;
+            $query = preg_replace('/\?/', $binding, $query, 1);
+        }
+
+        return $query;
     }
 
     protected function fetchBindings()
