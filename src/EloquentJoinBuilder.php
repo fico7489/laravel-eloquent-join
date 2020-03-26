@@ -26,25 +26,25 @@ class EloquentJoinBuilder extends Builder
     const AGGREGATE_COUNT = 'COUNT';
 
     //use table alias for join (real table name or sha1)
-    private $useTableAlias = false;
+    protected $useTableAlias = false;
 
     //appendRelationsCount
-    private $appendRelationsCount = false;
+    protected $appendRelationsCount = false;
 
     //leftJoin
-    private $leftJoin = true;
+    protected $leftJoin = true;
 
     //aggregate method
-    private $aggregateMethod = self::AGGREGATE_MAX;
+    protected $aggregateMethod = self::AGGREGATE_MAX;
 
     //base builder
-    public $baseBuilder;
+    protected $baseBuilder;
 
     //store if ->select(...) is already called on builder (we want only one groupBy())
-    private $selected = false;
+    protected $selected = false;
 
     //store joined tables, we want join table only once (e.g. when you call orderByJoin more time)
-    private $joinedTables = [];
+    protected $joinedTables = [];
 
     //store clauses on relation for join
     public $relationClauses = [];
@@ -153,7 +153,7 @@ class EloquentJoinBuilder extends Builder
     }
 
     //helpers methods
-    private function performJoin($relations, $leftJoin = null)
+    protected function performJoin($relations, $leftJoin = null)
     {
         //detect join method
         $leftJoin = null !== $leftJoin ? $leftJoin : $this->leftJoin;
@@ -234,7 +234,7 @@ class EloquentJoinBuilder extends Builder
         return $currentTableAlias.'.'.$column;
     }
 
-    private function joinQuery($join, $relation, $relatedTableAlias)
+    protected function joinQuery($join, $relation, $relatedTableAlias)
     {
         /** @var Builder $relationQuery */
         $relationBuilder = $relation->getQuery();
