@@ -62,14 +62,12 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     protected function getEnvironmentSetUp($app)
     {
         // Setup default database to use sqlite :memory:
-        $app['config']->set('database.default', 'sqlite');
         $app['config']->set('database.connections.sqlite', [
             'driver'   => 'sqlite',
             'database' => ':memory:',
             'prefix'   => '',
         ]);
 
-        $app['config']->set('database.default', 'mysql');
         $app['config']->set('database.connections.mysql', [
             'driver'    => 'mysql',
             'host'      => 'localhost',
@@ -81,7 +79,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             'strict'    => true,
         ]);
 
-        $app['config']->set('database.default', 'pgsql');
         $app['config']->set('database.connections.pgsql', [
             'driver'    => 'pgsql',
             'host'      => 'localhost',
@@ -93,6 +90,8 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             'schema'    => 'public',
             'sslmode'   => 'prefer',
         ]);
+
+        $app['config']->set('database.default', env('type', 'sqlite'));
     }
 
     protected function getPackageProviders($app)

@@ -23,12 +23,12 @@
         }
     ],
     "require": {
-        "illuminate/database": "^5.0|^6.0|^7.0"
+        "illuminate/database": "^5.5|^6.0|^7.0"
     },
     "require-dev": {
-        "orchestra/testbench": ">3.0",
-        "friendsofphp/php-cs-fixer" : ">2.0",
-        "phpunit/phpunit": "^8.5"
+        "orchestra/testbench": "*",
+        "friendsofphp/php-cs-fixer" : "*",
+        "phpunit/phpunit": "*"
     },
     "autoload": {
         "psr-4": {

@@ -1,6 +1,10 @@
 name: Test
 
-on: [push, pull_request]
+on:
+  pull_request:
+  push:
+    branches:
+      - master
 
 jobs:
   test:
@@ -8,7 +12,7 @@ jobs:
     strategy:
       matrix:
         php_version: [7.2]
-        laravel_version: [6.0.0]
+        laravel_version: [5.*,6.*, 7.*]
 
     steps:
       - name: Checkout commit
@@ -26,7 +30,7 @@ jobs:
         run: composer install --no-interaction --no-suggest
       
       - name: Install Laravel
-        run: composer require --no-interaction illuminate/database ^${{ matrix.laravel_version }}
+        run: composer update --no-interaction illuminate/database:^${{ matrix.laravel_version }}
 
       - name: Run PHPUnit
         run: ./vendor/bin/phpunit
