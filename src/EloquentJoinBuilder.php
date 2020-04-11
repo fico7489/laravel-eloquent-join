@@ -9,6 +9,7 @@ use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationClause;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationGlobalScope;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationWhere;
 use Fico7489\Laravel\EloquentJoin\Relations\BelongsToJoin;
+use Fico7489\Laravel\EloquentJoin\Relations\BelongsToManyJoin;
 use Fico7489\Laravel\EloquentJoin\Relations\HasManyJoin;
 use Fico7489\Laravel\EloquentJoin\Relations\HasOneJoin;
 use Illuminate\Database\Eloquent\Builder;
@@ -170,11 +171,9 @@ class EloquentJoinBuilder extends Builder
         $currentTableAlias = $baseTable;
 
         $relationsAccumulated = [];
-        foreach ($relations as $relation) {
-            if ($relation == $column) {
-                //last item in $relations argument is sort|where column
-                break;
-            }
+        for ($i = 0; $i < count($relations) - 1; $i++) {
+            $relation = $relations[$i];
+            $nextRelation = $relations[$i+1];
 
             /** @var Relation $relatedRelation */
             $relatedRelation = $currentModel->$relation();
@@ -191,17 +190,23 @@ class EloquentJoinBuilder extends Builder
                 $this->selectRaw('COUNT('.$relatedTableAlias.'.'.$relatedPrimaryKey.') as '.$relationAccumulatedString.'_count');
             }
 
+            if ($relatedRelation instanceof BelongsToManyJoin) {
+                $pivotTable = $relatedRelation->getTable();
+                $pivotTableAlias = $this->useTableAlias ? sha1($pivotTable) : $pivotTable;
+                $joinQueryPivot = $pivotTable.($this->useTableAlias ? ' as '.$pivotTableAlias : '');
+            }
+
             if (!in_array($relationAccumulatedString, $this->joinedTables)) {
-                $joinQuery = $relatedTable.($this->useTableAlias ? ' as '.$relatedTableAlias : '');
+                $joinQuery = $relatedTable.($this->useTableAlias ? ' as '.$relationAccumulatedString : '');
                 if ($relatedRelation instanceof BelongsToJoin) {
                     $relatedKey = ((float) \App::version() < 5.8) ? $relatedRelation->getQualifiedForeignKey() : $relatedRelation->getQualifiedForeignKeyName();
                     $relatedKey = last(explode('.', $relatedKey));
                     $ownerKey = ((float) \App::version() < 5.8) ? $relatedRelation->getOwnerKey() : $relatedRelation->getOwnerKeyName();
 
-                    $this->$joinMethod($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $relatedKey, $currentTableAlias, $ownerKey) {
-                        $join->on($relatedTableAlias.'.'.$ownerKey, '=', $currentTableAlias.'.'.$relatedKey);
+                    $this->$joinMethod($joinQuery, function ($join) use ($relatedRelation, $relationAccumulatedString, $relatedKey, $currentTableAlias, $ownerKey) {
+                        $join->on($relationAccumulatedString.'.'.$ownerKey, '=', $currentTableAlias.'.'.$relatedKey);
 
-                        $this->joinQuery($join, $relatedRelation, $relatedTableAlias);
+                        $this->joinQuery($join, $relatedRelation, $relationAccumulatedString);
                     });
                 } elseif ($relatedRelation instanceof HasOneJoin || $relatedRelation instanceof HasManyJoin) {
                     $relatedKey = $relatedRelation->getQualifiedForeignKeyName();
@@ -209,18 +214,40 @@ class EloquentJoinBuilder extends Builder
                     $localKey = $relatedRelation->getQualifiedParentKeyName();
                     $localKey = last(explode('.', $localKey));
 
-                    $this->$joinMethod($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $relatedKey, $currentTableAlias, $localKey) {
-                        $join->on($relatedTableAlias.'.'.$relatedKey, '=', $currentTableAlias.'.'.$localKey);
+                    $this->$joinMethod($joinQuery, function ($join) use ($relatedRelation, $relationAccumulatedString, $relatedKey, $currentTableAlias, $localKey) {
+                        $join->on($relationAccumulatedString.'.'.$relatedKey, '=', $currentTableAlias.'.'.$localKey);
 
-                        $this->joinQuery($join, $relatedRelation, $relatedTableAlias);
+                        $this->joinQuery($join, $relatedRelation, $relationAccumulatedString);
+                    });
+                } elseif ($relatedRelation instanceof BelongsToManyJoin) {
+                    $localPivotKey = $relatedRelation->getForeignPivotKeyName();
+                    $relatedPivotKey = $relatedRelation->getRelatedPivotKeyName();
+                    $localKey = $relatedRelation->getParentKeyName();
+                    $relatedKey = $relatedRelation->getRelatedKeyName();
+
+                    $this->$joinMethod($joinQueryPivot, function ($join) use ($relatedRelation, $pivotTableAlias, $localPivotKey, $currentTableAlias, $localKey) {
+                        $join->on($pivotTableAlias.'.'.$localPivotKey, '=', $currentTableAlias.'.'.$localKey);
+
+                        $this->joinQuery($join, $relatedRelation, $pivotTableAlias);
+                    });
+
+                    $this->$joinMethod($joinQuery, function ($join) use ($relatedRelation, $relationAccumulatedString, $relatedKey, $pivotTableAlias, $relatedPivotKey) {
+                        $join->on($relationAccumulatedString.'.'.$relatedKey, '=', $pivotTableAlias.'.'.$relatedPivotKey);
+
+                        $this->joinQuery($join, $relatedRelation, $relationAccumulatedString);
                     });
                 } else {
                     throw new InvalidRelation();
                 }
             }
 
+            if ($nextRelation === 'pivot') {
+                $relationAccumulatedString = $pivotTableAlias;
+                $i++;
+            }
+
             $currentModel = $relatedModel;
-            $currentTableAlias = $relatedTableAlias;
+            $currentTableAlias = $relationAccumulatedString;
 
             $this->joinedTables[] = implode('_', $relationsAccumulated);
         }
@@ -283,6 +310,8 @@ class EloquentJoinBuilder extends Builder
             } elseif ('onlyTrashed' == $method) {
                 call_user_func_array([$join, 'where'], [$relatedTableAlias.'.deleted_at', '<>', null]);
             }
+        } elseif (in_array($method, ['orderByRaw', 'whereRaw'])) {
+            call_user_func_array([$join, $method], $params);
         } else {
             throw new InvalidRelationClause();
         }
