@@ -119,7 +119,7 @@ class EloquentJoinBuilder extends Builder
     public function whereRawJoin($sql, $bindings = [], $boolean = 'and')
     {
         $query = $this->baseBuilder ? $this->baseBuilder : $this;
-        $sql = $query->performColumnBinding($sql);
+        $sql = $query->performColumnsBinding($sql);
 
         return $this->whereRaw($sql, $bindings, $boolean);
     }
@@ -127,7 +127,7 @@ class EloquentJoinBuilder extends Builder
     public function orWhereRawJoin($sql, $bindings = [], $boolean = 'and')
     {
         $query = $this->baseBuilder ? $this->baseBuilder : $this;
-        $sql = $query->performColumnBinding($sql);
+        $sql = $query->performColumnsBinding($sql);
 
         return $this->orWhereRaw($sql, $bindings, $boolean);
     }
@@ -325,7 +325,7 @@ class EloquentJoinBuilder extends Builder
         }
     }
 
-    public function performColumnBinding($sql)
+    public function performColumnsBinding($sql)
     {
         preg_match_all('/'.self::RAW_SQL_RELATION_PREFIX.':(([0-9a-zA-Z$_]\.?)+)/', $sql, $matches);
 
