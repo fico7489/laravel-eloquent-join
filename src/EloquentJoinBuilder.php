@@ -9,6 +9,7 @@ use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationClause;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationGlobalScope;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationWhere;
 use Fico7489\Laravel\EloquentJoin\Relations\BelongsToJoin;
+use Fico7489\Laravel\EloquentJoin\Relations\BelongsToManyJoin;
 use Fico7489\Laravel\EloquentJoin\Relations\HasManyJoin;
 use Fico7489\Laravel\EloquentJoin\Relations\HasOneJoin;
 use Illuminate\Database\Eloquent\Builder;
@@ -170,25 +171,30 @@ class EloquentJoinBuilder extends Builder
         $currentTableAlias = $baseTable;
 
         $relationsAccumulated = [];
-        foreach ($relations as $relation) {
-            if ($relation == $column) {
-                //last item in $relations argument is sort|where column
-                break;
-            }
+        for ($i = 0; $i < count($relations) - 1; ++$i) {
+            $relation = $relations[$i];
+            $nextRelation = $relations[$i + 1];
 
             /** @var Relation $relatedRelation */
             $relatedRelation = $currentModel->$relation();
             $relatedModel = $relatedRelation->getRelated();
             $relatedPrimaryKey = $relatedModel->getKeyName();
             $relatedTable = $relatedModel->getTable();
-            $relatedTableAlias = $this->useTableAlias ? sha1($relatedTable) : $relatedTable;
 
-            $relationsAccumulated[] = $relatedTableAlias;
+            $relationsAccumulated[] = $relatedTable;
             $relationAccumulatedString = implode('_', $relationsAccumulated);
+
+            $relatedTableAlias = $this->useTableAlias ? sha1($relatedTable) : $relatedTable;
 
             //relations count
             if ($this->appendRelationsCount) {
                 $this->selectRaw('COUNT('.$relatedTableAlias.'.'.$relatedPrimaryKey.') as '.$relationAccumulatedString.'_count');
+            }
+
+            if ($relatedRelation instanceof BelongsToManyJoin) {
+                $pivotTable = $relatedRelation->getTable();
+                $pivotTableAlias = $this->useTableAlias ? sha1($pivotTable) : $pivotTable;
+                $joinQueryPivot = $pivotTable.($this->useTableAlias ? ' as '.$pivotTableAlias : '');
             }
 
             if (!in_array($relationAccumulatedString, $this->joinedTables)) {
@@ -214,9 +220,31 @@ class EloquentJoinBuilder extends Builder
 
                         $this->joinQuery($join, $relatedRelation, $relatedTableAlias);
                     });
+                } elseif ($relatedRelation instanceof BelongsToManyJoin) {
+                    $localPivotKey = $relatedRelation->getForeignPivotKeyName();
+                    $relatedPivotKey = $relatedRelation->getRelatedPivotKeyName();
+                    $localKey = $relatedRelation->getParentKeyName();
+                    $relatedKey = $relatedRelation->getRelatedKeyName();
+
+                    $this->$joinMethod($joinQueryPivot, function ($join) use ($relatedRelation, $pivotTableAlias, $localPivotKey, $currentTableAlias, $localKey) {
+                        $join->on($pivotTableAlias.'.'.$localPivotKey, '=', $currentTableAlias.'.'.$localKey);
+
+                        $this->joinQuery($join, $relatedRelation, $pivotTableAlias);
+                    });
+
+                    $this->$joinMethod($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $relatedKey, $pivotTableAlias, $relatedPivotKey) {
+                        $join->on($relatedTableAlias.'.'.$relatedKey, '=', $pivotTableAlias.'.'.$relatedPivotKey);
+
+                        $this->joinQuery($join, $relatedRelation, $relatedTableAlias);
+                    });
                 } else {
                     throw new InvalidRelation();
                 }
+            }
+
+            if ('pivot' === $nextRelation) {
+                $relatedTableAlias = $pivotTableAlias;
+                ++$i;
             }
 
             $currentModel = $relatedModel;

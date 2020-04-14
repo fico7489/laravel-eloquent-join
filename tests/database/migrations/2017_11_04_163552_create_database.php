@@ -153,6 +153,19 @@ class CreateDatabase extends Migration
             $table->unsignedInteger('id_seller_foreign')->nullable();
             $table->foreign('id_seller_foreign')->references('id')->on('sellers');
         });
+
+        Schema::create('tags', function (Blueprint $table) {
+            $table->increments('id_location_primary');
+
+            $table->string('name');
+        });
+
+        Schema::create('taggables', function (Blueprint $table) {
+            $table->increments('tag_id');
+
+            $table->unsignedInteger('taggable_id');
+            $table->string('taggable_type');
+        });
     }
 
     /**
