@@ -17,7 +17,7 @@ class OrWhereRawTest extends TestCase
         $queryTest = 'select orders.* 
             from "orders" 
             left join "sellers" on "sellers"."id" = "orders"."seller_id" 
-            where ("sellers"."id" = 1 or "sellers"."id" = 2) 
+            where ("sellers"."id" = 1 or sellers.id = 2) 
             and "orders"."deleted_at" is null 
             group by "orders"."id"';
 

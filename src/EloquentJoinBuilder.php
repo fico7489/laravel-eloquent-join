@@ -344,21 +344,10 @@ class EloquentJoinBuilder extends Builder
     private function replaceColumnsKey($sql, $columnsBindings)
     {
         foreach ($columnsBindings as $columnName => $column) {
-            $sql = str_replace(self::RAW_SQL_RELATION_PREFIX.':'.$columnName, $this->prepareColumn($column), $sql);
+            $sql = str_replace(self::RAW_SQL_RELATION_PREFIX.':'.$columnName, $column, $sql);
         }
 
         return $sql;
-    }
-
-    private function prepareColumn($column)
-    {
-        $parts = explode('.', $column);
-
-        $parts = array_map(function ($value) {
-            return '`'.$value.'`';
-        }, $parts);
-
-        return implode('.', $parts);
     }
 
     //getters and setters
