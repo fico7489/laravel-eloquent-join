@@ -180,11 +180,10 @@ class EloquentJoinBuilder extends Builder
             $relatedModel = $relatedRelation->getRelated();
             $relatedPrimaryKey = $relatedModel->getKeyName();
             $relatedTable = $relatedModel->getTable();
+            $relatedTableAlias = $this->useTableAlias ? sha1($relatedTable) : $relatedTable;
 
             $relationsAccumulated[] = $relatedTable;
             $relationAccumulatedString = implode('_', $relationsAccumulated);
-
-            $relatedTableAlias = $this->useTableAlias ? sha1($relatedTable) : $relatedTable;
 
             //relations count
             if ($this->appendRelationsCount) {
