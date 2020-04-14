@@ -33,6 +33,10 @@ trait EloquentJoin
             $newEloquentBuilder->setUseTableAlias($this->useTableAlias);
         }
 
+        if (isset($this->useFullPathTableAlias)) {
+            $newEloquentBuilder->setUseFullPathTableAlias($this->useFullPathTableAlias);
+        }
+
         if (isset($this->appendRelationsCount)) {
             $newEloquentBuilder->setAppendRelationsCount($this->appendRelationsCount);
         }

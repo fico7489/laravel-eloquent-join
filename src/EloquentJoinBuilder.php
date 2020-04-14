@@ -28,6 +28,9 @@ class EloquentJoinBuilder extends Builder
     //use table alias for join (real table name or sha1)
     protected $useTableAlias = false;
 
+    //use full relation path for table alias to support join of one table several times
+    protected $useFullPathTableAlias = false;
+
     //appendRelationsCount
     protected $appendRelationsCount = false;
 
@@ -181,10 +184,12 @@ class EloquentJoinBuilder extends Builder
             $relatedModel = $relatedRelation->getRelated();
             $relatedPrimaryKey = $relatedModel->getKeyName();
             $relatedTable = $relatedModel->getTable();
-            $relatedTableAlias = $this->useTableAlias ? sha1($relatedTable) : $relatedTable;
 
-            $relationsAccumulated[] = $relatedTableAlias;
+            $relationsAccumulated[] = $relatedTable;
             $relationAccumulatedString = implode('_', $relationsAccumulated);
+
+            $relatedTableAlias = $this->useFullPathTableAlias ? $relationAccumulatedString : $relatedTable;
+            $relatedTableAlias = $this->useTableAlias ? sha1($relatedTableAlias) : $relatedTableAlias;
 
             //relations count
             if ($this->appendRelationsCount) {
@@ -192,7 +197,7 @@ class EloquentJoinBuilder extends Builder
             }
 
             if (!in_array($relationAccumulatedString, $this->joinedTables)) {
-                $joinQuery = $relatedTable.($this->useTableAlias ? ' as '.$relatedTableAlias : '');
+                $joinQuery = $relatedTable.($this->useTableAlias || $this->useFullPathTableAlias ? ' as '.$relatedTableAlias : '');
                 if ($relatedRelation instanceof BelongsToJoin) {
                     $relatedKey = ((float) \App::version() < 5.8) ? $relatedRelation->getQualifiedForeignKey() : $relatedRelation->getQualifiedForeignKeyName();
                     $relatedKey = last(explode('.', $relatedKey));
@@ -317,6 +322,13 @@ class EloquentJoinBuilder extends Builder
     public function setUseTableAlias(bool $useTableAlias)
     {
         $this->useTableAlias = $useTableAlias;
+
+        return $this;
+    }
+
+    public function setUseFullPathTableAlias(bool $useFullPathTableAlias)
+    {
+        $this->useFullPathTableAlias = $useFullPathTableAlias;
 
         return $this;
     }
