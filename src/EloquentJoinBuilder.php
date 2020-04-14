@@ -182,7 +182,7 @@ class EloquentJoinBuilder extends Builder
             $relatedTable = $relatedModel->getTable();
             $relatedTableAlias = $this->useTableAlias ? sha1($relatedTable) : $relatedTable;
 
-            $relationsAccumulated[] = $relatedTable;
+            $relationsAccumulated[] = $relatedTableAlias;
             $relationAccumulatedString = implode('_', $relationsAccumulated);
 
             //relations count
