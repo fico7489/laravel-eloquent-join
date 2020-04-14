@@ -120,6 +120,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             $expected = str_replace(['"'], '`', $expected);
         }
 
-        $this->assertMatchesRegularExpression($expected, $actual);
+        $this->assertRegExp($expected, $actual);
     }
 }
