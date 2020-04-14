@@ -24,6 +24,7 @@ class EloquentJoinBuilder extends Builder
     const AGGREGATE_MAX = 'MAX';
     const AGGREGATE_MIN = 'MIN';
     const AGGREGATE_COUNT = 'COUNT';
+    const RAW_SQL_RELATION_PREFIX = 'relation';
 
     //use table alias for join (real table name or sha1)
     protected $useTableAlias = false;
@@ -113,6 +114,22 @@ class EloquentJoinBuilder extends Builder
         $column = $query->performJoin($column);
 
         return $this->orWhereNotIn($column, $values);
+    }
+
+    public function whereRawJoin($sql, $bindings = [], $boolean = 'and')
+    {
+        $query = $this->baseBuilder ? $this->baseBuilder : $this;
+        $sql = $query->performColumnBinding($sql);
+
+        return $this->whereRaw($sql, $bindings, $boolean);
+    }
+
+    public function orWhereRawJoin($sql, $bindings = [], $boolean = 'and')
+    {
+        $query = $this->baseBuilder ? $this->baseBuilder : $this;
+        $sql = $query->performColumnBinding($sql);
+
+        return $this->orWhereRaw($sql, $bindings, $boolean);
     }
 
     public function orderByJoin($column, $direction = 'asc', $aggregateMethod = null)
@@ -306,6 +323,40 @@ class EloquentJoinBuilder extends Builder
         if (!in_array($direction, ['asc', 'desc'], true)) {
             throw new InvalidDirection();
         }
+    }
+
+    public function performColumnBinding($sql)
+    {
+        preg_match_all('/'.self::RAW_SQL_RELATION_PREFIX.':(([0-9a-zA-Z$_]\.?)+)/', $sql, $matches);
+
+        $columns = $matches[1];
+
+        $columnsBindings = [];
+        foreach ($columns as $column) {
+            $columnsBindings[$column] = $this->performJoin($column);
+        }
+
+        return $this->replaceColumnsKey($sql, $columnsBindings);
+    }
+
+    private function replaceColumnsKey($sql, $columnsBindings)
+    {
+        foreach ($columnsBindings as $columnName => $column) {
+            $sql = str_replace(self::RAW_SQL_RELATION_PREFIX.':'.$columnName, $this->prepareColumn($column), $sql);
+        }
+
+        return $sql;
+    }
+
+    private function prepareColumn($column)
+    {
+        $parts = explode('.', $column);
+
+        $parts = array_map(function ($value) {
+            return '"'.$value.'"';
+        }, $parts);
+
+        return implode('.', $parts);
     }
 
     //getters and setters
