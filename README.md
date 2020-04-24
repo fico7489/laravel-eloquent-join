@@ -393,6 +393,10 @@ class City extends BaseModel
 
 ```Seller::joinRelations('city', true)->joinRelations('city.state', false)```
 
+### Join (multiple relationships)
+
+```Seller::join(['city.state', 'locations'])```
+
 ### Ordering
 
 ##### Order BelongsTo
