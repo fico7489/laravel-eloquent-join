@@ -142,14 +142,28 @@ class EloquentJoinBuilder extends Builder
         return $this->orderBy($column, $direction);
     }
 
+	/**
+	 * Joining relations
+	 *
+	 * @param string|array $relations
+	 * @param bool|null $leftJoin
+	 * @return $this
+	 * @throws InvalidRelation
+	 */
     public function joinRelations($relations, $leftJoin = null)
     {
-        $leftJoin = null !== $leftJoin ? $leftJoin : $this->leftJoin;
+	    $leftJoin = null !== $leftJoin ? $leftJoin : $this->leftJoin;
+	    $query = $this->baseBuilder ? $this->baseBuilder : $this;
 
-        $query = $this->baseBuilder ? $this->baseBuilder : $this;
-        $column = $query->performJoin($relations.'.FAKE_FIELD', $leftJoin);
+	    if(is_array($relations)) {
+		    foreach($relations as $relation) {
+			    $query->performJoin($relation.'.FAKE_FIELD', $leftJoin);
+		    }
+	    } else {
+		    $query->performJoin($relations.'.FAKE_FIELD', $leftJoin);
+	    }
 
-        return $this;
+	    return $this;
     }
 
     //helpers methods
