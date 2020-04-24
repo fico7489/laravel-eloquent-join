@@ -157,7 +157,7 @@ class EloquentJoinBuilder extends Builder
 
 	    if(is_array($relations)) {
 		    foreach($relations as $relation) {
-			    $query->performJoin($relation.'.FAKE_FIELD', $leftJoin);
+			    $query->joinRelations($relation, $leftJoin);
 		    }
 	    } else {
 		    $query->performJoin($relations.'.FAKE_FIELD', $leftJoin);
