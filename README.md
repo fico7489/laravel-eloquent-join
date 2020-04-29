@@ -1,3 +1,5 @@
+![Tests status](https://github.com/fico7489/laravel-eloquent-join/workflows/Test/badge.svg)
+
 # Laravel Eloquent Join
 
 This package introduces the join magic for eloquent models and relations.
@@ -390,6 +392,10 @@ class City extends BaseModel
 ### Join (mix left join)
 
 ```Seller::joinRelations('city', true)->joinRelations('city.state', false)```
+
+### Join (multiple relationships)
+
+```Seller::join(['city.state', 'locations'])```
 
 ### Ordering
 

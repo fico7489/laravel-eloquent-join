@@ -2,10 +2,10 @@
 
 namespace Fico7489\Laravel\EloquentJoin\Tests;
 
-use Fico7489\Laravel\EloquentJoin\Tests\Models\Seller;
+use Fico7489\Laravel\EloquentJoin\Tests\Models\Location;
 use Fico7489\Laravel\EloquentJoin\Tests\Models\Order;
 use Fico7489\Laravel\EloquentJoin\Tests\Models\OrderItem;
-use Fico7489\Laravel\EloquentJoin\Tests\Models\Location;
+use Fico7489\Laravel\EloquentJoin\Tests\Models\Seller;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
@@ -42,47 +42,64 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         \DB::enableQueryLog();
     }
 
-    protected function fetchQuery()
+    protected function fetchLastLog()
     {
         $log = \DB::getQueryLog();
 
-        return end($log)['query'];
+        return end($log);
+    }
+
+    protected function fetchQuery()
+    {
+        $query = $this->fetchLastLog()['query'];
+        $bindings = $this->fetchLastLog()['bindings'];
+
+        foreach ($bindings as $binding) {
+            $binding = is_string($binding) ? ('"'.$binding.'"') : $binding;
+            $query = preg_replace('/\?/', $binding, $query, 1);
+        }
+
+        return $query;
+    }
+
+    protected function fetchBindings()
+    {
+        return $this->fetchLastLog()['bindings'];
     }
 
     protected function getEnvironmentSetUp($app)
     {
         // Setup default database to use sqlite :memory:
-        $app['config']->set('database.default', 'sqlite');
         $app['config']->set('database.connections.sqlite', [
-            'driver'   => 'sqlite',
+            'driver' => 'sqlite',
             'database' => ':memory:',
-            'prefix'   => '',
+            'prefix' => '',
         ]);
 
-        $app['config']->set('database.default', 'mysql');
         $app['config']->set('database.connections.mysql', [
-            'driver'    => 'mysql',
-            'host'      => 'localhost',
-            'database'  => 'join',
-            'username'  => 'root',
-            'password'  => '',
-            'charset'   => 'utf8',
+            'driver' => 'mysql',
+            'host' => 'localhost',
+            'database' => 'join',
+            'username' => 'root',
+            'password' => '',
+            'charset' => 'utf8',
             'collation' => 'utf8_unicode_ci',
-            'strict'    => true,
+            'strict' => true,
         ]);
 
-        $app['config']->set('database.default', 'pgsql');
         $app['config']->set('database.connections.pgsql', [
-            'driver'    => 'pgsql',
-            'host'      => 'localhost',
-            'database'  => 'join',
-            'username'  => 'postgres',
-            'password'  => 'root',
-            'charset'   => 'utf8',
-            'prefix'    => '',
-            'schema'    => 'public',
-            'sslmode'   => 'prefer',
+            'driver' => 'pgsql',
+            'host' => 'localhost',
+            'database' => 'join',
+            'username' => 'postgres',
+            'password' => 'root',
+            'charset' => 'utf8',
+            'prefix' => '',
+            'schema' => 'public',
+            'sslmode' => 'prefer',
         ]);
+
+        $app['config']->set('database.default', env('type', 'sqlite'));
     }
 
     protected function getPackageProviders($app)
@@ -92,12 +109,12 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
     protected function assertQueryMatches($expected, $actual)
     {
-        $actual   = preg_replace('/\s\s+/', ' ', $actual);
-        $actual   = str_replace(['\n', '\r'], '', $actual);
+        $actual = preg_replace('/\s\s+/', ' ', $actual);
+        $actual = str_replace(['\n', '\r'], '', $actual);
 
         $expected = preg_replace('/\s\s+/', ' ', $expected);
         $expected = str_replace(['\n', '\r'], '', $expected);
-        $expected   = '/'.$expected.'/';
+        $expected = '/'.$expected.'/';
         $expected = preg_quote($expected);
         if ('mysql' == $_ENV['type']) {
             $expected = str_replace(['"'], '`', $expected);

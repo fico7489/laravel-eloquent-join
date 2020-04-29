@@ -3,14 +3,15 @@
 namespace Fico7489\Laravel\EloquentJoin;
 
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidAggregateMethod;
+use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidDirection;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelation;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationClause;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationGlobalScope;
 use Fico7489\Laravel\EloquentJoin\Exceptions\InvalidRelationWhere;
-use Illuminate\Database\Eloquent\Builder;
 use Fico7489\Laravel\EloquentJoin\Relations\BelongsToJoin;
-use Fico7489\Laravel\EloquentJoin\Relations\HasOneJoin;
 use Fico7489\Laravel\EloquentJoin\Relations\HasManyJoin;
+use Fico7489\Laravel\EloquentJoin\Relations\HasOneJoin;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Query\JoinClause;
@@ -18,32 +19,32 @@ use Illuminate\Database\Query\JoinClause;
 class EloquentJoinBuilder extends Builder
 {
     //constants
-    const AGGREGATE_SUM      = 'SUM';
-    const AGGREGATE_AVG      = 'AVG';
-    const AGGREGATE_MAX      = 'MAX';
-    const AGGREGATE_MIN      = 'MIN';
-    const AGGREGATE_COUNT    = 'COUNT';
+    const AGGREGATE_SUM = 'SUM';
+    const AGGREGATE_AVG = 'AVG';
+    const AGGREGATE_MAX = 'MAX';
+    const AGGREGATE_MIN = 'MIN';
+    const AGGREGATE_COUNT = 'COUNT';
 
     //use table alias for join (real table name or sha1)
-    private $useTableAlias = false;
+    protected $useTableAlias = false;
 
     //appendRelationsCount
-    private $appendRelationsCount = false;
+    protected $appendRelationsCount = false;
 
     //leftJoin
-    private $leftJoin = true;
+    protected $leftJoin = true;
 
     //aggregate method
-    private $aggregateMethod = self::AGGREGATE_MAX;
+    protected $aggregateMethod = self::AGGREGATE_MAX;
 
     //base builder
-    public $baseBuilder;
+    protected $baseBuilder;
 
     //store if ->select(...) is already called on builder (we want only one groupBy())
-    private $selected = false;
+    protected $selected = false;
 
     //store joined tables, we want join table only once (e.g. when you call orderByJoin more time)
-    private $joinedTables = [];
+    protected $joinedTables = [];
 
     //store clauses on relation for join
     public $relationClauses = [];
@@ -116,6 +117,8 @@ class EloquentJoinBuilder extends Builder
 
     public function orderByJoin($column, $direction = 'asc', $aggregateMethod = null)
     {
+        $direction = strtolower($direction);
+        $this->checkDirection($direction);
         $dotPos = strrpos($column, '.');
 
         $query = $this->baseBuilder ? $this->baseBuilder : $this;
@@ -128,7 +131,8 @@ class EloquentJoinBuilder extends Builder
             $sortsCount = count($this->query->orders ?? []);
             $sortAlias = 'sort'.(0 == $sortsCount ? '' : ($sortsCount + 1));
 
-            $query->selectRaw($aggregateMethod.'('.$column.') as '.$sortAlias);
+            $grammar = \DB::query()->getGrammar();
+            $query->selectRaw($aggregateMethod.'('.$grammar->wrap($column).') as '.$sortAlias);
 
             return $this->orderByRaw($sortAlias.' '.$direction);
         }
@@ -138,31 +142,47 @@ class EloquentJoinBuilder extends Builder
         return $this->orderBy($column, $direction);
     }
 
+    /**
+     * Joining relations.
+     *
+     * @param string|array $relations
+     * @param bool|null    $leftJoin
+     *
+     * @return $this
+     *
+     * @throws InvalidRelation
+     */
     public function joinRelations($relations, $leftJoin = null)
     {
         $leftJoin = null !== $leftJoin ? $leftJoin : $this->leftJoin;
-
         $query = $this->baseBuilder ? $this->baseBuilder : $this;
-        $column = $query->performJoin($relations.'.FAKE_FIELD', $leftJoin);
+
+        if (is_array($relations)) {
+            foreach ($relations as $relation) {
+                $query->joinRelations($relation, $leftJoin);
+            }
+        } else {
+            $query->performJoin($relations.'.FAKE_FIELD', $leftJoin);
+        }
 
         return $this;
     }
 
     //helpers methods
-    private function performJoin($relations, $leftJoin = null)
+    protected function performJoin($relations, $leftJoin = null)
     {
         //detect join method
-        $leftJoin   = null !== $leftJoin ? $leftJoin : $this->leftJoin;
+        $leftJoin = null !== $leftJoin ? $leftJoin : $this->leftJoin;
         $joinMethod = $leftJoin ? 'leftJoin' : 'join';
 
         //detect current model data
         $relations = explode('.', $relations);
-        $column    = end($relations);
+        $column = end($relations);
         $baseModel = $this->getModel();
         $baseTable = $baseModel->getTable();
         $basePrimaryKey = $baseModel->getKeyName();
 
-        $currentModel      = $baseModel;
+        $currentModel = $baseModel;
         $currentTableAlias = $baseTable;
 
         $relationsAccumulated = [];
@@ -173,13 +193,13 @@ class EloquentJoinBuilder extends Builder
             }
 
             /** @var Relation $relatedRelation */
-            $relatedRelation   = $currentModel->$relation();
-            $relatedModel      = $relatedRelation->getRelated();
+            $relatedRelation = $currentModel->$relation();
+            $relatedModel = $relatedRelation->getRelated();
             $relatedPrimaryKey = $relatedModel->getKeyName();
-            $relatedTable      = $relatedModel->getTable();
+            $relatedTable = $relatedModel->getTable();
             $relatedTableAlias = $this->useTableAlias ? sha1($relatedTable) : $relatedTable;
 
-            $relationsAccumulated[]    = $relatedTableAlias;
+            $relationsAccumulated[] = $relatedTableAlias;
             $relationAccumulatedString = implode('_', $relationsAccumulated);
 
             //relations count
@@ -190,16 +210,16 @@ class EloquentJoinBuilder extends Builder
             if (!in_array($relationAccumulatedString, $this->joinedTables)) {
                 $joinQuery = $relatedTable.($this->useTableAlias ? ' as '.$relatedTableAlias : '');
                 if ($relatedRelation instanceof BelongsToJoin) {
-                    $relatedKey = ((float) \App::version() < 5.8) ? $relatedRelation->getQualifiedForeignKey() : $relatedRelation->getQualifiedForeignKeyName();
+                    $relatedKey = is_callable([$relatedRelation, 'getQualifiedForeignKeyName']) ? $relatedRelation->getQualifiedForeignKeyName() : $relatedRelation->getQualifiedForeignKey();
                     $relatedKey = last(explode('.', $relatedKey));
-                    $ownerKey = ((float) \App::version() < 5.8) ? $relatedRelation->getOwnerKey() : $relatedRelation->getOwnerKeyName();
+                    $ownerKey = is_callable([$relatedRelation, 'getOwnerKeyName']) ? $relatedRelation->getOwnerKeyName() : $relatedRelation->getOwnerKey();
 
                     $this->$joinMethod($joinQuery, function ($join) use ($relatedRelation, $relatedTableAlias, $relatedKey, $currentTableAlias, $ownerKey) {
                         $join->on($relatedTableAlias.'.'.$ownerKey, '=', $currentTableAlias.'.'.$relatedKey);
 
                         $this->joinQuery($join, $relatedRelation, $relatedTableAlias);
                     });
-                } elseif ($relatedRelation instanceof HasOneJoin  ||  $relatedRelation instanceof HasManyJoin) {
+                } elseif ($relatedRelation instanceof HasOneJoin || $relatedRelation instanceof HasManyJoin) {
                     $relatedKey = $relatedRelation->getQualifiedForeignKeyName();
                     $relatedKey = last(explode('.', $relatedKey));
                     $localKey = $relatedRelation->getQualifiedParentKeyName();
@@ -215,7 +235,7 @@ class EloquentJoinBuilder extends Builder
                 }
             }
 
-            $currentModel      = $relatedModel;
+            $currentModel = $relatedModel;
             $currentTableAlias = $relatedTableAlias;
 
             $this->joinedTables[] = implode('_', $relationsAccumulated);
@@ -230,7 +250,7 @@ class EloquentJoinBuilder extends Builder
         return $currentTableAlias.'.'.$column;
     }
 
-    private function joinQuery($join, $relation, $relatedTableAlias)
+    protected function joinQuery($join, $relation, $relatedTableAlias)
     {
         /** @var Builder $relationQuery */
         $relationBuilder = $relation->getQuery();
@@ -294,6 +314,13 @@ class EloquentJoinBuilder extends Builder
             self::AGGREGATE_COUNT,
         ])) {
             throw new InvalidAggregateMethod();
+        }
+    }
+
+    private function checkDirection($direction)
+    {
+        if (!in_array($direction, ['asc', 'desc'], true)) {
+            throw new InvalidDirection();
         }
     }
 
