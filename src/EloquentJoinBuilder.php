@@ -283,6 +283,8 @@ class EloquentJoinBuilder extends Builder
                         $params[0][$relatedTableAlias.'.'.$k] = $param;
                         unset($params[0][$k]);
                     }
+                } elseif (is_callable($params[0])) {
+                    throw new InvalidRelationWhere();
                 } else {
                     $params[0] = $relatedTableAlias.'.'.$params[0];
                 }
