@@ -40,8 +40,5 @@ jobs:
       - name: Install Laravel
         run: composer update --no-interaction illuminate/database:^${{ steps.laravel_version_cleaned.outputs.value }}
     
-      - name: Install Laravel
-        run: composer update --no-interaction illuminate/database:^${{ matrix.laravel_version }}
-
       - name: Run PHPUnit
         run: ./vendor/bin/phpunit
