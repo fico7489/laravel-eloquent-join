@@ -28,7 +28,18 @@ jobs:
       
       - name: Run composer install
         run: composer install --no-interaction --no-suggest
-      
+        
+      - name: Run find-and-replace to replace * with 0
+        uses: mad9000/actions-find-and-replace-string@1
+        id: laravel_version_cleaned
+        with:
+          source: ${{ matrix.laravel_version }}
+          find: '*'
+          replace: '0'
+
+      - name: Install Laravel
+        run: composer update --no-interaction illuminate/database:^${{ steps.laravel_version_cleaned.outputs.value }}
+    
       - name: Install Laravel
         run: composer update --no-interaction illuminate/database:^${{ matrix.laravel_version }}
 
