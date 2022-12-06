@@ -63,4 +63,9 @@ class Seller extends BaseModel
     {
         return $this->belongsTo(City::class);
     }
+
+    public function tags()
+    {
+        return $this->morphToMany(Tag::class, 'taggable');
+    }
 }
