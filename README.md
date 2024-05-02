@@ -1,3 +1,5 @@
+FORK to support Laravel 10
+
 ![Tests status](https://github.com/fico7489/laravel-eloquent-join/workflows/Test/badge.svg)
 
 # Laravel Eloquent Join
