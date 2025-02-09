@@ -11,4 +11,9 @@ class User extends BaseModel
     protected $table = 'users';
 
     protected $fillable = ['name'];
+
+    public function tags()
+    {
+        return $this->morphToMany(Tag::class, 'taggable');
+    }
 }
